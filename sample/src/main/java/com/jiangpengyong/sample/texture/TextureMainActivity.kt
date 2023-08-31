@@ -1,0 +1,21 @@
+package com.jiangpengyong.sample.texture
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox.R
+
+
+/**
+ * @author: jiang peng yong
+ * @date: 2023/8/31 19:16
+ * @email: 56002982@qq.com
+ * @desc: 纹理页面
+ */
+class TextureMainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_texture_main)
+    }
+
+}
