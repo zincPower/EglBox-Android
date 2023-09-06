@@ -12,8 +12,11 @@ import com.jiangpengyong.eglbox.logger.Logger
  * @email: 56002982@qq.com
  * @desc: 纹理
  */
-class Texture(
-    private val targetType: TargetType = TargetType.TEXTURE_2D,
+class GLTexture(
+    val target: Target = Target.TEXTURE_2D,
+    private val internalFormat: Int = GLES20.GL_RGBA,
+    private val format: Int = GLES20.GL_RGBA,
+    private val type: Int = GLES20.GL_UNSIGNED_BYTE,
     private val minFilter: MinFilter = MinFilter.NEAREST,
     private val magFilter: MagFilter = MagFilter.LINEAR,
     private val wrapS: WrapMode = WrapMode.EDGE,
@@ -33,10 +36,9 @@ class Texture(
     /**
      * 初始化纹理
      */
-    fun createTexture() {
+    fun create() {
         init()
-        GLES20.glBindTexture(targetType.value, 0)
-
+        unbind()
         Logger.i("Create texture simple. [id: $id]")
     }
 
@@ -44,11 +46,9 @@ class Texture(
      * 初始化纹理
      * @param width 纹理宽
      * @param height 纹理高
-     * @param internalFormat 内部格式
-     * @param format 数据格式
      */
-    fun createTexture(width: Int, height: Int, internalFormat: Int = GLES20.GL_RGBA, format: Int = GLES20.GL_RGBA) {
-        if (targetType == TargetType.EXTERNAL_OES) {
+    fun create(width: Int, height: Int) {
+        if (target == Target.EXTERNAL_OES) {
             Logger.e("Target type can't EXTERNAL OES.")
             return
         }
@@ -57,18 +57,17 @@ class Texture(
         this.height = height
         // 设置颜色附件纹理格式
         GLES20.glTexImage2D(
-            GLES20.GL_TEXTURE_2D,
-            0,                   // 层次
-            internalFormat,             // 内部格式
-            width,                      // 宽度
-            height,                     // 高度
-            0,                  // 边界宽度
-            format,                     // 格式
-            GLES20.GL_UNSIGNED_BYTE,    // 每个像素数据格式
-            null
+            target.value,
+            0,       // 层次
+            internalFormat, // 内部格式
+            width,          // 宽度
+            height,         // 高度
+            0,      // 边界宽度
+            format,         // 格式
+            type,           // 每个像素数据格式
+            null,
         )
-        GLES20.glBindTexture(targetType.value, 0)
-
+        unbind()
         Logger.i("Create texture by size. [id: $id, size: ${this.width} x ${this.height}]")
     }
 
@@ -77,6 +76,10 @@ class Texture(
      * @param bitmap 位图
      */
     fun createTexture(bitmap: Bitmap) {
+        if (target == Target.EXTERNAL_OES) {
+            Logger.e("Target type can't EXTERNAL OES.")
+            return
+        }
         if (bitmap.isRecycled) {
             Logger.e("Bitmap is recycled.")
             return
@@ -86,15 +89,14 @@ class Texture(
         this.height = bitmap.height
         // https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glTexImage2D.xml
         GLUtils.texImage2D(
-            GLES20.GL_TEXTURE_2D,               // 纹理类型
+            target.value,               // 纹理类型
             0,                           // 层次
             GLUtils.getInternalFormat(bitmap),  // 指定纹理的内部格式
             bitmap,                             // 纹理图像
             GLUtils.getType(bitmap),            // 指定 texel 数据的格式，必须匹配 internal format。
             0                           // 纹理边框尺寸
         )
-        GLES20.glBindTexture(targetType.value, 0)
-
+        unbind()
         Logger.i("Create texture by bitmap. [id: $id, size: ${this.width} x ${this.height}]")
     }
 
@@ -109,49 +111,34 @@ class Texture(
         id = textureIdArray[0]
 
         // 可用参数 https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
-        GLES20.glBindTexture(targetType.value, id)
-        GLES20.glTexParameteri(targetType.value, GLES20.GL_TEXTURE_MIN_FILTER, minFilter.value)
-        GLES20.glTexParameteri(targetType.value, GLES20.GL_TEXTURE_MAG_FILTER, magFilter.value)
-        GLES20.glTexParameteri(targetType.value, GLES20.GL_TEXTURE_WRAP_S, wrapS.value)
-        GLES20.glTexParameteri(targetType.value, GLES20.GL_TEXTURE_WRAP_T, wrapT.value)
+        bind()
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MIN_FILTER, minFilter.value)
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MAG_FILTER, magFilter.value)
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_S, wrapS.value)
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_T, wrapT.value)
     }
 
-    /**
-     * 是否初始化
-     * @return true：已经初始化
-     *         false：未初始化
-     */
     fun isInit(): Boolean = (id != NOT_INIT)
 
-    /**
-     * 是否可复用（这里没有进行比对 targetType 等属性）
-     * @param width 新的宽度
-     * @param height 新的高度
-     * @return true 可复用
-     *         false 不可复用
-     */
-    fun isReusable(width: Int, height: Int): Boolean {
-        if (!isInit()) return false
-        return width == this.width && height == this.height
-    }
-
-    fun bind() {
+    fun bind(textureUnit: Int = GLES20.GL_TEXTURE0) {
         if (id < 0) {
             Logger.e("Texture id is invalid.Please call initTexture function first. [$id]")
             return
         }
-        GLES20.glBindTexture(targetType.value, id)
+        GLES20.glActiveTexture(textureUnit)
+        GLES20.glBindTexture(target.value, id)
     }
 
     fun unbind() {
-        GLES20.glBindTexture(targetType.value, 0)
+        GLES20.glBindTexture(target.value, 0)
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
     }
 
     fun release() {
         if (!isInit()) return
-        GLES20.glBindTexture(targetType.value, 0)
+        unbind()
         GLES20.glDeleteTextures(1, intArrayOf(id), 0)
-        Logger.i("Delete Texture.[Texture Id: $id]")
+        Logger.i("Release texture. [$id]")
 
         id = NOT_INIT
         width = NOT_INIT
@@ -163,7 +150,7 @@ class Texture(
     }
 }
 
-enum class TargetType(val value: Int) {
+enum class Target(val value: Int) {
     TEXTURE_2D(GLES20.GL_TEXTURE_2D),
     EXTERNAL_OES(GLES11Ext.GL_TEXTURE_EXTERNAL_OES),
 }
