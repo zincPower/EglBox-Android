@@ -21,7 +21,7 @@ class GLFramebuffer {
 
     fun isInit(): Boolean = (id != NOT_INIT)
 
-    fun create() {
+    fun init() {
         val array = IntArray(1)
         GLES20.glGenFramebuffers(1, array, 0)
         id = array[0]

@@ -2,12 +2,13 @@ package com.jiangpengyong.eglbox
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox.logger.Logger
+import com.jiangpengyong.eglbox.utils.GLShaderUtil.loadShader
 
 /**
- * @author: jiang peng yong
- * @date: 2023/8/31 20:57
- * @email: 56002982@qq.com
- * @desc: 程序
+ * @author jiang peng yong
+ * @date 2024/2/9 14:46
+ * @email 56002982@qq.com
+ * @des GL 程序
  */
 class GLProgram {
 
@@ -17,6 +18,7 @@ class GLProgram {
 
     var id: Int = NOT_INIT
         private set
+
     private var mVertexShader: Int = NOT_INIT
     private var mFragmentShader: Int = NOT_INIT
 
@@ -117,28 +119,5 @@ class GLProgram {
             return NOT_INIT
         }
         return GLES20.glGetAttribLocation(id, attributeName)
-    }
-
-    private fun loadShader(shaderType: Int, source: String): Int {
-        // 创建一个新 shader
-        var shader = GLES20.glCreateShader(shaderType)
-        // 若创建成功则加载 shader
-        if (shader != 0) {
-            // 加载 shader 的源代码
-            GLES20.glShaderSource(shader, source)
-            // 编译 shader
-            GLES20.glCompileShader(shader)
-            // 存放编译成功 shader 数量的数组
-            val compiled = IntArray(1)
-            // 获取 shader 的编译情况
-            GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0)
-            // 若编译失败则显示错误日志并删除此 shader
-            if (compiled[0] == 0) {
-                Logger.e("Could not compile shader $shaderType:\n ${GLES20.glGetShaderInfoLog(shader)}")
-                GLES20.glDeleteShader(shader)
-                shader = 0
-            }
-        }
-        return shader
     }
 }
