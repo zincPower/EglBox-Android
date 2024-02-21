@@ -326,7 +326,7 @@ FT_BEGIN_HEADER
 
 #define FT_ASSERT( condition )  do { } while ( 0 )
 
-#define FT_THROW( e )  FT_ERR_CAT( FT_Err_, e )   // jiang
+#define FT_THROW( e )  FT_ERR_CAT( FT_Err_, e )   // FreeType 修改 FT_ERR_PREFIX -> FT_Err_
 
 #endif /* !FT_DEBUG_LEVEL_ERROR */
 

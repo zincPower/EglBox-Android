@@ -598,7 +598,7 @@ FT_BEGIN_HEADER
 
   /* see `ftmoderr.h` for descriptions of the following macros */
 
-#define FT_ERR( e )  FT_ERR_CAT( FT_Err_, e ) // jiang
+#define FT_ERR( e )  FT_ERR_CAT( FT_Err_, e ) // FreeType 修改 FT_ERR_PREFIX -> FT_Err_
 
 #define FT_ERROR_BASE( x )    ( (x) & 0xFF )
 #define FT_ERROR_MODULE( x )  ( (x) & 0xFF00U )

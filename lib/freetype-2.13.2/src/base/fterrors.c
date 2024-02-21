@@ -26,7 +26,7 @@
   FT_Error_String( FT_Error  error_code )
   {
     if ( error_code <  0                                ||
-         error_code >= FT_ERR_CAT( FT_Err_, Max ) ) // jiang
+         error_code >= FT_ERR_CAT( FT_Err_, Max ) )     // FreeType 修改 FT_ERR_PREFIX -> FT_Err_
       return NULL;
 
 #if defined( FT_CONFIG_OPTION_ERROR_STRINGS ) || \
