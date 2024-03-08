@@ -13,7 +13,7 @@ import com.jiangpengyong.eglbox.utils.GLShaderUtil.loadShader
 class GLProgram {
 
     companion object {
-        private const val NOT_INIT = -1
+        private const val NOT_INIT = 0
     }
 
     var id: Int = NOT_INIT
@@ -39,14 +39,16 @@ class GLProgram {
         // 加载顶点着色器
         mVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderSource)
         if (mVertexShader == NOT_INIT) {
-            Logger.e("Vertex shader loader failure.[$mVertexShader]")
+            Logger.e("Vertex shader load failure.[$mVertexShader]")
             return
         }
 
         // 加载片元着色器
         mFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderSource)
         if (mFragmentShader == NOT_INIT) {
-            Logger.e("Fragment shader loader failure.[$mVertexShader]")
+            Logger.e("Fragment shader load failure.[$mVertexShader]")
+            GLES20.glDeleteShader(mVertexShader)
+            mVertexShader = NOT_INIT
             return
         }
 
@@ -76,7 +78,7 @@ class GLProgram {
 
     fun bind() {
         if (!isInit()) {
-            Logger.e("Program id is invalid.Please call createProgram function first. [$id]")
+            Logger.e("Program id is invalid.Please call create method first. [$id]")
             return
         }
         GLES20.glUseProgram(id)
@@ -105,12 +107,12 @@ class GLProgram {
         id = NOT_INIT
     }
 
-    fun getUniformLocation(attributeName: String): Int {
+    fun getUniformLocation(uniformName: String): Int {
         if (!isInit()) {
             Logger.e("Program id is invalid.Please call createProgram function first. [$id]")
             return NOT_INIT
         }
-        return GLES20.glGetUniformLocation(id, attributeName)
+        return GLES20.glGetUniformLocation(id, uniformName)
     }
 
     fun getAttribLocation(attributeName: String): Int {
