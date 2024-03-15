@@ -2,14 +2,14 @@
     package="com.jiangpengyong.sample">
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".App"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".font.FontActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,7 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-<!--        <activity android:name=".triangle.SimpleTriangleActivity"/>-->
+
+        <activity android:name=".triangle.SimpleTriangleActivity" />
+        <activity android:name=".font.FontActivity" />
     </application>
 </manifest>

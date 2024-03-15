@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
+import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.triangle.SimpleTriangleActivity
 
 /**
@@ -19,6 +20,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         findViewById<TextView>(R.id.simpleTriangle).setOnClickListener {
             startActivity(Intent(this, SimpleTriangleActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.font).setOnClickListener {
+            startActivity(Intent(this, FontActivity::class.java))
         }
     }
 }

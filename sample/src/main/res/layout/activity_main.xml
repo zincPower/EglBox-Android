@@ -9,4 +9,9 @@
         style="@style/common_button"
         android:text="简易三角形" />
 
+    <TextView
+        android:id="@+id/font"
+        style="@style/common_button"
+        android:text="字体" />
+
 </LinearLayout>
