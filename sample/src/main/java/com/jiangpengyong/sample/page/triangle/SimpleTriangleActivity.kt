@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.triangle
+package com.jiangpengyong.sample.page.triangle
 
 import android.content.Context
 import android.opengl.GLES20
@@ -23,8 +23,6 @@ class SimpleTriangleActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mSimpleTriangleView = SimpleTriangleView(this)
-            .apply {
-            }
         setContentView(mSimpleTriangleView)
     }
 

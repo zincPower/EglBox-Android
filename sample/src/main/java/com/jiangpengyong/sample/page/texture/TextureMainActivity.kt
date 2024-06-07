@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.texture
+package com.jiangpengyong.sample.page.texture
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

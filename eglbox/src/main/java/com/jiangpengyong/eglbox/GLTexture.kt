@@ -130,8 +130,8 @@ class GLTexture(
     }
 
     fun unbind() {
-        GLES20.glBindTexture(target.value, 0)
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+        GLES20.glBindTexture(target.value, 0)
     }
 
     fun release() {

@@ -18,7 +18,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".triangle.SimpleTriangleActivity" />
-        <activity android:name=".font.FontActivity" />
+        <activity android:name=".page.triangle.SimpleTriangleActivity" />
+        <activity android:name=".page.font.FontActivity" />
+        <activity android:name=".page.obj.FrustumActivity" />
     </application>
 </manifest>
