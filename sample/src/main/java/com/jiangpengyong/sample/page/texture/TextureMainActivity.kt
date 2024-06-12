@@ -14,8 +14,8 @@ import com.jiangpengyong.eglbox.R
 class TextureMainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_texture_main)
+//        super.onCreate(savedInstanceState)
+//        setContentView(R.layout.activity_texture_main)
     }
 
 }

@@ -21,25 +21,36 @@ class GLTexture(
     private val magFilter: MagFilter = MagFilter.LINEAR,
     private val wrapS: WrapMode = WrapMode.EDGE,
     private val wrapT: WrapMode = WrapMode.EDGE,
-) {
-    companion object {
-        private const val NOT_INIT = -1
-    }
+) : GLObject {
+    private val TAG: String = "GLTexture"
 
-    var id = NOT_INIT
+    var id = 0
         private set
-    var width: Int = NOT_INIT
+    var width: Int = 0
         private set
-    var height: Int = NOT_INIT
+    var height: Int = 0
         private set
 
     /**
      * 初始化纹理
      */
-    fun create() {
-        init()
+    override fun init() {
+        if (isInit()) {
+            Logger.i(TAG, "Texture has been initialized. id=$id")
+            return
+        }
+        val ids = IntArray(1)
+        GLES20.glGenTextures(1, ids, 0)
+        id = ids[0]
+        // TODO 是否需要进行区分 TextureUnit
+        bind()
+        // 可用参数 https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MIN_FILTER, minFilter.value)
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MAG_FILTER, magFilter.value)
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_S, wrapS.value)
+        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_T, wrapT.value)
         unbind()
-        Logger.i("Create texture simple. [id: $id]")
+        Logger.i(TAG, "Init GLTexture success. id=$id")
     }
 
     /**
@@ -47,14 +58,19 @@ class GLTexture(
      * @param width 纹理宽
      * @param height 纹理高
      */
-    fun create(width: Int, height: Int) {
-        if (target == Target.EXTERNAL_OES) {
-            Logger.e("Target type can't EXTERNAL OES.")
+    fun setData(width: Int, height: Int, pixels: java.nio.Buffer? = null) {
+        if (!isInit()) {
+            Logger.i(TAG, "Texture isn't initialized. size=$width x $height【setData(width, height, pixels)】")
             return
         }
-        init()
+        if (target == Target.EXTERNAL_OES) {
+            Logger.e(TAG, "Target type can't EXTERNAL OES.")
+            return
+        }
         this.width = width
         this.height = height
+        // TODO 是否需要进行区分 TextureUnit
+        bind()
         // 设置颜色附件纹理格式
         GLES20.glTexImage2D(
             target.value,
@@ -65,28 +81,33 @@ class GLTexture(
             0,      // 边界宽度
             format,         // 格式
             type,           // 每个像素数据格式
-            null,
+            pixels,
         )
         unbind()
-        Logger.i("Create texture by size. [id: $id, size: ${this.width} x ${this.height}]")
+        Logger.i(TAG, "Set data to texture success. id=$id, size=$width x $height, pixels=$pixels")
     }
 
     /**
      * 初始化纹理
      * @param bitmap 位图
      */
-    fun createTexture(bitmap: Bitmap) {
+    fun setData(bitmap: Bitmap) {
+        if (!isInit()) {
+            Logger.e(TAG, "Texture isn't initialized. size=${bitmap.width} x ${bitmap.height}【setData(bitmap)】")
+            return
+        }
         if (target == Target.EXTERNAL_OES) {
-            Logger.e("Target type can't EXTERNAL OES.")
+            Logger.e(TAG, "Target type can't EXTERNAL OES.")
             return
         }
         if (bitmap.isRecycled) {
-            Logger.e("Bitmap is recycled.")
+            Logger.e(TAG, "Bitmap is recycled.")
             return
         }
-        init()
         this.width = bitmap.width
         this.height = bitmap.height
+        // TODO 是否需要进行区分 TextureUnit
+        bind()
         // https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glTexImage2D.xml
         GLUtils.texImage2D(
             target.value,               // 纹理类型
@@ -97,56 +118,47 @@ class GLTexture(
             0                           // 纹理边框尺寸
         )
         unbind()
-        Logger.i("Create texture by bitmap. [id: $id, size: ${this.width} x ${this.height}]")
+        Logger.i(TAG, "Create texture by bitmap. id=$id, size=${this.width} x ${this.height}")
     }
 
-    private fun init() {
-        if (id != NOT_INIT) {
-            Logger.e("Texture id is not NOT_INIT. Please delete texture first.[$id]")
-            return
-        }
-
-        val textureIdArray = intArrayOf(NOT_INIT)
-        GLES20.glGenTextures(1, textureIdArray, 0)
-        id = textureIdArray[0]
-
-        // 可用参数 https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
-        bind()
-        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MIN_FILTER, minFilter.value)
-        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MAG_FILTER, magFilter.value)
-        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_S, wrapS.value)
-        GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_T, wrapT.value)
-    }
-
-    fun isInit(): Boolean = (id != NOT_INIT)
+    override fun isInit(): Boolean = (id != 0)
 
     fun bind(textureUnit: Int = GLES20.GL_TEXTURE0) {
-        if (id < 0) {
-            Logger.e("Texture id is invalid.Please call initTexture function first. [$id]")
+        if (id <= 0) {
+            Logger.i(TAG, "GLTexture isn't initialized.【bind】")
             return
         }
+        // TODO 是否需要记录 Texture Unit
         GLES20.glActiveTexture(textureUnit)
         GLES20.glBindTexture(target.value, id)
     }
 
     fun unbind() {
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glBindTexture(target.value, 0)
+        if (!isInit()) {
+            Logger.e(TAG, "GLTexture isn't initialized.【unbind】")
+            return
+        }
+        val currentTexture = EGLBox.getCurrentTexture()
+        if (currentTexture == id) {
+            // TODO 是否需要进行动态激活
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+            GLES20.glBindTexture(target.value, 0)
+        }
     }
 
-    fun release() {
+    override fun release() {
         if (!isInit()) return
+        Logger.i(TAG, "Release GLTexture. id=$id, size=$width x $height")
         unbind()
         GLES20.glDeleteTextures(1, intArrayOf(id), 0)
-        Logger.i("Release texture. [$id]")
 
-        id = NOT_INIT
-        width = NOT_INIT
-        height = NOT_INIT
+        id = 0
+        width = 0
+        height = 0
     }
 
     override fun toString(): String {
-        return "id: $id, size: $width x $height"
+        return "[ GLTexture id: $id, size: $width x $height ]"
     }
 }
 

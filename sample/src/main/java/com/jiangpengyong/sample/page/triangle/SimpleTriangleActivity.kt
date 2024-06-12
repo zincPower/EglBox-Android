@@ -58,14 +58,14 @@ class SimpleTriangleView(context: Context?) : GLSurfaceView(context) {
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
             GLES20.glViewport(0, 0, width, height)
-            mContext.width = width
-            mContext.height = height
-            mTriangleFilter.updateSize(mContext)
+//            mContext.width = width
+//            mContext.height = height
+//            mTriangleFilter.updateSize(mContext)
         }
 
         override fun onDrawFrame(gl: GL10?) {
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-            mTriangleFilter.render(mContext)
+            mTriangleFilter.draw()
         }
 
     }

@@ -1,6 +1,7 @@
 package com.jiangpengyong.eglbox.filter
 
 import com.jiangpengyong.eglbox.GLTexture
+import java.util.ArrayList
 
 /**
  * @author jiang peng yong

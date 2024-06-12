@@ -13,28 +13,28 @@ object Logger {
     private const val TAG = "EglBox"
     private var SHOW = true
 
-    fun i(msg: String) {
+    fun i(tag: String, msg: String) {
         if (!SHOW) return
-        Log.i(TAG, "【Thread: ${Thread.currentThread()}】 $msg")
+        Log.i("【${TAG}-${tag}】", "【Thread: ${Thread.currentThread()}】 $msg")
     }
 
-    fun d(msg: String) {
+    fun d(tag: String, msg: String) {
         if (!SHOW) return
-        Log.d(TAG, "【Thread: ${Thread.currentThread()}】 $msg")
+        Log.d("【${TAG}-${tag}】", "【Thread: ${Thread.currentThread()}】 $msg")
     }
 
-    fun w(msg: String) {
+    fun w(tag: String, msg: String) {
         if (!SHOW) return
-        Log.w(TAG, "【Thread: ${Thread.currentThread()}】 $msg")
+        Log.w("【${TAG}-${tag}】", "【Thread: ${Thread.currentThread()}】 $msg")
     }
 
-    fun e(msg: String) {
+    fun e(tag: String, msg: String) {
         if (!SHOW) return
-        Log.e(TAG, "【Thread: ${Thread.currentThread()}】 $msg")
+        Log.e("【${TAG}-${tag}】", "【Thread: ${Thread.currentThread()}】 $msg")
     }
 
-    fun e(msg: String, e: Throwable) {
+    fun e(tag: String, msg: String, e: Throwable) {
         if (!SHOW) return
-        Log.e(TAG, "【Thread: ${Thread.currentThread()}】 $msg", e)
+        Log.e("【${TAG}-${tag}】", "【Thread: ${Thread.currentThread()}】 $msg", e)
     }
 }

@@ -2,7 +2,7 @@ package com.jiangpengyong.eglbox
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox.logger.Logger
-import com.jiangpengyong.eglbox.utils.GLShaderUtil.loadShader
+import com.jiangpengyong.eglbox.utils.GLShaderExt.loadShader
 
 /**
  * @author jiang peng yong
@@ -10,52 +10,113 @@ import com.jiangpengyong.eglbox.utils.GLShaderUtil.loadShader
  * @email 56002982@qq.com
  * @des GL 程序
  */
-class GLProgram {
+abstract class GLProgram : GLObject {
+    private val TAG = "GLProgram"
 
-    companion object {
-        private const val NOT_INIT = 0
-    }
-
-    var id: Int = NOT_INIT
+    var id: Int = 0
         private set
 
-    private var mVertexShader: Int = NOT_INIT
-    private var mFragmentShader: Int = NOT_INIT
+    private var mVertexShader: Int = 0
+    private var mFragmentShader: Int = 0
 
-    fun create(vertexShaderSource: String, fragmentShaderSource: String) {
+    override fun init() {
         if (isInit()) {
-            Logger.e("Program had init.[$id]")
+            Logger.e(TAG, "Program has been initialized. 【init】id=$id")
             return
         }
+        createProgram()
+        if (id != 0) onInit()
+    }
+
+    fun draw() {
+        if (isInit()) {
+            GLES20.glUseProgram(id)
+            onDraw()
+            GLES20.glUseProgram(0)
+        } else {
+            Logger.i(TAG, "Program hasn't initialized. 【draw】")
+        }
+    }
+
+    override fun release() {
+        if (isInit()) {
+            onRelease()
+            val currentProgram = EGLBox.getCurrentProgram()
+            if (currentProgram == id) GLES20.glUseProgram(0)
+            releaseResource()
+        }
+    }
+
+    override fun isInit(): Boolean = (id != 0)
+
+    protected abstract fun onInit()
+    protected abstract fun onDraw()
+    protected abstract fun onRelease()
+    protected abstract fun getVertexShaderSource(): String
+    protected abstract fun getFragmentShaderSource(): String
+
+    fun bind() {
+        if (!isInit()) {
+            Logger.e(TAG, "Program id is invalid. Please call create method first.")
+            return
+        }
+        GLES20.glUseProgram(id)
+    }
+
+    fun unbind() {
+        GLES20.glUseProgram(0)
+    }
+
+    protected fun getUniformLocation(uniformName: String): Int {
+        if (!isInit()) {
+            Logger.e(TAG, "Program isn't initialized. Please call init function first. uniformName=$uniformName")
+            return 0
+        }
+        return GLES20.glGetUniformLocation(id, uniformName)
+    }
+
+    protected fun getAttribLocation(attributeName: String): Int {
+        if (!isInit()) {
+            Logger.e(TAG, "Program isn't initialized. Please call init function first. attributeName=$attributeName")
+
+            return 0
+        }
+        return GLES20.glGetAttribLocation(id, attributeName)
+    }
+
+    private fun createProgram() {
+        val vertexShaderSource = getVertexShaderSource()
         if (vertexShaderSource.isEmpty()) {
-            Logger.e("VertexShaderSource is empty")
+            Logger.e(TAG, "VertexShaderSource is empty.")
             return
         }
+        val fragmentShaderSource = getFragmentShaderSource()
         if (fragmentShaderSource.isEmpty()) {
-            Logger.e("FragmentShaderSource is empty")
+            Logger.e(TAG, "FragmentShaderSource is empty.")
             return
         }
 
         // 加载顶点着色器
         mVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderSource)
-        if (mVertexShader == NOT_INIT) {
-            Logger.e("Vertex shader load failure.[$mVertexShader]")
+        if (mVertexShader == 0) {
+            Logger.e(TAG, "Vertex shader load failure. ")
+            releaseResource()
             return
         }
-
         // 加载片元着色器
         mFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderSource)
-        if (mFragmentShader == NOT_INIT) {
-            Logger.e("Fragment shader load failure.[$mVertexShader]")
-            GLES20.glDeleteShader(mVertexShader)
-            mVertexShader = NOT_INIT
+        if (mFragmentShader == 0) {
+            Logger.e(TAG, "Fragment shader load failure. VertexShader=$mVertexShader")
+            releaseResource()
             return
         }
 
         // 创建程序
         id = GLES20.glCreateProgram()
-        // 若程序创建成功则向程序中加入顶点着色器与片元着色器
-        if (id != NOT_INIT) {
+        if (id == 0) {
+            Logger.e(TAG, "Create program failure.")
+            releaseResource()
+        } else {  // 若程序创建成功则向程序中加入顶点着色器与片元着色器
             // 向程序中加入顶点着色器
             GLES20.glAttachShader(id, mVertexShader)
             // 向程序中加入片元着色器
@@ -68,58 +129,29 @@ class GLProgram {
             GLES20.glGetProgramiv(id, GLES20.GL_LINK_STATUS, linkStatus, 0)
             // 若链接失败则报错并删除程序
             if (linkStatus[0] != GLES20.GL_TRUE) {
-                Logger.e("Could not link program: \n ${GLES20.glGetProgramInfoLog(id)}")
-                GLES20.glDeleteProgram(id)
-                id = NOT_INIT
+                Logger.e(TAG, "Link program failure. id=$id, errorLog= \n ${GLES20.glGetProgramInfoLog(id)}")
+                releaseResource()
+            } else {
+                Logger.e(TAG, "Create program success. id=$id")
             }
         }
-        Logger.e("Create program. [$id]")
     }
 
-    fun bind() {
-        if (!isInit()) {
-            Logger.e("Program id is invalid.Please call create method first. [$id]")
-            return
+    private fun releaseResource() {
+        Logger.i(TAG, "Release program. ProgramId=$id, VertexShaderId=$mVertexShader, FragmentShaderId=$mFragmentShader")
+        if (mVertexShader != 0) {
+            if (id != 0) GLES20.glDetachShader(id, mVertexShader)
+            GLES20.glDeleteShader(mVertexShader)
+            mVertexShader = 0
         }
-        GLES20.glUseProgram(id)
-    }
-
-    fun unbind() {
-        GLES20.glUseProgram(0)
-    }
-
-    fun isInit(): Boolean = (id != NOT_INIT)
-
-    fun release() {
-        if (!isInit()) return
-        unbind()
-        if (mVertexShader != NOT_INIT) {
-            GLES20.glDetachShader(id, mVertexShader)
-            mVertexShader = NOT_INIT
+        if (mFragmentShader != 0) {
+            if (id != 0) GLES20.glDetachShader(id, mFragmentShader)
+            GLES20.glDeleteShader(mFragmentShader)
+            mFragmentShader = 0
         }
-        if (mFragmentShader != NOT_INIT) {
-            GLES20.glDetachShader(id, mFragmentShader)
-            mFragmentShader = NOT_INIT
+        if (id != 0) {
+            GLES20.glDeleteProgram(id)
+            id = 0
         }
-        GLES20.glDeleteProgram(id)
-        Logger.i("Release program. [$id]")
-
-        id = NOT_INIT
-    }
-
-    fun getUniformLocation(uniformName: String): Int {
-        if (!isInit()) {
-            Logger.e("Program id is invalid.Please call createProgram function first. [$id]")
-            return NOT_INIT
-        }
-        return GLES20.glGetUniformLocation(id, uniformName)
-    }
-
-    fun getAttribLocation(attributeName: String): Int {
-        if (!isInit()) {
-            Logger.e("Program id is invalid.Please call createProgram function first. [$id]")
-            return NOT_INIT
-        }
-        return GLES20.glGetAttribLocation(id, attributeName)
     }
 }

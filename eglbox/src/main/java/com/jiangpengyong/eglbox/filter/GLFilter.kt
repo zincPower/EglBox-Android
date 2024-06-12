@@ -1,6 +1,7 @@
 package com.jiangpengyong.eglbox.filter
 
-import com.jiangpengyong.eglbox.GLThread
+import android.os.Bundle
+import com.jiangpengyong.eglbox.logger.Logger
 
 /**
  * @author jiang peng yong
@@ -8,19 +9,54 @@ import com.jiangpengyong.eglbox.GLThread
  * @email 56002982@qq.com
  * @des OpenGL 滤镜链
  */
-interface GLFilter {
-    companion object {
-        const val NOT_INIT = -1
+abstract class GLFilter {
+    private val TAG = "GLFilter"
+    protected var mContext: FilterContext? = null
+
+    fun init(context: FilterContext) {
+        if (isInit()) {
+            Logger.e(TAG, "GLFilter has been initialized.")
+            return
+        }
+        this.mContext = context
+        onInit()
     }
 
-    @GLThread
-    fun init(context: FilterContext)
+    fun draw() {
+        if (!isInit()) {
+            Logger.e(TAG, "GLFilter hasn't initialized.")
+            return
+        }
+        onDraw(mContext!!)
+    }
 
-    fun updateSize(context: FilterContext)
+    fun release() {
+        if (!isInit()) return
+        onRelease()
+        mContext = null
+    }
 
-    @GLThread
-    fun render(context: FilterContext)
+    fun updateData(inputData: Bundle) {
+        if (!isInit()) return
+        onUpdateData(inputData)
+    }
 
-    @GLThread
-    fun release()
+    fun restoreData(restoreData: Bundle) {
+        if (!isInit()) return
+        onRestoreData(restoreData)
+    }
+
+    fun saveData(saveData: Bundle) {
+        if (!isInit()) return
+        onSaveData(saveData)
+    }
+
+    fun isInit(): Boolean = mContext != null
+
+    protected abstract fun onInit()
+    protected abstract fun onDraw(context: FilterContext)
+    protected abstract fun onRelease()
+    protected abstract fun onUpdateData(inputData: Bundle)
+    protected abstract fun onRestoreData(restoreData: Bundle)
+    protected abstract fun onSaveData(saveData: Bundle)
 }

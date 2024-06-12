@@ -11,7 +11,9 @@ import java.io.ByteArrayOutputStream
  * @email 56002982@qq.com
  * @des 着色器工具
  */
-object GLShaderUtil {
+object GLShaderExt {
+    private val TAG = "GLShaderExt"
+
     /**
      * 加载着色器
      * @param shaderType 着色器类型，可选值如下
@@ -36,8 +38,8 @@ object GLShaderUtil {
             // 获取 shader 的编译情况
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0)
             // 若编译失败则显示错误日志并删除此 shader
-            if (compiled[0] == 0) {
-                Logger.e("Could not compile shader $shaderType:\n ${GLES20.glGetShaderInfoLog(shader)}")
+            if (compiled[0] != GLES20.GL_TRUE) {
+                Logger.e(TAG, "Could not compile shader $shaderType:\n ${GLES20.glGetShaderInfoLog(shader)}")
                 // 异常情况，删除着色器
                 GLES20.glDeleteShader(shader)
                 shader = 0
@@ -66,7 +68,7 @@ object GLShaderUtil {
             result = String(byteArray, Charsets.UTF_8)
             result = result.replace("\\r\\n", "\n")
         } catch (e: Exception) {
-            Logger.e("Load from assets file failure.", e)
+            Logger.e(TAG,"Load from assets file failure.", e)
         }
         return result ?: ""
     }

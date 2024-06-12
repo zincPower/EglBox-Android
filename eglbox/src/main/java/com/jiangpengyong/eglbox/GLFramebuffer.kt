@@ -11,6 +11,7 @@ import com.jiangpengyong.eglbox.logger.Logger
  * @desc: framebuffer object
  */
 class GLFramebuffer {
+    private val TAG = "GLFramebuffer"
 
     companion object {
         private const val NOT_INIT = -1
@@ -25,7 +26,7 @@ class GLFramebuffer {
         val array = IntArray(1)
         GLES20.glGenFramebuffers(1, array, 0)
         id = array[0]
-        Logger.i("Create framebuffer. [$id]")
+        Logger.i(TAG, "Create framebuffer. id=$id")
     }
 
     fun bindTexture(
@@ -77,7 +78,7 @@ class GLFramebuffer {
             unbind()
         }
         GLES20.glDeleteFramebuffers(1, intArrayOf(id), 0)
-        Logger.i("Release framebuffer. [$id]")
+        Logger.i(TAG, "Release framebuffer. id=$id")
 
         id = NOT_INIT
     }
