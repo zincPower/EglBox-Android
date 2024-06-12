@@ -6,6 +6,13 @@ import java.nio.FloatBuffer
 
 private const val MATRIX_LENGTH = 16
 
+val IDENTITY_MATRIX_4x4 = floatArrayOf(
+    1.0F, 0.0F, 0.0F, 0.0F,
+    0.0F, 1.0F, 0.0F, 0.0F,
+    0.0F, 0.0F, 1.0F, 0.0F,
+    0.0F, 0.0F, 0.0F, 1.0F,
+).copyOf()
+
 /**
  * @author jiang peng yong
  * @date 2024/2/11 18:42
