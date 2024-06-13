@@ -3,6 +3,7 @@ package com.jiangpengyong.sample.filter
 import android.os.Bundle
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
+import com.jiangpengyong.eglbox.filter.ImageInOut
 
 /**
  * @author jiang peng yong
@@ -36,7 +37,7 @@ class TriangleFilter : GLFilter() {
 //        }
 //    }
 
-    override fun onDraw(context: FilterContext) {
+    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         mTriangleProgram.draw()
     }
 

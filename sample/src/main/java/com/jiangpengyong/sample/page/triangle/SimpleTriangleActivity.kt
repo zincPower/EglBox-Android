@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
+import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.sample.filter.TriangleFilter
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -51,6 +52,7 @@ class SimpleTriangleView(context: Context?) : GLSurfaceView(context) {
 
         private val mTriangleFilter = TriangleFilter()
         private val mContext = FilterContext()
+        private val mImage = ImageInOut()
 
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
             mTriangleFilter.init(mContext)
@@ -65,7 +67,7 @@ class SimpleTriangleView(context: Context?) : GLSurfaceView(context) {
 
         override fun onDrawFrame(gl: GL10?) {
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-            mTriangleFilter.draw()
+            mTriangleFilter.draw(mImage)
         }
 
     }

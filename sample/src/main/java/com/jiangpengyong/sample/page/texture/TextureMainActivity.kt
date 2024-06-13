@@ -1,6 +1,8 @@
 package com.jiangpengyong.sample.page.texture
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 
@@ -16,6 +18,10 @@ class TextureMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_texture_main)
+
+        findViewById<TextView>(R.id.texture2d).setOnClickListener {
+            startActivity(Intent(this, Texture2DActivity::class.java))
+        }
     }
 
 }

@@ -132,7 +132,7 @@ abstract class GLProgram : GLObject {
                 Logger.e(TAG, "Link program failure. id=$id, errorLog= \n ${GLES20.glGetProgramInfoLog(id)}")
                 releaseResource()
             } else {
-                Logger.e(TAG, "Create program success. id=$id")
+                Logger.i(TAG, "Create program success. id=$id")
             }
         }
     }

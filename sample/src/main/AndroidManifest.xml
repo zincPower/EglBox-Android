@@ -23,5 +23,6 @@
         <activity android:name="com.jiangpengyong.sample.page.font.FontActivity" />
         <activity android:name="com.jiangpengyong.sample.page.obj.FrustumActivity" />
         <activity android:name="com.jiangpengyong.sample.page.texture.TextureMainActivity" />
+        <activity android:name="com.jiangpengyong.sample.page.texture.Texture2DActivity" />
     </application>
 </manifest>

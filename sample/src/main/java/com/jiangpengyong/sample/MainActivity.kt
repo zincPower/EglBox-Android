@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.sample.page.font.FontActivity
 import com.jiangpengyong.sample.page.obj.FrustumActivity
+import com.jiangpengyong.sample.page.texture.TextureMainActivity
 import com.jiangpengyong.sample.page.triangle.SimpleTriangleActivity
 
 /**
@@ -21,6 +22,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         findViewById<TextView>(R.id.simpleTriangle).setOnClickListener {
             startActivity(Intent(this, SimpleTriangleActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.texture).setOnClickListener {
+            startActivity(Intent(this, TextureMainActivity::class.java))
         }
 
         findViewById<TextView>(R.id.font).setOnClickListener {

@@ -4,16 +4,22 @@ import android.os.Bundle
 import com.jiangpengyong.eglbox.Target
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
+import com.jiangpengyong.eglbox.filter.ImageInOut
+import com.jiangpengyong.eglbox.utils.ModelMatrix
 
 class Texture2DFilter : GLFilter() {
     private val mTexture2DProgram = Texture2DProgram(Target.TEXTURE_2D)
+    private val mMatrix = ModelMatrix()
 
     override fun onInit() {
         mTexture2DProgram.init()
+        mMatrix.scale(1F,-1F,1F)
     }
 
-    override fun onDraw(context: FilterContext, ) {
-
+    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+        imageInOut.texture?.let { mTexture2DProgram.setTexture(it) }
+        mTexture2DProgram.setVertexMatrix(mMatrix.matrix)
+        mTexture2DProgram.draw()
     }
 
     override fun onRelease() {

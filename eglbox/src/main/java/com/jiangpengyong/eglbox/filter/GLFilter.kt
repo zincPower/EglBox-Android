@@ -22,12 +22,12 @@ abstract class GLFilter {
         onInit()
     }
 
-    fun draw() {
+    fun draw(imageInOut: ImageInOut) {
         if (!isInit()) {
             Logger.e(TAG, "GLFilter hasn't initialized.")
             return
         }
-        onDraw(mContext!!)
+        onDraw(mContext!!, imageInOut)
     }
 
     fun release() {
@@ -54,7 +54,7 @@ abstract class GLFilter {
     fun isInit(): Boolean = mContext != null
 
     protected abstract fun onInit()
-    protected abstract fun onDraw(context: FilterContext)
+    protected abstract fun onDraw(context: FilterContext, imageInOut: ImageInOut)
     protected abstract fun onRelease()
     protected abstract fun onUpdateData(inputData: Bundle)
     protected abstract fun onRestoreData(restoreData: Bundle)
