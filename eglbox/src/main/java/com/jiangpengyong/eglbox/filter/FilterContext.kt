@@ -1,7 +1,8 @@
 package com.jiangpengyong.eglbox.filter
 
+import com.jiangpengyong.eglbox.GLCachePool
+import com.jiangpengyong.eglbox.GLFrameBuffer
 import com.jiangpengyong.eglbox.GLTexture
-import java.util.ArrayList
 
 /**
  * @author jiang peng yong
@@ -11,5 +12,26 @@ import java.util.ArrayList
  */
 class FilterContext {
 
+    val cachePool = GLCachePool()
+
+    fun recycle(fbo: GLFrameBuffer) {
+        cachePool.recycle(fbo)
+    }
+
+    fun recycle(texture: GLTexture) {
+        cachePool.recycle(texture)
+    }
+
+    fun getTexFBO(width: Int, height: Int): GLFrameBuffer {
+        return cachePool.getTexFBO(width, height)
+    }
+
+    fun getFBO(): GLFrameBuffer {
+        return cachePool.getFBO()
+    }
+
+    fun getTexture(width: Int, height: Int): GLTexture {
+        return cachePool.getTexture(width, height)
+    }
 
 }

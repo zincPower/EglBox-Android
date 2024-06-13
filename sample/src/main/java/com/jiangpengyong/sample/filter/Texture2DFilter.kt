@@ -12,7 +12,7 @@ class Texture2DFilter : GLFilter() {
         mTexture2DProgram.init()
     }
 
-    override fun onDraw(context: FilterContext) {
+    override fun onDraw(context: FilterContext, ) {
 
     }
 

@@ -158,7 +158,7 @@ class GLTexture(
     }
 
     override fun toString(): String {
-        return "[ GLTexture id: $id, size: $width x $height ]"
+        return "[ GLTexture id=$id, size=$width x $height ]"
     }
 }
 
