@@ -54,10 +54,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
     fun setVertexMatrix(matrix: FloatArray): Texture2DProgram {
         if (mCurrentTexture2DInfo.scaleType != ScaleType.MATRIX) {
-            Logger.e(
-                TAG,
-                "Since the scale type of Texture2DProgram isn't Matrix, you can't use setVertexMatrix function."
-            )
+            Logger.e(TAG, "Since the scale type of Texture2DProgram isn't Matrix, you can't use setVertexMatrix function.")
             return this
         }
         mVertexMatrix = matrix
@@ -66,10 +63,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
     fun setTextureMatrix(matrix: FloatArray): Texture2DProgram {
         if (mCurrentTexture2DInfo.scaleType != ScaleType.MATRIX) {
-            Logger.e(
-                TAG,
-                "Since the scale type of Texture2DProgram isn't Matrix, you can't use setTextureMatrix function."
-            )
+            Logger.e(TAG, "Since the scale type of Texture2DProgram isn't Matrix, you can't use setTextureMatrix function.")
             return this
         }
         mTextureMatrix = matrix
@@ -173,6 +167,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
             mBeforeTexture2DInfo.update(mCurrentTexture2DInfo)
             return
         }
+
         val targetSize = mCurrentTexture2DInfo.targetSize
         if (!targetSize.isValid()) {
             Logger.e(TAG, "Target size is invalid. size=${targetSize}")
@@ -183,6 +178,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
             return
         }
 
+        mBeforeTexture2DInfo.update(mCurrentTexture2DInfo)
         mTextureMatrix = IDENTITY_MATRIX_4x4
 
         val matrix = VertexAlgorithmFactory.calculate(
@@ -291,7 +287,29 @@ interface VertexAlgorithm {
 
 class CenterCropAlgorithm : VertexAlgorithm {
     override fun getScaleType(): ScaleType = ScaleType.CENTER_CROP
-    override fun handle(targetSize: Size, sourceSize: Size): ModelMatrix = ModelMatrix()
+    override fun handle(targetSize: Size, sourceSize: Size): ModelMatrix {
+        val matrix = ModelMatrix()
+        val targetRatio = targetSize.width.toFloat() / targetSize.height.toFloat()
+        val sourceRatio = sourceSize.width.toFloat() / sourceSize.height.toFloat()
+        var scaleX = 1F
+        var scaleY = 1F
+        if (targetRatio < sourceRatio) { // 横图
+            val width = sourceSize.height * targetRatio
+            scaleX = sourceSize.width.toFloat() / width
+            scaleY = 1.0F
+        } else {                         // 竖图
+            val height = sourceSize.width / targetRatio
+            scaleX = 1.0F
+            scaleY = targetSize.height.toFloat() / height
+        }
+        Logger.i(
+            "CenterCropAlgorithm",
+            "handle targetRatio=${targetRatio}, sourceRatio=${sourceRatio}, scaleX=${scaleX}, scaleY=${scaleY}"
+        );
+        matrix.reset()
+        matrix.scale(scaleX, scaleY, 1F)
+        return matrix
+    }
 }
 
 class CenterInsideAlgorithm : VertexAlgorithm {
