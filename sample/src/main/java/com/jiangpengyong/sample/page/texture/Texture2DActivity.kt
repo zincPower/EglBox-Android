@@ -59,7 +59,8 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
             mTexture.init()
             mTexture.setData(
                 BitmapFactory.decodeFile(
-                    File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath
+//                    File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath
+                    File(App.context.filesDir, "images/original_image_2.jpeg").absolutePath
                 )
             )
             mImage.reset(mTexture)
