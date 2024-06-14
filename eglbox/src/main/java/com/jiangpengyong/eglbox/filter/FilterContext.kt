@@ -1,5 +1,6 @@
 package com.jiangpengyong.eglbox.filter
 
+import android.util.Size
 import com.jiangpengyong.eglbox.GLCachePool
 import com.jiangpengyong.eglbox.GLFrameBuffer
 import com.jiangpengyong.eglbox.GLTexture
@@ -12,7 +13,9 @@ import com.jiangpengyong.eglbox.GLTexture
  */
 class FilterContext {
 
-    val cachePool = GLCachePool()
+    private val cachePool = GLCachePool()
+
+    var displaySize: Size = Size(0, 0)
 
     fun recycle(fbo: GLFrameBuffer) {
         cachePool.recycle(fbo)
@@ -33,5 +36,4 @@ class FilterContext {
     fun getTexture(width: Int, height: Int): GLTexture {
         return cachePool.getTexture(width, height)
     }
-
 }

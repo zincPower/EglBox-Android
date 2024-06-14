@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.GLTexture
 import com.jiangpengyong.eglbox.filter.FilterContext
@@ -66,6 +67,7 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
             GLES20.glViewport(0, 0, width, height)
+            mContext.displaySize = Size(width, height)
         }
 
         override fun onDrawFrame(gl: GL10?) {

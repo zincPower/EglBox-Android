@@ -8,49 +8,8 @@ import com.jiangpengyong.eglbox.Target
 import com.jiangpengyong.eglbox.allocateFloatBuffer
 import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.IDENTITY_MATRIX_4x4
-
-enum class ScaleType {
-    CENTER_CROP,        // 较小边适配，图片按比例缩放
-    CENTER_INSIDE,      // 较大边适配，图片按比例缩放
-    FIT_XY,             // 铺满整个页面，不保持比例
-    MATRIX,             // 按自定义矩阵
-}
-
-fun Size.isValid(): Boolean {
-    return width > 0 && height > 0
-}
-
-private data class Texture2DInfo(
-    var scaleType: ScaleType = ScaleType.MATRIX,
-    var targetSize: Size = Size(0, 0),
-    var isMirrorX: Boolean = false,
-    var isMirrorY: Boolean = false,
-) {
-    fun update(info: Texture2DInfo) {
-        scaleType = info.scaleType
-        targetSize = info.targetSize
-        isMirrorX = info.isMirrorX
-        isMirrorY = info.isMirrorY
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Texture2DInfo) return false
-        return scaleType == other.scaleType &&
-                targetSize.width == other.targetSize.width &&
-                targetSize.height == other.targetSize.height &&
-                isMirrorX == other.isMirrorX &&
-                isMirrorY == other.isMirrorY
-    }
-
-    override fun hashCode(): Int {
-        var result = scaleType.hashCode()
-        result = 31 * result + targetSize.hashCode()
-        result = 31 * result + isMirrorX.hashCode()
-        result = 31 * result + isMirrorY.hashCode()
-        return result
-    }
-}
+import com.jiangpengyong.eglbox.utils.ModelMatrix
+import java.nio.FloatBuffer
 
 class Texture2DProgram(val target: Target) : GLProgram() {
     private val TAG = "Texture2DProgram"
@@ -96,7 +55,10 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
     fun setVertexMatrix(matrix: FloatArray): Texture2DProgram {
         if (mCurrentTexture2DInfo.scaleType != ScaleType.MATRIX) {
-            Logger.e(TAG, "Since the scale type of Texture2DProgram isn't Matrix, you can't use setVertexMatrix function.")
+            Logger.e(
+                TAG,
+                "Since the scale type of Texture2DProgram isn't Matrix, you can't use setVertexMatrix function."
+            )
             return this
         }
         mVertexMatrix = matrix
@@ -105,7 +67,10 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
     fun setTextureMatrix(matrix: FloatArray): Texture2DProgram {
         if (mCurrentTexture2DInfo.scaleType != ScaleType.MATRIX) {
-            Logger.e(TAG, "Since the scale type of Texture2DProgram isn't Matrix, you can't use setTextureMatrix function.")
+            Logger.e(
+                TAG,
+                "Since the scale type of Texture2DProgram isn't Matrix, you can't use setTextureMatrix function."
+            )
             return this
         }
         mTextureMatrix = matrix
@@ -131,6 +96,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     override fun onDraw() {
         if (mTexture == null) return
         mTexture?.bind()
+        calculate(Size(mTexture?.width ?: 0, mTexture?.height ?: 0))
         GLES20.glUniformMatrix4fv(mVertexMatrixHandle, 1, false, mVertexMatrix, 0)
         GLES20.glUniformMatrix4fv(mTextureMatrixHandle, 1, false, mTextureMatrix, 0)
         GLES20.glEnableVertexAttribArray(mVertexPosHandle)
@@ -218,6 +184,14 @@ class Texture2DProgram(val target: Target) : GLProgram() {
             return
         }
 
+        mVertexMatrix = IDENTITY_MATRIX_4x4
+        mTextureMatrix = IDENTITY_MATRIX_4x4
+
+        mVertexMatrix = VertexAlgorithmFactory.calculate(
+            mCurrentTexture2DInfo.scaleType,
+            targetSize,
+            textureSize
+        )
     }
 
     companion object {
@@ -239,4 +213,111 @@ class Texture2DProgram(val target: Target) : GLProgram() {
             )
         )
     }
+}
+
+private data class Texture2DInfo(
+    var scaleType: ScaleType = ScaleType.MATRIX,
+    var targetSize: Size = Size(0, 0),
+    var isMirrorX: Boolean = false,
+    var isMirrorY: Boolean = false,
+) {
+    fun update(info: Texture2DInfo) {
+        scaleType = info.scaleType
+        targetSize = info.targetSize
+        isMirrorX = info.isMirrorX
+        isMirrorY = info.isMirrorY
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Texture2DInfo) return false
+        return scaleType == other.scaleType &&
+                targetSize.width == other.targetSize.width &&
+                targetSize.height == other.targetSize.height &&
+                isMirrorX == other.isMirrorX &&
+                isMirrorY == other.isMirrorY
+    }
+
+    override fun hashCode(): Int {
+        var result = scaleType.hashCode()
+        result = 31 * result + targetSize.hashCode()
+        result = 31 * result + isMirrorX.hashCode()
+        result = 31 * result + isMirrorY.hashCode()
+        return result
+    }
+}
+
+fun Size.isValid(): Boolean {
+    return width > 0 && height > 0
+}
+
+enum class ScaleType {
+    CENTER_CROP,        // 较小边适配，图片按比例缩放
+    CENTER_INSIDE,      // 较大边适配，图片按比例缩放
+    FIT_XY,             // 铺满整个页面，不保持比例
+    MATRIX,             // 按自定义矩阵
+}
+
+object VertexAlgorithmFactory {
+
+    private val algorithm = ArrayList<VertexAlgorithm>()
+
+    init {
+        algorithm.add(CenterCropAlgorithm())
+        algorithm.add(CenterInsideAlgorithm())
+        algorithm.add(FitXYAlgorithm())
+    }
+
+    fun calculate(scaleType: ScaleType, targetSize: Size, sourceSize: Size): FloatArray {
+        for (item in algorithm) {
+            if (item.getScaleType() == scaleType) {
+                return item.handle(targetSize, sourceSize)
+            }
+        }
+        return IDENTITY_MATRIX_4x4
+    }
+
+}
+
+interface VertexAlgorithm {
+    fun getScaleType(): ScaleType
+
+    fun handle(targetSize: Size, sourceSize: Size): FloatArray
+}
+
+class CenterCropAlgorithm : VertexAlgorithm {
+    override fun getScaleType(): ScaleType = ScaleType.CENTER_CROP
+    override fun handle(targetSize: Size, sourceSize: Size): FloatArray = IDENTITY_MATRIX_4x4
+}
+
+class CenterInsideAlgorithm : VertexAlgorithm {
+    private val mMatrix = ModelMatrix()
+    override fun getScaleType(): ScaleType = ScaleType.CENTER_INSIDE
+    override fun handle(targetSize: Size, sourceSize: Size): FloatArray {
+        val targetRatio = targetSize.width.toFloat() / targetSize.height.toFloat()
+        val sourceRatio = sourceSize.width.toFloat() / sourceSize.height.toFloat()
+        var scaleX = 1F
+        var scaleY = 1F
+        if (targetRatio < sourceRatio) { // 横图
+            val height = targetSize.width.toFloat() / sourceRatio
+            scaleX = 1.0F
+            scaleY = height / targetSize.height.toFloat()
+        } else {                         // 竖图
+            val width = targetSize.height * sourceRatio
+            scaleX = width / targetSize.width.toFloat()
+            scaleY = 1.0F
+        }
+        Logger.i(
+            "CenterInsideAlgorithm",
+            "handle targetRatio=${targetRatio}, sourceRatio=${sourceRatio}, scaleX=${scaleX}, scaleY=${scaleY}"
+        );
+        mMatrix.reset()
+        mMatrix.scale(scaleX, scaleY, 1F)
+        return mMatrix.matrix.copyOf()
+    }
+}
+
+class FitXYAlgorithm : VertexAlgorithm {
+    override fun getScaleType(): ScaleType = ScaleType.FIT_XY
+    override fun handle(targetSize: Size, sourceSize: Size): FloatArray = IDENTITY_MATRIX_4x4
 }

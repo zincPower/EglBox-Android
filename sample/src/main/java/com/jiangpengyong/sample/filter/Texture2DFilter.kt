@@ -13,12 +13,14 @@ class Texture2DFilter : GLFilter() {
 
     override fun onInit() {
         mTexture2DProgram.init()
-        mMatrix.scale(1F,-1F,1F)
+        mMatrix.scale(1F, -1F, 1F)
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         imageInOut.texture?.let { mTexture2DProgram.setTexture(it) }
-        mTexture2DProgram.setVertexMatrix(mMatrix.matrix)
+        mContext?.let { mTexture2DProgram.setTargetSize(it.displaySize) }
+        mTexture2DProgram.setScaleType(ScaleType.CENTER_INSIDE)
+//        mTexture2DProgram.setVertexMatrix(mMatrix.matrix)
         mTexture2DProgram.draw()
     }
 
