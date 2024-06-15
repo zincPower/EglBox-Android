@@ -1,7 +1,6 @@
 package com.jiangpengyong.eglbox.utils
 
 import android.opengl.Matrix
-import com.jiangpengyong.eglbox.allocateFloatBuffer
 import java.nio.FloatBuffer
 
 private const val MATRIX_LENGTH = 16

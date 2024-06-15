@@ -1,7 +1,7 @@
 package com.jiangpengyong.sample.filter
 
 import android.os.Bundle
-import com.jiangpengyong.eglbox.Target
+import com.jiangpengyong.eglbox.gles.Target
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut

@@ -1,8 +1,8 @@
 package com.jiangpengyong.sample.filter
 
 import android.opengl.GLES20
-import com.jiangpengyong.eglbox.GLProgram
-import com.jiangpengyong.eglbox.allocateFloatBuffer
+import com.jiangpengyong.eglbox.gles.GLProgram
+import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 
 class TriangleProgram : GLProgram() {

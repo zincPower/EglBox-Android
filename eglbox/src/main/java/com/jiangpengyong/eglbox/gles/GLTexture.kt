@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox
+package com.jiangpengyong.eglbox.gles
 
 import android.graphics.Bitmap
 import android.opengl.GLES11Ext

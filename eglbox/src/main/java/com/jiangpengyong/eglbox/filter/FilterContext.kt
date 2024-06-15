@@ -1,9 +1,9 @@
 package com.jiangpengyong.eglbox.filter
 
 import android.util.Size
-import com.jiangpengyong.eglbox.GLCachePool
-import com.jiangpengyong.eglbox.GLFrameBuffer
-import com.jiangpengyong.eglbox.GLTexture
+import com.jiangpengyong.eglbox.gles.GLCachePool
+import com.jiangpengyong.eglbox.gles.GLFrameBuffer
+import com.jiangpengyong.eglbox.gles.GLTexture
 
 /**
  * @author jiang peng yong

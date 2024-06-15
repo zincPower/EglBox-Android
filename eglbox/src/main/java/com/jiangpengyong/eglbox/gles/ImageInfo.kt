@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox
+package com.jiangpengyong.eglbox.gles
 
 import java.nio.IntBuffer
 

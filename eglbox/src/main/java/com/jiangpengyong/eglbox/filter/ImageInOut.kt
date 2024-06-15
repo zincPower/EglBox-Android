@@ -1,7 +1,7 @@
 package com.jiangpengyong.eglbox.filter
 
-import com.jiangpengyong.eglbox.GLFrameBuffer
-import com.jiangpengyong.eglbox.GLTexture
+import com.jiangpengyong.eglbox.gles.GLFrameBuffer
+import com.jiangpengyong.eglbox.gles.GLTexture
 
 class ImageInOut {
 

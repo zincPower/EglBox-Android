@@ -2,10 +2,10 @@ package com.jiangpengyong.sample.filter
 
 import android.opengl.GLES20
 import android.util.Size
-import com.jiangpengyong.eglbox.GLProgram
-import com.jiangpengyong.eglbox.GLTexture
-import com.jiangpengyong.eglbox.Target
-import com.jiangpengyong.eglbox.allocateFloatBuffer
+import com.jiangpengyong.eglbox.gles.GLProgram
+import com.jiangpengyong.eglbox.gles.GLTexture
+import com.jiangpengyong.eglbox.gles.Target
+import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
 import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.IDENTITY_MATRIX_4x4
 import com.jiangpengyong.eglbox.utils.ModelMatrix

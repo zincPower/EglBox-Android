@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox
+package com.jiangpengyong.eglbox.gles
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox.logger.Logger
@@ -12,8 +12,6 @@ import java.nio.IntBuffer
  * @desc: framebuffer object
  */
 class GLFrameBuffer : GLObject {
-    private val TAG = "GLFrameBuffer"
-
     var id = 0
         private set
 
@@ -171,4 +169,7 @@ class GLFrameBuffer : GLObject {
         return "[ GLFrameBuffer id=${id}, texture=${mTexture} ] "
     }
 
+    companion object{
+        private const val TAG = "GLFrameBuffer"
+    }
 }

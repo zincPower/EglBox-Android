@@ -7,7 +7,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
-import com.jiangpengyong.eglbox.GLTexture
+import com.jiangpengyong.eglbox.gles.GLTexture
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.sample.App

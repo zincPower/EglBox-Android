@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox
+package com.jiangpengyong.eglbox.utils
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

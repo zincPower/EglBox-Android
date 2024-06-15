@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox
+package com.jiangpengyong.eglbox.gles
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox.logger.Logger

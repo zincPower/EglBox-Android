@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox
+package com.jiangpengyong.eglbox.egl
 
 
 /**
@@ -15,10 +15,6 @@ data class Parameters(
     val surfaceType: SurfaceType,
     val width: Int = -1,
     val height: Int = -1,
-    val releaseNativeWindow:Boolean = false
 )
 
-enum class SurfaceType {
-    PBuffer,
-    Window
-}
+enum class SurfaceType { PBuffer, Window }
