@@ -344,4 +344,14 @@ open class GLMatrix {
     fun reset() {
         Matrix.setIdentityM(matrix, 0)
     }
+
+    operator fun times(other: GLMatrix): GLMatrix {
+        val result = GLMatrix()
+        Matrix.multiplyMM(
+            result.matrix, 0,
+            matrix, 0,
+            other.matrix, 0
+        )
+        return result
+    }
 }

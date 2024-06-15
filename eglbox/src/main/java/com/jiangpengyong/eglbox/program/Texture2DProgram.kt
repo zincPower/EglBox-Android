@@ -10,17 +10,46 @@ import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.IDENTITY_MATRIX_4x4
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 
+/**
+ * @author jiang peng yong
+ * @date 2024/6/15 12:43
+ * @email 56002982@qq.com
+ * @des 用于绘制 2D 纹理，支持四种模式，通过 [setScaleType] 方法进行设置：
+ * ScaleType {
+ *     CENTER_CROP,        // 较小边适配，图片按比例缩放，会填充满可绘制区域
+ *     CENTER_INSIDE,      // 较大边适配，图片按比例缩放，居中绘制纹理，可能会留有黑边
+ *     FIT_XY,             // 铺满整个页面，不保持比例，铺满整个绘制区域，可能会变形
+ *     MATRIX,             // 按自定义矩阵，按照定义的矩阵进行绘制
+ * }
+ *
+ * 如果设置为 [ScaleType.MATRIX] ，可以通过下面两个方法设置需要的纹理：
+ * 1、[setVertexMatrix] 设置顶点矩阵
+ * 2、[setTextureMatrix] 设置纹理矩阵
+ *
+ * 通过 [setTargetSize] 设置绘制区域的大小，会根据设置的 [ScaleType] 和 设置的纹理大小进行计算矩阵，最后进行绘制
+ *
+ * 通过 [isMirrorX] 和 [isMirrorY] 设置是否需要进行 x 轴和 y 轴的镜像翻转
+ *
+ * 通过 [setTexture] 设置需要绘制的纹理
+ *
+ * 通过 [reset] 可以重置状态，包括：纹理、矩阵、设置信息
+ *
+ * 彩蛋：
+ * 如果自定义矩阵，但又想使用 [ScaleType] 模式的算法，可以调用 [VertexAlgorithmFactory.calculate] 进行计算，
+ * 可以得到一个 [ModelMatrix] 类型的返回值，内部包含了缩放值，可以直接对该矩阵调用相应的方法进行缩放、偏移、旋转，也
+ * 可以调用 [ModelMatrix.matrix] 获取 16 个 Float 类型的 [FloatArray] 数组。
+ */
 class Texture2DProgram(val target: Target) : GLProgram() {
     private var mVertexCoordinates = defaultVertexCoordinates
     private var mTextureCoordinates = defaultTextureCoordinates
     private var mVertexMatrix = IDENTITY_MATRIX_4x4
     private var mTextureMatrix = IDENTITY_MATRIX_4x4
+    private var mTexture: GLTexture? = null
 
     private var mVertexMatrixHandle = 0
     private var mTextureMatrixHandle = 0
     private var mVertexPosHandle = 0
     private var mTexturePosHandle = 0
-    private var mTexture: GLTexture? = null
 
     private val mCurrentTexture2DInfo = Texture2DInfo()
     private val mBeforeTexture2DInfo = Texture2DInfo()
@@ -63,12 +92,15 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     }
 
     fun reset(): Texture2DProgram {
-        mVertexCoordinates = defaultVertexCoordinates
-        mTextureCoordinates = defaultTextureCoordinates
+//        mVertexCoordinates = defaultVertexCoordinates
+//        mTextureCoordinates = defaultTextureCoordinates
         mVertexMatrix = IDENTITY_MATRIX_4x4
         mTextureMatrix = IDENTITY_MATRIX_4x4
         mTexture = null
+        mCurrentTexture2DInfo.reset()
         mBeforeTexture2DInfo.reset()
+        mCustomVertexMatrix = IDENTITY_MATRIX_4x4
+        mCustomTextureMatrix = IDENTITY_MATRIX_4x4
         return this
     }
 
@@ -118,15 +150,15 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     }
 
     override fun getVertexShaderSource(): String = """
-    uniform mat4 uVertexMatrix;
-    uniform mat4 uTextureMatrix;
-    attribute vec4 aVertexPosition;
-    attribute vec4 aTexturePosition;
-    varying vec2 vTexturePosition;
-    void main() {
-        gl_Position = uVertexMatrix * aVertexPosition;
-        vTexturePosition = (uTextureMatrix * aTexturePosition).xy;
-    }
+        uniform mat4 uVertexMatrix;
+        uniform mat4 uTextureMatrix;
+        attribute vec4 aVertexPosition;
+        attribute vec4 aTexturePosition;
+        varying vec2 vTexturePosition;
+        void main() {
+            gl_Position = uVertexMatrix * aVertexPosition;
+            vTexturePosition = (uTextureMatrix * aTexturePosition).xy;
+        }
     """
 
     override fun getFragmentShaderSource(): String = if (target == Target.TEXTURE_2D) {

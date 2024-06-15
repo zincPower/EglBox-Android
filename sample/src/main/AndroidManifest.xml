@@ -20,9 +20,14 @@
         </activity>
 
         <activity android:name="com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity" />
+
+        <activity android:name="com.jiangpengyong.sample.b_projection.ProjectionMainActivity" />
+        <activity android:name="com.jiangpengyong.sample.b_projection.ProjectionActivity" />
+
+        <activity android:name="com.jiangpengyong.sample.d_texture.TextureMainActivity" />
+        <activity android:name="com.jiangpengyong.sample.d_texture.Texture2DActivity" />
+
         <activity android:name="com.jiangpengyong.sample.font.FontActivity" />
         <activity android:name="com.jiangpengyong.sample.obj.FrustumActivity" />
-        <activity android:name="com.jiangpengyong.sample.texture.TextureMainActivity" />
-        <activity android:name="com.jiangpengyong.sample.texture.Texture2DActivity" />
     </application>
 </manifest>

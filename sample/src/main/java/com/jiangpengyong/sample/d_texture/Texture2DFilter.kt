@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.texture
+package com.jiangpengyong.sample.d_texture
 
 import android.os.Bundle
 import com.jiangpengyong.eglbox.gles.Target

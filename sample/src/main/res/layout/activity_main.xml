@@ -10,6 +10,11 @@
         android:text="简易三角形" />
 
     <TextView
+        android:id="@+id/projection"
+        style="@style/common_button"
+        android:text="投影" />
+
+    <TextView
         android:id="@+id/texture"
         style="@style/common_button"
         android:text="纹理" />

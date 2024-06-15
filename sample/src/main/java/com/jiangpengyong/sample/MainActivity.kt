@@ -7,8 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.obj.FrustumActivity
-import com.jiangpengyong.sample.texture.TextureMainActivity
+import com.jiangpengyong.sample.d_texture.TextureMainActivity
 import com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity
+import com.jiangpengyong.sample.b_projection.ProjectionActivity
 
 /**
  * @author jiang peng yong
@@ -20,8 +21,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         findViewById<TextView>(R.id.simpleTriangle).setOnClickListener {
             startActivity(Intent(this, SimpleTriangleActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.projection).setOnClickListener {
+            startActivity(Intent(this, ProjectionActivity::class.java))
         }
 
         findViewById<TextView>(R.id.texture).setOnClickListener {

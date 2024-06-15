@@ -5,8 +5,23 @@ import com.jiangpengyong.eglbox.gles.GLProgram
 import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 
+/**
+ * @author jiang peng yong
+ * @date 2024/6/15 13:05
+ * @email 56002982@qq.com
+ * @des 绘制三角形
+ *    第一个点     第二个点
+ *      红色       绿色
+ *       ***********
+ *        *********
+ *         **原点**
+ *          *****
+ *           ***
+ *            *
+ *         第三个点
+ *          蓝色
+ */
 class TriangleProgram : GLProgram() {
-
     private val mVertexBuffer = allocateFloatBuffer(
         floatArrayOf(
             -0.5F, 0.5F, 0.0F,

@@ -6,7 +6,9 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
+import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
+import com.jiangpengyong.eglbox.program.TriangleProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -14,30 +16,29 @@ import javax.microedition.khronos.opengles.GL10
  * @author jiang peng yong
  * @date 2024/2/9 15:33
  * @email 56002982@qq.com
- * @des 简易三角形 demo
+ * @des 三角形
  */
 class SimpleTriangleActivity : AppCompatActivity() {
-
-    private lateinit var mSimpleTriangleView: SimpleTriangleView
+    private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mSimpleTriangleView = SimpleTriangleView(this)
-        setContentView(mSimpleTriangleView)
+        mRenderView = RenderView(this)
+        setContentView(mRenderView)
     }
 
     override fun onResume() {
         super.onResume()
-        mSimpleTriangleView.onResume()
+        mRenderView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mSimpleTriangleView.onPause()
+        mRenderView.onPause()
     }
 }
 
-class SimpleTriangleView(context: Context?) : GLSurfaceView(context) {
+class RenderView(context: Context?) : GLSurfaceView(context) {
     private val mRenderer = Renderer()
 
     init {
@@ -46,9 +47,7 @@ class SimpleTriangleView(context: Context?) : GLSurfaceView(context) {
         renderMode = RENDERMODE_CONTINUOUSLY
     }
 
-
     private class Renderer : GLSurfaceView.Renderer {
-
         private val mTriangleFilter = TriangleFilter()
         private val mContext = FilterContext()
         private val mImage = ImageInOut()
@@ -65,6 +64,26 @@ class SimpleTriangleView(context: Context?) : GLSurfaceView(context) {
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
             mTriangleFilter.draw(mImage)
         }
-
     }
+}
+
+class TriangleFilter : GLFilter() {
+
+    private val mTriangleProgram = TriangleProgram()
+
+    override fun onInit() {
+        mTriangleProgram.init()
+    }
+
+    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+        mTriangleProgram.draw()
+    }
+
+    override fun onRelease() {
+        mTriangleProgram.release()
+    }
+
+    override fun onUpdateData(inputData: Bundle) {}
+    override fun onRestoreData(restoreData: Bundle) {}
+    override fun onSaveData(saveData: Bundle) {}
 }

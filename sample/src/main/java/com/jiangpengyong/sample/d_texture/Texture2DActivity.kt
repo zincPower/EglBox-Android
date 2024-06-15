@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.texture
+package com.jiangpengyong.sample.d_texture
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -16,7 +16,6 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class Texture2DActivity : AppCompatActivity() {
-
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +46,6 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
 
 
     private class Renderer : GLSurfaceView.Renderer {
-
         private val mFilter = Texture2DFilter()
         private val mContext = FilterContext()
         private val mTexture = GLTexture()
@@ -74,6 +72,5 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
             mFilter.draw(mImage)
         }
-
     }
 }
