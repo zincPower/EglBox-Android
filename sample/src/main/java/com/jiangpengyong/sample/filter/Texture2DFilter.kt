@@ -22,8 +22,9 @@ class Texture2DFilter : GLFilter() {
         mTexture2DProgram.isMirrorY(true)
 //        mTexture2DProgram.setScaleType(ScaleType.CENTER_INSIDE)
 //        mTexture2DProgram.setScaleType(ScaleType.FIT_XY)
-//        mTexture2DProgram.setScaleType(ScaleType.MATRIX)
-//            .setVertexMatrix(mMatrix.matrix)
+        mTexture2DProgram
+            .setVertexMatrix(mMatrix.matrix)
+            .setScaleType(ScaleType.MATRIX)
         mTexture2DProgram.setScaleType(ScaleType.CENTER_CROP)
         mContext?.let { mTexture2DProgram.setTargetSize(it.displaySize) }
         mTexture2DProgram.draw()

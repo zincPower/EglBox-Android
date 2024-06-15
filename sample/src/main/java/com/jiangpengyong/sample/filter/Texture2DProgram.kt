@@ -11,8 +11,6 @@ import com.jiangpengyong.eglbox.utils.IDENTITY_MATRIX_4x4
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 
 class Texture2DProgram(val target: Target) : GLProgram() {
-    private val TAG = "Texture2DProgram"
-
     private var mVertexCoordinates = defaultVertexCoordinates
     private var mTextureCoordinates = defaultTextureCoordinates
     private var mVertexMatrix = IDENTITY_MATRIX_4x4
@@ -26,6 +24,8 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
     private val mCurrentTexture2DInfo = Texture2DInfo()
     private val mBeforeTexture2DInfo = Texture2DInfo()
+    private var mCustomVertexMatrix = IDENTITY_MATRIX_4x4
+    private var mCustomTextureMatrix = IDENTITY_MATRIX_4x4
 
     fun setScaleType(scaleType: ScaleType): Texture2DProgram {
         mCurrentTexture2DInfo.scaleType = scaleType
@@ -53,20 +53,12 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     }
 
     fun setVertexMatrix(matrix: FloatArray): Texture2DProgram {
-        if (mCurrentTexture2DInfo.scaleType != ScaleType.MATRIX) {
-            Logger.e(TAG, "Since the scale type of Texture2DProgram isn't Matrix, you can't use setVertexMatrix function.")
-            return this
-        }
-        mVertexMatrix = matrix
+        mCustomVertexMatrix = matrix
         return this
     }
 
     fun setTextureMatrix(matrix: FloatArray): Texture2DProgram {
-        if (mCurrentTexture2DInfo.scaleType != ScaleType.MATRIX) {
-            Logger.e(TAG, "Since the scale type of Texture2DProgram isn't Matrix, you can't use setTextureMatrix function.")
-            return this
-        }
-        mTextureMatrix = matrix
+        mCustomTextureMatrix = matrix
         return this
     }
 
@@ -76,6 +68,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
         mVertexMatrix = IDENTITY_MATRIX_4x4
         mTextureMatrix = IDENTITY_MATRIX_4x4
         mTexture = null
+        mBeforeTexture2DInfo.reset()
         return this
     }
 
@@ -89,7 +82,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     override fun onDraw() {
         if (mTexture == null) return
         mTexture?.bind()
-        calculate(Size(mTexture?.width ?: 0, mTexture?.height ?: 0))
+        updateInfo(Size(mTexture?.width ?: 0, mTexture?.height ?: 0))
         GLES20.glUniformMatrix4fv(mVertexMatrixHandle, 1, false, mVertexMatrix, 0)
         GLES20.glUniformMatrix4fv(mTextureMatrixHandle, 1, false, mTextureMatrix, 0)
         GLES20.glEnableVertexAttribArray(mVertexPosHandle)
@@ -157,17 +150,18 @@ class Texture2DProgram(val target: Target) : GLProgram() {
         """
     }
 
-    private fun calculate(textureSize: Size) {
+    private fun updateInfo(textureSize: Size) {
+        // 如果是 Matrix 类型，则矩阵计算交由外部
+        if (mCurrentTexture2DInfo.scaleType == ScaleType.MATRIX) {
+            mBeforeTexture2DInfo.update(mCurrentTexture2DInfo)
+            mVertexMatrix = mCustomVertexMatrix
+            mTextureMatrix = mCustomTextureMatrix
+            return
+        }
         // 没有改变则不进行计算
         if (mCurrentTexture2DInfo == mBeforeTexture2DInfo) {
             return
         }
-        // 如果是 Matrix 类型，则矩阵计算交由外部
-        if (mCurrentTexture2DInfo.scaleType == ScaleType.MATRIX) {
-            mBeforeTexture2DInfo.update(mCurrentTexture2DInfo)
-            return
-        }
-
         val targetSize = mCurrentTexture2DInfo.targetSize
         if (!targetSize.isValid()) {
             Logger.e(TAG, "Target size is invalid. size=${targetSize}")
@@ -195,6 +189,8 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     }
 
     companion object {
+        private const val TAG = "Texture2DProgram"
+
         val defaultVertexCoordinates = allocateFloatBuffer(
             floatArrayOf(
                 -1.0f, -1.0f,   // 左下
@@ -203,7 +199,6 @@ class Texture2DProgram(val target: Target) : GLProgram() {
                 1.0f, 1.0f      // 右上
             )
         )
-
         val defaultTextureCoordinates = allocateFloatBuffer(
             floatArrayOf(
                 0.0f, 0.0f,     // 左下
@@ -226,6 +221,13 @@ private data class Texture2DInfo(
         targetSize = info.targetSize
         isMirrorX = info.isMirrorX
         isMirrorY = info.isMirrorY
+    }
+
+    fun reset() {
+        scaleType = ScaleType.MATRIX
+        targetSize = Size(0, 0)
+        isMirrorX = false
+        isMirrorY = false
     }
 
     override fun equals(other: Any?): Boolean {
