@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
+import com.jiangpengyong.eglbox.program.CubeProgram
 import com.jiangpengyong.eglbox.program.ScaleType
 import com.jiangpengyong.eglbox.program.StarProgram
 import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
@@ -48,12 +49,13 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
     }
 
     private class Renderer : GLSurfaceView.Renderer {
-        private val mFilter = StarFilter()
+        private val mFilter = CubeFilter()
         private val mContext = FilterContext()
         private val mImage = ImageInOut()
 
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
             mFilter.init(mContext)
+            GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         }
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -70,10 +72,6 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
 
 class StarFilter : GLFilter() {
     private val mColors = arrayOf(
-//        floatArrayOf(58F / 255F, 166F / 255F, 185F / 255F),
-//        floatArrayOf(255F / 255F, 208F / 255F, 208F / 255F),
-//        floatArrayOf(255F / 255F, 158F / 255F, 170F / 255F),
-//        floatArrayOf(249F / 255F, 249F / 255F, 224F / 255F),
         floatArrayOf(0F / 255F, 50F / 255F, 133F / 255F),
         floatArrayOf(42F / 255F, 98F / 255F, 154F / 255F),
         floatArrayOf(255F / 255F, 127F / 255F, 62F / 255F),
@@ -121,4 +119,54 @@ class StarFilter : GLFilter() {
         mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * matrix)
         mStarProgram.draw()
     }
+}
+
+class CubeFilter : GLFilter() {
+    private val mCubeProgram = CubeProgram()
+    private val mProjectMatrix = ProjectMatrix()
+    private val mViewMatrix = ViewMatrix()
+
+    override fun onInit() {
+        mCubeProgram.init()
+        mProjectMatrix.setFrustumM(
+//        mProjectMatrix.setOrthoM(
+            -1F, 1F,
+            -1F, 1F,
+            2F, 20F
+        )
+        mViewMatrix.setLookAtM(
+            0F, 0F, 5F,
+            0F, 0F, 0F,
+            0F, 1F, 0F
+        )
+    }
+
+    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+        val width = min(context.displaySize.width, context.displaySize.height)
+        val leftMatrix= VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+        leftMatrix.scale(0.8F, 0.8F, 1F)
+        leftMatrix.translate(-2F, -2F, 0F)
+        mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
+        mCubeProgram.draw()
+
+        val rightMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+        rightMatrix.scale(0.8F, 0.8F, 1F)
+        rightMatrix.translate(2F, 2F, 0F)
+        mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
+        mCubeProgram.draw()
+
+        val centerMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+        centerMatrix.scale(0.8F, 0.8F, 1F)
+        mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * centerMatrix)
+        mCubeProgram.draw()
+    }
+
+    override fun onRelease() {
+        mCubeProgram.release()
+    }
+
+    override fun onUpdateData(inputData: Bundle) {}
+    override fun onRestoreData(restoreData: Bundle) {}
+    override fun onSaveData(saveData: Bundle) {}
+
 }

@@ -11,8 +11,6 @@ import com.jiangpengyong.eglbox.utils.GLShaderExt.loadShader
  * @des GL 程序
  */
 abstract class GLProgram : GLObject {
-    private val TAG = "GLProgram"
-
     var id: Int = 0
         private set
 
@@ -153,5 +151,9 @@ abstract class GLProgram : GLObject {
             GLES20.glDeleteProgram(id)
             id = 0
         }
+    }
+
+    companion object{
+        private const val TAG = "GLProgram"
     }
 }

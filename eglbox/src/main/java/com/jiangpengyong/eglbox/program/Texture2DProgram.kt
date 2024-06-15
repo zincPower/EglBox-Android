@@ -334,7 +334,7 @@ class CenterCropAlgorithm : VertexAlgorithm {
         } else {                         // 竖图
             val height = sourceSize.width / targetRatio
             scaleX = 1.0F
-            scaleY = targetSize.height.toFloat() / height
+            scaleY = sourceSize.height.toFloat() / height
         }
         Logger.i(
             "CenterCropAlgorithm",

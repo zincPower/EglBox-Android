@@ -11,7 +11,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.jiangpengyong.sample.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,15 +20,29 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity" />
+        <activity
+            android:name="com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity"
+            android:screenOrientation="landscape" />
 
-        <activity android:name="com.jiangpengyong.sample.b_projection.ProjectionMainActivity" />
-        <activity android:name="com.jiangpengyong.sample.b_projection.ProjectionActivity" />
+        <activity
+            android:name="com.jiangpengyong.sample.b_projection.ProjectionMainActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.b_projection.ProjectionActivity"
+            android:screenOrientation="landscape" />
 
-        <activity android:name="com.jiangpengyong.sample.d_texture.TextureMainActivity" />
-        <activity android:name="com.jiangpengyong.sample.d_texture.Texture2DActivity" />
+        <activity
+            android:name="com.jiangpengyong.sample.d_texture.TextureMainActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.d_texture.Texture2DActivity"
+            android:screenOrientation="landscape" />
 
-        <activity android:name="com.jiangpengyong.sample.font.FontActivity" />
-        <activity android:name="com.jiangpengyong.sample.obj.FrustumActivity" />
+        <activity
+            android:name="com.jiangpengyong.sample.font.FontActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.obj.FrustumActivity"
+            android:screenOrientation="landscape" />
     </application>
 </manifest>
