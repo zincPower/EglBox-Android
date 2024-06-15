@@ -1,10 +1,12 @@
-package com.jiangpengyong.sample.filter
+package com.jiangpengyong.sample.texture
 
 import android.os.Bundle
 import com.jiangpengyong.eglbox.gles.Target
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
+import com.jiangpengyong.eglbox.program.ScaleType
+import com.jiangpengyong.eglbox.program.Texture2DProgram
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 
 class Texture2DFilter : GLFilter() {

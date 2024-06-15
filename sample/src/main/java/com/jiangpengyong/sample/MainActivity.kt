@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
-import com.jiangpengyong.sample.page.font.FontActivity
-import com.jiangpengyong.sample.page.obj.FrustumActivity
-import com.jiangpengyong.sample.page.texture.TextureMainActivity
-import com.jiangpengyong.sample.page.triangle.SimpleTriangleActivity
+import com.jiangpengyong.sample.font.FontActivity
+import com.jiangpengyong.sample.obj.FrustumActivity
+import com.jiangpengyong.sample.texture.TextureMainActivity
+import com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity
 
 /**
  * @author jiang peng yong

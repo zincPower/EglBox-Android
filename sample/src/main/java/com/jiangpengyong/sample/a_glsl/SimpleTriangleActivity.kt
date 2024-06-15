@@ -1,39 +1,43 @@
-package com.jiangpengyong.sample.page.obj
+package com.jiangpengyong.sample.a_glsl
 
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
-import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.sample.filter.TriangleFilter
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class FrustumActivity : AppCompatActivity() {
+/**
+ * @author jiang peng yong
+ * @date 2024/2/9 15:33
+ * @email 56002982@qq.com
+ * @des 简易三角形 demo
+ */
+class SimpleTriangleActivity : AppCompatActivity() {
 
-    private lateinit var mRenderView: RenderView
+    private lateinit var mSimpleTriangleView: SimpleTriangleView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mRenderView = RenderView(this)
-        setContentView(mRenderView)
+        mSimpleTriangleView = SimpleTriangleView(this)
+        setContentView(mSimpleTriangleView)
     }
 
     override fun onResume() {
         super.onResume()
-        mRenderView.onResume()
+        mSimpleTriangleView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mRenderView.onPause()
+        mSimpleTriangleView.onPause()
     }
 }
 
-private class RenderView(context: Context?) : GLSurfaceView(context) {
+class SimpleTriangleView(context: Context?) : GLSurfaceView(context) {
     private val mRenderer = Renderer()
 
     init {
@@ -55,7 +59,6 @@ private class RenderView(context: Context?) : GLSurfaceView(context) {
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
             GLES20.glViewport(0, 0, width, height)
-            mContext.displaySize = Size(width, height)
         }
 
         override fun onDrawFrame(gl: GL10?) {
@@ -64,5 +67,4 @@ private class RenderView(context: Context?) : GLSurfaceView(context) {
         }
 
     }
-
 }

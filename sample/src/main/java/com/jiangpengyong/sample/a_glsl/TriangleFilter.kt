@@ -1,9 +1,10 @@
-package com.jiangpengyong.sample.filter
+package com.jiangpengyong.sample.a_glsl
 
 import android.os.Bundle
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
+import com.jiangpengyong.eglbox.program.TriangleProgram
 
 /**
  * @author jiang peng yong

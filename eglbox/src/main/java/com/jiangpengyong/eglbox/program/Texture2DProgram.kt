@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.filter
+package com.jiangpengyong.eglbox.program
 
 import android.opengl.GLES20
 import android.util.Size

@@ -19,10 +19,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.jiangpengyong.sample.page.triangle.SimpleTriangleActivity" />
-        <activity android:name="com.jiangpengyong.sample.page.font.FontActivity" />
-        <activity android:name="com.jiangpengyong.sample.page.obj.FrustumActivity" />
-        <activity android:name="com.jiangpengyong.sample.page.texture.TextureMainActivity" />
-        <activity android:name="com.jiangpengyong.sample.page.texture.Texture2DActivity" />
+        <activity android:name="com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity" />
+        <activity android:name="com.jiangpengyong.sample.font.FontActivity" />
+        <activity android:name="com.jiangpengyong.sample.obj.FrustumActivity" />
+        <activity android:name="com.jiangpengyong.sample.texture.TextureMainActivity" />
+        <activity android:name="com.jiangpengyong.sample.texture.Texture2DActivity" />
     </application>
 </manifest>

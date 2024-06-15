@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.page.font
+package com.jiangpengyong.sample.font
 
 import android.os.Bundle
 import android.widget.TextView

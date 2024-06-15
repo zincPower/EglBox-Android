@@ -1,22 +1,18 @@
-package com.jiangpengyong.sample.page.texture
+package com.jiangpengyong.sample.obj
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
-import com.jiangpengyong.eglbox.gles.GLTexture
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.filter.Texture2DFilter
-import java.io.File
+import com.jiangpengyong.sample.a_glsl.TriangleFilter
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class Texture2DActivity : AppCompatActivity() {
+class FrustumActivity : AppCompatActivity() {
 
     private lateinit var mRenderView: RenderView
 
@@ -37,7 +33,7 @@ class Texture2DActivity : AppCompatActivity() {
     }
 }
 
-class RenderView(context: Context?) : GLSurfaceView(context) {
+private class RenderView(context: Context?) : GLSurfaceView(context) {
     private val mRenderer = Renderer()
 
     init {
@@ -49,21 +45,12 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
 
     private class Renderer : GLSurfaceView.Renderer {
 
-        private val mFilter = Texture2DFilter()
+        private val mTriangleFilter = TriangleFilter()
         private val mContext = FilterContext()
-        private val mTexture = GLTexture()
         private val mImage = ImageInOut()
 
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-            mFilter.init(mContext)
-            mTexture.init()
-            mTexture.setData(
-                BitmapFactory.decodeFile(
-//                    File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath
-                    File(App.context.filesDir, "images/original_image_2.jpeg").absolutePath
-                )
-            )
-            mImage.reset(mTexture)
+            mTriangleFilter.init(mContext)
         }
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -73,8 +60,9 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
 
         override fun onDrawFrame(gl: GL10?) {
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-            mFilter.draw(mImage)
+            mTriangleFilter.draw(mImage)
         }
 
     }
+
 }
