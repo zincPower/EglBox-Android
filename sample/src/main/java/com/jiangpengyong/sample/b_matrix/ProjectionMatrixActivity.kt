@@ -31,7 +31,7 @@ import kotlin.math.min
  * 正价投影：直接投射至屏幕，无论远近都一样大小
  */
 class ProjectionActivity : AppCompatActivity() {
-    companion object{
+    companion object {
         private const val MODE = "projectionMode"
     }
 
@@ -76,7 +76,7 @@ class ProjectionActivity : AppCompatActivity() {
             private val mFilter = CubeFilter()
             private val mContext = FilterContext()
             private val mImage = ImageInOut()
-            private var mBundle = Bundle()
+            private var mBundle: Bundle? = null
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 mFilter.init(mContext)
@@ -93,17 +93,17 @@ class ProjectionActivity : AppCompatActivity() {
 
             override fun onDrawFrame(gl: GL10?) {
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-                val bundle = synchronized(mBundle) {
-                    Bundle(mBundle)
+                val bundle = synchronized(this) {
+                    val temp = mBundle
+                    mBundle = null
+                    temp
                 }
-                mFilter.updateData(bundle)
+                bundle?.let { mFilter.updateData(it) }
                 mFilter.draw(mImage)
             }
 
             fun updateFilterData(bundle: Bundle) {
-                synchronized(mBundle) {
-                    mBundle.putAll(bundle)
-                }
+                synchronized(this) { mBundle = bundle }
             }
         }
     }

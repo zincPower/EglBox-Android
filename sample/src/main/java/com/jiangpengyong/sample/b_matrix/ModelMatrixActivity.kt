@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.util.Size
-import android.util.SizeF
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
@@ -22,7 +21,6 @@ import com.jiangpengyong.eglbox.program.isValid
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
-import java.util.logging.Logger
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.math.min
@@ -36,7 +34,6 @@ import kotlin.math.min
 class ModelMatrixActivity : AppCompatActivity() {
     companion object {
         private const val MODE = "mode"
-        private const val TRIGGER_RENDER = "trigger_render"
     }
 
     private lateinit var mRenderView: RenderView
@@ -58,17 +55,9 @@ class ModelMatrixActivity : AppCompatActivity() {
         model.setOnCheckedChangeListener { group, checkedId ->
             val bundle = Bundle()
             when (checkedId) {
-                R.id.translation -> {
-                    bundle.putInt(MODE, ModelMode.Translation.value)
-                }
-
-                R.id.scale -> {
-                    bundle.putInt(MODE, ModelMode.Scale.value)
-                }
-
-                R.id.rotation -> {
-                    bundle.putInt(MODE, ModelMode.Rotation.value)
-                }
+                R.id.translation -> bundle.putInt(MODE, ModelMode.Translation.value)
+                R.id.scale -> bundle.putInt(MODE, ModelMode.Scale.value)
+                R.id.rotation -> bundle.putInt(MODE, ModelMode.Rotation.value)
             }
             mRenderView.updateFilterData(bundle)
         }
@@ -101,7 +90,7 @@ class ModelMatrixActivity : AppCompatActivity() {
             private val mFilter = CubeFilter()
             private val mContext = FilterContext()
             private val mImage = ImageInOut()
-            private var mBundle = Bundle()
+            private var mBundle: Bundle? = null
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 // 开启深度测试
@@ -118,17 +107,16 @@ class ModelMatrixActivity : AppCompatActivity() {
 
             override fun onDrawFrame(gl: GL10?) {
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-//                val bundle = synchronized(mBundle) {
-//                    Bundle(mBundle)
-//                }
-//                mFilter.updateData(bundle)
+                synchronized(this) {
+                    val temp = mBundle
+                    mBundle = null
+                    temp
+                }?.let { mFilter.updateData(it) }
                 mFilter.draw(mImage)
             }
 
             fun updateFilterData(bundle: Bundle) {
-                synchronized(mBundle) {
-                    mBundle.putAll(bundle)
-                }
+                synchronized(this) { mBundle = bundle }
             }
         }
     }
@@ -136,10 +124,7 @@ class ModelMatrixActivity : AppCompatActivity() {
     enum class ModelMode(val value: Int) { Translation(1), Scale(2), Rotation(3) }
 
     class CubeFilter : GLFilter() {
-        enum class State {
-            RightToLeft,
-            LeftToRight,
-        }
+        enum class State { Out, In }
 
         data class Area(val start: Float, val end: Float) {
             val width = end - start
@@ -157,17 +142,16 @@ class ModelMatrixActivity : AppCompatActivity() {
             nearToFarSize = Area(start = -1F, end = 1F)
         )
 
-        private var mState = State.LeftToRight
-
+        private var mState = State.Out
         private var mMode = ModelMode.Translation
+        private val mRatio = 1 / 100F
+        private var mCurrentOffset = 0F
+        private var mDisplaySize = Size(0, 0)
+
         private val mCubeProgram = PureColorCubeProgram()
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
         private var mModelMatrix = ModelMatrix()
-
-        private var mTranslationOffset = 0F
-
-        private var mDisplaySize = Size(0, 0)
 
         override fun onInit() {
             mCubeProgram.init()
@@ -185,30 +169,14 @@ class ModelMatrixActivity : AppCompatActivity() {
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
             if (mDisplaySize.width != context.displaySize.width || mDisplaySize.height != context.displaySize.height) {
-                val width = min(context.displaySize.width, context.displaySize.height)
-                mModelMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-                mModelMatrix.translate(mSpace.leftToRightSize.start, mSpace.bottomToTopSize.start, mSpace.nearToFarSize.start)
+                updateModelMatrix(context)
                 mDisplaySize = context.displaySize
             }
             if (!mDisplaySize.isValid()) return
-            if (mMode == ModelMode.Translation) {
-                val ratio = 1 / 100F
-                val tranVer = mSpace.leftToRightSize.width * ratio
-                val tranHor = mSpace.bottomToTopSize.width * ratio
-                val tranDis = mSpace.nearToFarSize.width * ratio
-                if (mState == State.LeftToRight) {
-                    mTranslationOffset += ratio
-                    mModelMatrix.translate(tranVer, tranHor, tranDis)
-                    if (mTranslationOffset >= 1F) {
-                        mState = State.RightToLeft
-                    }
-                } else if (mState == State.RightToLeft) {
-                    mTranslationOffset -= ratio
-                    mModelMatrix.translate(-tranVer, -tranHor, -tranDis)
-                    if (mTranslationOffset <= 0F) {
-                        mState = State.LeftToRight
-                    }
-                }
+            when (mMode) {
+                ModelMode.Translation -> handleTranslation()
+                ModelMode.Scale -> handleScale()
+                ModelMode.Rotation -> handleRotation()
             }
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
             mCubeProgram.draw()
@@ -226,6 +194,67 @@ class ModelMatrixActivity : AppCompatActivity() {
                 ModelMode.Rotation.value -> ModelMode.Rotation
                 else -> ModelMode.Translation
             }
+            mContext?.let { updateModelMatrix(it) }
+        }
+
+        private fun updateModelMatrix(context: FilterContext) {
+            val width = min(context.displaySize.width, context.displaySize.height)
+            mModelMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+            when (mMode) {
+                ModelMode.Translation -> {
+                    mModelMatrix.translate(mSpace.leftToRightSize.start, mSpace.bottomToTopSize.start, mSpace.nearToFarSize.start)
+                }
+
+                ModelMode.Scale -> {
+                    mModelMatrix.rotate(30F, 1F, 0F, 0F)
+                    mModelMatrix.rotate(-30F, 0F, 1F, 0F)
+                }
+
+                ModelMode.Rotation -> {
+                    mModelMatrix.rotate(45F, 1F, 0F, 0F)
+                    mModelMatrix.rotate(45F, 0F, 1F, 0F)
+//                    mModelMatrix.rotate(30F, 0F, 0F, 1F)
+                }
+            }
+
+            // 重置
+            mCurrentOffset = 0F
+            mState = State.Out
+        }
+
+        private fun handleTranslation() {
+            mCurrentOffset += mRatio
+
+            val tranVer = mSpace.leftToRightSize.width * mRatio
+            val tranHor = mSpace.bottomToTopSize.width * mRatio
+            val tranDis = mSpace.nearToFarSize.width * mRatio
+            if (mState == State.Out) {  // 从左向右移动
+                mModelMatrix.translate(tranVer, tranHor, tranDis)
+            } else if (mState == State.In) {   // 从右向左移动
+                mModelMatrix.translate(-tranVer, -tranHor, -tranDis)
+            }
+
+            if (mCurrentOffset >= 1F) {
+                mState = if (mState == State.Out) State.In else State.Out
+                mCurrentOffset = 0F
+            }
+        }
+
+        private fun handleScale() {
+            val beforeScale = mCurrentOffset
+            if (mState == State.Out) {          // 变长
+                mCurrentOffset += mRatio * 5
+                if (mCurrentOffset >= 3F) mState = State.In
+            } else if (mState == State.In) {   // 变短
+                mCurrentOffset -= mRatio * 5
+                if (mCurrentOffset <= 0F) mState = State.Out
+            }
+            mModelMatrix.scale((1F + mCurrentOffset) / (1F + beforeScale), 1F, 1F)
+        }
+
+        private fun handleRotation() {
+            mCurrentOffset += mRatio
+            mModelMatrix.rotate(mRatio / 5 * 360, 1F, 1F, 1F)
         }
 
         override fun onRestoreData(restoreData: Bundle) {}
