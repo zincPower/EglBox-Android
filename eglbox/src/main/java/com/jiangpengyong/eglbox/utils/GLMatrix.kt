@@ -77,7 +77,7 @@ class MVPMatrix {
      * @param y
      * @param z
      */
-    fun rotate(angle: Double, x: Float, y: Float, z: Float): MVPMatrix {
+    fun rotate(angle: Float, x: Float, y: Float, z: Float): MVPMatrix {
         mModelMatrix.rotate(angle, x, y, z)
         return this
     }
@@ -214,8 +214,8 @@ class ModelMatrix : GLMatrix() {
      * @param y
      * @param z
      */
-    fun rotate(angle: Double, x: Float, y: Float, z: Float): ModelMatrix {
-        Matrix.rotateM(matrix, 0, Math.toRadians(angle).toFloat(), x, y, z)
+    fun rotate(angle: Float, x: Float, y: Float, z: Float): ModelMatrix {
+        Matrix.rotateM(matrix, 0, angle, x, y, z)
         return this
     }
 

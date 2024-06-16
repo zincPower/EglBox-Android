@@ -5,10 +5,11 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
+import com.jiangpengyong.sample.a_glsl.GLSLMainActivity
 import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.obj.FrustumActivity
 import com.jiangpengyong.sample.d_texture.TextureMainActivity
-import com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity
+import com.jiangpengyong.sample.a_glsl.TriangleActivity
 import com.jiangpengyong.sample.b_projection.ProjectionActivity
 
 /**
@@ -22,8 +23,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<TextView>(R.id.simpleTriangle).setOnClickListener {
-            startActivity(Intent(this, SimpleTriangleActivity::class.java))
+        findViewById<TextView>(R.id.glsl).setOnClickListener {
+            startActivity(Intent(this, GLSLMainActivity::class.java))
         }
 
         findViewById<TextView>(R.id.projection).setOnClickListener {

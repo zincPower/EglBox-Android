@@ -21,7 +21,13 @@
         </activity>
 
         <activity
-            android:name="com.jiangpengyong.sample.a_glsl.SimpleTriangleActivity"
+            android:name="com.jiangpengyong.sample.a_glsl.GLSLMainActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.a_glsl.TriangleActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.a_glsl.StarActivity"
             android:screenOrientation="landscape" />
 
         <activity

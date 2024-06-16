@@ -4,14 +4,16 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Size
+import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.CubeProgram
+import com.jiangpengyong.eglbox.program.PureColorCubeProgram
 import com.jiangpengyong.eglbox.program.ScaleType
-import com.jiangpengyong.eglbox.program.StarProgram
 import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
@@ -19,28 +21,35 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.math.min
 
+private const val projectionMode = "projectionMode"
+
 class ProjectionActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mRenderView = RenderView(this)
-        setContentView(mRenderView)
-    }
+        setContentView(R.layout.activity_projection)
 
-    override fun onResume() {
-        super.onResume()
-        mRenderView.onResume()
-    }
+        mRenderView = findViewById(R.id.surface_view)
 
-    override fun onPause() {
-        super.onPause()
-        mRenderView.onPause()
+        val projection = findViewById<RadioGroup>(R.id.projection)
+        projection.setOnCheckedChangeListener { group, checkedId ->
+            val bundle = Bundle()
+            if (checkedId == R.id.frustum) {
+                bundle.putInt(projectionMode, ProjectionMode.frustum.value)
+            } else {
+                bundle.putInt(projectionMode, ProjectionMode.ortho.value)
+            }
+            mRenderView.updateFilterData(bundle)
+        }
     }
 }
 
-class RenderView(context: Context?) : GLSurfaceView(context) {
+class RenderView : GLSurfaceView {
     private val mRenderer = Renderer()
+
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
     init {
         setEGLContextClientVersion(3)
@@ -48,14 +57,22 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
         renderMode = RENDERMODE_CONTINUOUSLY
     }
 
+    fun updateFilterData(bundle: Bundle) {
+        mRenderer.updateFilterData(bundle)
+    }
+
     private class Renderer : GLSurfaceView.Renderer {
         private val mFilter = CubeFilter()
         private val mContext = FilterContext()
         private val mImage = ImageInOut()
+        private var mBundle = Bundle()
 
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
             mFilter.init(mContext)
+            // 开启深度测试
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+            // 开启背面裁剪
+            GLES20.glEnable(GLES20.GL_CULL_FACE)
         }
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -65,74 +82,39 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
 
         override fun onDrawFrame(gl: GL10?) {
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
+            val bundle = synchronized(mBundle) {
+                Bundle(mBundle)
+            }
+            mFilter.updateData(bundle)
             mFilter.draw(mImage)
         }
-    }
-}
 
-class StarFilter : GLFilter() {
-    private val mColors = arrayOf(
-        floatArrayOf(0F / 255F, 50F / 255F, 133F / 255F),
-        floatArrayOf(42F / 255F, 98F / 255F, 154F / 255F),
-        floatArrayOf(255F / 255F, 127F / 255F, 62F / 255F),
-        floatArrayOf(255F / 255F, 218F / 255F, 120F / 255F),
-    )
-    private val mStarProgram = StarProgram()
-    private val mProjectMatrix = ProjectMatrix()
-    private val mViewMatrix = ViewMatrix()
-
-    override fun onInit() {
-        mStarProgram.init()
-        mProjectMatrix.setFrustumM(
-//        mProjectMatrix.setOrthoM(
-            -1F, 1F,
-            -1F, 1F,
-            5F, 20F
-        )
-        mViewMatrix.setLookAtM(
-            1F, 1F, 10F,
-            0F, 0F, 0F,
-            0F, 1F, 0F
-        )
-    }
-
-    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-        for (index in mColors.size - 1 downTo 0) {
-            drawStar(context, index, mColors[index])
+        fun updateFilterData(bundle: Bundle) {
+            synchronized(mBundle) {
+                mBundle.putAll(bundle)
+            }
         }
     }
-
-    override fun onRelease() {
-        mStarProgram.release()
-    }
-
-    override fun onUpdateData(inputData: Bundle) {}
-    override fun onRestoreData(restoreData: Bundle) {}
-    override fun onSaveData(saveData: Bundle) {}
-
-    private fun drawStar(context: FilterContext, index: Int, colors: FloatArray) {
-        val width = min(context.displaySize.width, context.displaySize.height)
-        val matrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-        matrix.scale(0.8F, 0.8F, 1F)
-        matrix.translate(index * 0.5F, index * 1F, index * -2F)
-        mStarProgram.setColor(colors[0], colors[1], colors[2], 0F)
-        mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * matrix)
-        mStarProgram.draw()
-    }
 }
 
+enum class ProjectionMode(val value: Int) { frustum(1), ortho(2) }
+
+data class ControlInfo(
+    var projectionMode: ProjectionMode
+)
+
 class CubeFilter : GLFilter() {
-    private val mCubeProgram = CubeProgram()
+    private val mControlInfo = ControlInfo(ProjectionMode.frustum)
+    private val mCubeProgram = PureColorCubeProgram()
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
 
     override fun onInit() {
         mCubeProgram.init()
         mProjectMatrix.setFrustumM(
-//        mProjectMatrix.setOrthoM(
             -1F, 1F,
             -1F, 1F,
-            2F, 20F
+            2F, 10F
         )
         mViewMatrix.setLookAtM(
             0F, 0F, 5F,
@@ -143,20 +125,18 @@ class CubeFilter : GLFilter() {
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val width = min(context.displaySize.width, context.displaySize.height)
-        val leftMatrix= VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-        leftMatrix.scale(0.8F, 0.8F, 1F)
-        leftMatrix.translate(-2F, -2F, 0F)
+        val leftMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+        leftMatrix.translate(-1.5F, -1F, 0F)
+        leftMatrix.rotate(30F, 0F, 0F, 1F)
         mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
         mCubeProgram.draw()
 
         val rightMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-        rightMatrix.scale(0.8F, 0.8F, 1F)
-        rightMatrix.translate(2F, 2F, 0F)
+        rightMatrix.translate(1.5F, 1F, 0F)
         mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
         mCubeProgram.draw()
 
         val centerMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-        centerMatrix.scale(0.8F, 0.8F, 1F)
         mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * centerMatrix)
         mCubeProgram.draw()
     }
@@ -165,7 +145,31 @@ class CubeFilter : GLFilter() {
         mCubeProgram.release()
     }
 
-    override fun onUpdateData(inputData: Bundle) {}
+    private fun updateProjection() {
+        if (mControlInfo.projectionMode == ProjectionMode.frustum) {
+            mProjectMatrix.setFrustumM(
+                -1F, 1F,
+                -1F, 1F,
+                2F, 10F
+            )
+        } else {
+            mProjectMatrix.setOrthoM(
+                -1F, 1F,
+                -1F, 1F,
+                2F, 10F
+            )
+        }
+    }
+
+    override fun onUpdateData(inputData: Bundle) {
+        mControlInfo.projectionMode = if (inputData.getInt(projectionMode, ProjectionMode.frustum.value) == ProjectionMode.frustum.value) {
+            ProjectionMode.frustum
+        } else {
+            ProjectionMode.ortho
+        }
+        updateProjection()
+    }
+
     override fun onRestoreData(restoreData: Bundle) {}
     override fun onSaveData(saveData: Bundle) {}
 

@@ -18,7 +18,7 @@ import javax.microedition.khronos.opengles.GL10
  * @email 56002982@qq.com
  * @des 三角形
  */
-class SimpleTriangleActivity : AppCompatActivity() {
+class TriangleActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,33 +36,33 @@ class SimpleTriangleActivity : AppCompatActivity() {
         super.onPause()
         mRenderView.onPause()
     }
-}
 
-class RenderView(context: Context?) : GLSurfaceView(context) {
-    private val mRenderer = Renderer()
+    class RenderView(context: Context?) : GLSurfaceView(context) {
+        private val mRenderer = Renderer()
 
-    init {
-        setEGLContextClientVersion(3)
-        setRenderer(mRenderer)
-        renderMode = RENDERMODE_CONTINUOUSLY
-    }
-
-    private class Renderer : GLSurfaceView.Renderer {
-        private val mTriangleFilter = TriangleFilter()
-        private val mContext = FilterContext()
-        private val mImage = ImageInOut()
-
-        override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-            mTriangleFilter.init(mContext)
+        init {
+            setEGLContextClientVersion(3)
+            setRenderer(mRenderer)
+            renderMode = RENDERMODE_CONTINUOUSLY
         }
 
-        override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-            GLES20.glViewport(0, 0, width, height)
-        }
+        private class Renderer : GLSurfaceView.Renderer {
+            private val mTriangleFilter = TriangleFilter()
+            private val mContext = FilterContext()
+            private val mImage = ImageInOut()
 
-        override fun onDrawFrame(gl: GL10?) {
-            GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-            mTriangleFilter.draw(mImage)
+            override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+                mTriangleFilter.init(mContext)
+            }
+
+            override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+                GLES20.glViewport(0, 0, width, height)
+            }
+
+            override fun onDrawFrame(gl: GL10?) {
+                GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
+                mTriangleFilter.draw(mImage)
+            }
         }
     }
 }

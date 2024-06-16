@@ -5,14 +5,14 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/simpleTriangle"
+        android:id="@+id/glsl"
         style="@style/common_button"
-        android:text="简易三角形" />
+        android:text="1、GLSL" />
 
     <TextView
         android:id="@+id/projection"
         style="@style/common_button"
-        android:text="投影" />
+        android:text="2、投影" />
 
     <TextView
         android:id="@+id/texture"
