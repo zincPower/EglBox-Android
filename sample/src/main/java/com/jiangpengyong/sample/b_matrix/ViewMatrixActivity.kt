@@ -17,11 +17,16 @@ import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.eglbox.program.PureColorCubeProgram
 import com.jiangpengyong.eglbox.program.ScaleType
 import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
+import com.jiangpengyong.eglbox.program.isValid
+import com.jiangpengyong.eglbox.program.toRadians
+import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.sin
 
 /**
  * @author jiang peng yong
@@ -152,11 +157,6 @@ class ViewMatrixActivity : AppCompatActivity() {
 
         override fun onInit() {
             mCubeProgram.init()
-            mProjectMatrix.setFrustumM(
-                -1F, 1F,
-                -1F, 1F,
-                2F, 20F
-            )
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
                 0F, 0F, 0F,
@@ -165,6 +165,14 @@ class ViewMatrixActivity : AppCompatActivity() {
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+            val displaySize = mContext?.displaySize ?: return
+            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+            mProjectMatrix.setFrustumM(
+                -ratio, ratio,
+                -1F, 1F,
+                2F, 20F
+            )
+
             when (mMode) {
                 ViewMode.Position -> handlePosition()
                 ViewMode.Viewpoint -> handleViewpoint()
@@ -172,12 +180,12 @@ class ViewMatrixActivity : AppCompatActivity() {
             }
 
             val width = min(context.displaySize.width, context.displaySize.height)
-            val leftMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+            val leftMatrix = ModelMatrix()//VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
             leftMatrix.translate(-1.5F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
             mCubeProgram.draw()
 
-            val rightMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+            val rightMatrix = ModelMatrix()//VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
             rightMatrix.translate(1.5F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
             mCubeProgram.draw()
@@ -217,7 +225,6 @@ class ViewMatrixActivity : AppCompatActivity() {
                     if (mCurrentOffset <= 0F) mState = State.Out
                 }
             }
-
             mViewMatrix.setLookAtM(
                 0F, 0F, 3F,
                 -2F + offset, 0F, 0F,
@@ -226,7 +233,14 @@ class ViewMatrixActivity : AppCompatActivity() {
         }
 
         private fun handleOrientation() {
+            val offset = mCurrentOffset * 360
+            mCurrentOffset += mRatio / 5
 
+            mViewMatrix.setLookAtM(
+                0F, 0F, 5F,
+                0F, 0F, 0F,
+                cos(offset.toRadians()).toFloat(), sin(offset.toRadians()).toFloat(), 0F
+            )
         }
 
         override fun onRelease() {
@@ -241,6 +255,7 @@ class ViewMatrixActivity : AppCompatActivity() {
                 ViewMode.Orientation.value -> ViewMode.Orientation
                 else -> ViewMode.Position
             }
+            mCurrentOffset = 0F
         }
 
         override fun onRestoreData(restoreData: Bundle) {}
