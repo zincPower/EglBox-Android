@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="模型变化方式"
+            android:text="视图变化方式"
             android:textColor="@color/primary_black"
             android:textSize="12sp" />
 
@@ -24,27 +24,27 @@
             android:layout_height="wrap_content">
 
             <RadioButton
-                android:id="@+id/translation"
+                android:id="@+id/position"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="偏移"
+                android:text="相机位置"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
 
             <RadioButton
-                android:id="@+id/scale"
+                android:id="@+id/viewpoint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="缩放"
+                android:text="观察点"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
 
             <RadioButton
-                android:id="@+id/rotation"
+                android:id="@+id/orientation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="旋转"
+                android:text="观察方向"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
         </RadioGroup>

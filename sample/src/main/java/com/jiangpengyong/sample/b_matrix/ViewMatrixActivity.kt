@@ -17,8 +17,6 @@ import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.eglbox.program.PureColorCubeProgram
 import com.jiangpengyong.eglbox.program.ScaleType
 import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
-import com.jiangpengyong.eglbox.program.isValid
-import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
 import javax.microedition.khronos.egl.EGLConfig
@@ -55,9 +53,9 @@ class ViewMatrixActivity : AppCompatActivity() {
         model.setOnCheckedChangeListener { group, checkedId ->
             val bundle = Bundle()
             when (checkedId) {
-                R.id.translation -> bundle.putInt(MODE, ModelMode.Translation.value)
-                R.id.scale -> bundle.putInt(MODE, ModelMode.Scale.value)
-                R.id.rotation -> bundle.putInt(MODE, ModelMode.Rotation.value)
+                R.id.position -> bundle.putInt(MODE, ViewMode.Position.value)
+                R.id.viewpoint -> bundle.putInt(MODE, ViewMode.Viewpoint.value)
+                R.id.orientation -> bundle.putInt(MODE, ViewMode.Orientation.value)
             }
             mRenderView.updateFilterData(bundle)
         }
@@ -121,7 +119,7 @@ class ViewMatrixActivity : AppCompatActivity() {
         }
     }
 
-    enum class ModelMode(val value: Int) { Translation(1), Scale(2), Rotation(3) }
+    enum class ViewMode(val value: Int) { Position(1), Viewpoint(2), Orientation(3) }
 
     class CubeFilter : GLFilter() {
         enum class State { Out, In }
@@ -142,18 +140,22 @@ class ViewMatrixActivity : AppCompatActivity() {
             nearToFarSize = Area(start = -1F, end = 1F)
         )
 
-        private var mMode = ModelMode.Translation
+        private var mMode = ViewMode.Position
 
         private val mCubeProgram = PureColorCubeProgram()
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
+
+        private val mRatio = 1 / 100F
+        private var mCurrentOffset = 0F
+        private var mState = State.Out
 
         override fun onInit() {
             mCubeProgram.init()
             mProjectMatrix.setFrustumM(
                 -1F, 1F,
                 -1F, 1F,
-                2F, 10F
+                2F, 20F
             )
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
@@ -163,16 +165,68 @@ class ViewMatrixActivity : AppCompatActivity() {
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+            when (mMode) {
+                ViewMode.Position -> handlePosition()
+                ViewMode.Viewpoint -> handleViewpoint()
+                ViewMode.Orientation -> handleOrientation()
+            }
+
             val width = min(context.displaySize.width, context.displaySize.height)
             val leftMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-            leftMatrix.translate(-1.5F,0F,0F)
+            leftMatrix.translate(-1.5F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
             mCubeProgram.draw()
 
             val rightMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-            rightMatrix.translate(1.5F,0F,0F)
+            rightMatrix.translate(1.5F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
             mCubeProgram.draw()
+        }
+
+        private fun handlePosition() {
+            val offset = 5 * mCurrentOffset
+            when (mState) {
+                State.Out -> {
+                    mCurrentOffset += mRatio / 2
+                    if (mCurrentOffset >= 1F) mState = State.In
+                }
+
+                State.In -> {
+                    mCurrentOffset -= mRatio / 2
+                    if (mCurrentOffset <= 0F) mState = State.Out
+                }
+            }
+
+            mViewMatrix.setLookAtM(
+                0F, 0F, 3F + offset,
+                0F, 0F, 0F,
+                0F, 1F, 0F
+            )
+        }
+
+        private fun handleViewpoint() {
+            val offset = 4 * mCurrentOffset
+            when (mState) {
+                State.Out -> {
+                    mCurrentOffset += mRatio / 2
+                    if (mCurrentOffset >= 1F) mState = State.In
+                }
+
+                State.In -> {
+                    mCurrentOffset -= mRatio / 2
+                    if (mCurrentOffset <= 0F) mState = State.Out
+                }
+            }
+
+            mViewMatrix.setLookAtM(
+                0F, 0F, 3F,
+                -2F + offset, 0F, 0F,
+                0F, 1F, 0F
+            )
+        }
+
+        private fun handleOrientation() {
+
         }
 
         override fun onRelease() {
@@ -180,12 +234,12 @@ class ViewMatrixActivity : AppCompatActivity() {
         }
 
         override fun onUpdateData(inputData: Bundle) {
-            val mode = inputData.getInt(MODE, ModelMode.Translation.value)
+            val mode = inputData.getInt(MODE, ViewMode.Position.value)
             mMode = when (mode) {
-                ModelMode.Translation.value -> ModelMode.Translation
-                ModelMode.Scale.value -> ModelMode.Scale
-                ModelMode.Rotation.value -> ModelMode.Rotation
-                else -> ModelMode.Translation
+                ViewMode.Position.value -> ViewMode.Position
+                ViewMode.Viewpoint.value -> ViewMode.Viewpoint
+                ViewMode.Orientation.value -> ViewMode.Orientation
+                else -> ViewMode.Position
             }
         }
 
