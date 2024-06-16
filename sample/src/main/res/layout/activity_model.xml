@@ -14,29 +14,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="投影模式"
+            android:text="模型变化方式"
             android:textColor="@color/primary_black"
             android:textSize="12sp" />
 
         <RadioGroup
-            android:id="@+id/projection"
+            android:id="@+id/model"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <RadioButton
-                android:id="@+id/frustum"
+                android:id="@+id/translation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="透视投影"
+                android:text="偏移"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
 
             <RadioButton
-                android:id="@+id/ortho"
+                android:id="@+id/scale"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="正交投影"
+                android:text="缩放"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/rotation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="旋转"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
         </RadioGroup>
@@ -45,7 +53,7 @@
 
     <view
         android:id="@+id/surface_view"
-        class="com.jiangpengyong.sample.b_matrix.ProjectionActivity$RenderView"
+        class="com.jiangpengyong.sample.b_matrix.ModelMatrixActivity$RenderView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

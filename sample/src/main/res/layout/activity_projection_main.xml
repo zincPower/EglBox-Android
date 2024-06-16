@@ -8,4 +8,14 @@
         style="@style/common_button"
         android:text="投影模式" />
 
+    <TextView
+        android:id="@+id/view_mode"
+        style="@style/common_button"
+        android:text="观察角度" />
+
+    <TextView
+        android:id="@+id/model_mode"
+        style="@style/common_button"
+        android:text="物体变换" />
+
 </LinearLayout>

@@ -6,11 +6,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.sample.a_glsl.GLSLMainActivity
+import com.jiangpengyong.sample.b_matrix.ProjectionMainActivity
+import com.jiangpengyong.sample.d_texture.TextureMainActivity
 import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.obj.FrustumActivity
-import com.jiangpengyong.sample.d_texture.TextureMainActivity
-import com.jiangpengyong.sample.a_glsl.TriangleActivity
-import com.jiangpengyong.sample.b_projection.ProjectionActivity
 
 /**
  * @author jiang peng yong
@@ -28,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.projection).setOnClickListener {
-            startActivity(Intent(this, ProjectionActivity::class.java))
+            startActivity(Intent(this, ProjectionMainActivity::class.java))
         }
 
         findViewById<TextView>(R.id.texture).setOnClickListener {

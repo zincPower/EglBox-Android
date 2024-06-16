@@ -31,11 +31,17 @@
             android:screenOrientation="landscape" />
 
         <activity
-            android:name="com.jiangpengyong.sample.b_projection.ProjectionMainActivity"
+            android:name="com.jiangpengyong.sample.b_matrix.ProjectionMainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.b_projection.ProjectionActivity"
+            android:name="com.jiangpengyong.sample.b_matrix.ProjectionActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.b_matrix.ModelMatrixActivity"
+            android:screenOrientation="landscape" />
+<!--        <activity-->
+<!--            android:name="com.jiangpengyong.sample.b_matrix.ProjectionActivity"-->
+<!--            android:screenOrientation="landscape" />-->
 
         <activity
             android:name="com.jiangpengyong.sample.d_texture.TextureMainActivity"
