@@ -17,7 +17,7 @@ class ProjectionMainActivity: AppCompatActivity() {
         }
 
         findViewById<View>(R.id.view_mode).setOnClickListener {
-            startActivity(Intent(this, ProjectionActivity::class.java))
+            startActivity(Intent(this, ViewMatrixActivity::class.java))
         }
 
         findViewById<View>(R.id.model_mode).setOnClickListener {

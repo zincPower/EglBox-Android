@@ -39,7 +39,7 @@ class ProjectionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_projection)
+        setContentView(R.layout.activity_projection_matrix)
 
         mRenderView = findViewById(R.id.surface_view)
 

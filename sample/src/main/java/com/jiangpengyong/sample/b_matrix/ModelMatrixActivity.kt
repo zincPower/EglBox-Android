@@ -3,6 +3,7 @@ package com.jiangpengyong.sample.b_matrix
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import android.opengl.Matrix
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -47,7 +48,7 @@ class ModelMatrixActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_model)
+        setContentView(R.layout.activity_model_matrix)
 
         mRenderView = findViewById(R.id.surface_view)
 
@@ -178,8 +179,20 @@ class ModelMatrixActivity : AppCompatActivity() {
                 ModelMode.Scale -> handleScale()
                 ModelMode.Rotation -> handleRotation()
             }
-            mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-            mCubeProgram.draw()
+
+            // 旋转模式的绘制两个立方体
+            if (mMode == ModelMode.Rotation) {
+                val leftMatrix = ModelMatrix().apply { translate(-1F, 0F, 0F) }
+                mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix * mModelMatrix)
+                mCubeProgram.draw()
+
+                val rightMatrix = ModelMatrix().apply { translate(1F, 0F, 0F) }
+                mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix * mModelMatrix)
+                mCubeProgram.draw()
+            } else {
+                mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+                mCubeProgram.draw()
+            }
         }
 
         override fun onRelease() {
@@ -213,7 +226,6 @@ class ModelMatrixActivity : AppCompatActivity() {
                 ModelMode.Rotation -> {
                     mModelMatrix.rotate(45F, 1F, 0F, 0F)
                     mModelMatrix.rotate(45F, 0F, 1F, 0F)
-//                    mModelMatrix.rotate(30F, 0F, 0F, 1F)
                 }
             }
 

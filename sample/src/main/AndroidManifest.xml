@@ -39,9 +39,9 @@
         <activity
             android:name="com.jiangpengyong.sample.b_matrix.ModelMatrixActivity"
             android:screenOrientation="landscape" />
-<!--        <activity-->
-<!--            android:name="com.jiangpengyong.sample.b_matrix.ProjectionActivity"-->
-<!--            android:screenOrientation="landscape" />-->
+        <activity
+            android:name="com.jiangpengyong.sample.b_matrix.ViewMatrixActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.d_texture.TextureMainActivity"
