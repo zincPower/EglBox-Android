@@ -129,49 +129,52 @@ class ViewMatrixActivity : AppCompatActivity() {
     class CubeFilter : GLFilter() {
         enum class State { Out, In }
 
-        data class Area(val start: Float, val end: Float) {
-            val width = end - start
-        }
-
-        data class Space(
-            val leftToRightSize: Area,
-            val bottomToTopSize: Area,
-            val nearToFarSize: Area,
-        )
-
-        private var mSpace = Space(
-            leftToRightSize = Area(start = -2.5F, end = 2.5F),
-            bottomToTopSize = Area(start = -1F, end = 1F),
-            nearToFarSize = Area(start = -1F, end = 1F)
-        )
-
-        private var mMode = ViewMode.Position
-
         private val mCubeProgram = PureColorCubeProgram()
+
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
 
+        private var mMode = ViewMode.Position
         private val mRatio = 1 / 100F
         private var mCurrentOffset = 0F
         private var mState = State.Out
 
+        private var mDisplay = Size(0, 0)
+
+        private val leftMatrix = ModelMatrix()
+            .apply {
+                translate(-1.5F, 0F, 0F)
+                rotate(15F, 1F, 0F, 0F)
+            }
+        private val rightMatrix = ModelMatrix()
+            .apply {
+                translate(1.5F, 0F, 0F)
+                rotate(15F, 1F, 0F, 0F)
+            }
+
         override fun onInit() {
             mCubeProgram.init()
-            mViewMatrix.setLookAtM(
-                0F, 0F, 5F,
-                0F, 0F, 0F,
-                0F, 1F, 0F
-            )
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
             val displaySize = mContext?.displaySize ?: return
-            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
-            mProjectMatrix.setFrustumM(
-                -ratio, ratio,
-                -1F, 1F,
-                2F, 20F
-            )
+            if (mDisplay.width != displaySize.width || mDisplay.height != displaySize.height) {
+                val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+                if (displaySize.width > displaySize.height) {
+                    mProjectMatrix.setFrustumM(
+                        -ratio, ratio,
+                        -1F, 1F,
+                        2F, 20F
+                    )
+                } else {
+                    mProjectMatrix.setFrustumM(
+                        -1F, 1F,
+                        -ratio, ratio,
+                        2F, 20F
+                    )
+                }
+                mDisplay = displaySize
+            }
 
             when (mMode) {
                 ViewMode.Position -> handlePosition()
@@ -179,14 +182,9 @@ class ViewMatrixActivity : AppCompatActivity() {
                 ViewMode.Orientation -> handleOrientation()
             }
 
-            val width = min(context.displaySize.width, context.displaySize.height)
-            val leftMatrix = ModelMatrix()//VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-            leftMatrix.translate(-1.5F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
             mCubeProgram.draw()
 
-            val rightMatrix = ModelMatrix()//VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-            rightMatrix.translate(1.5F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
             mCubeProgram.draw()
         }
@@ -204,7 +202,6 @@ class ViewMatrixActivity : AppCompatActivity() {
                     if (mCurrentOffset <= 0F) mState = State.Out
                 }
             }
-
             mViewMatrix.setLookAtM(
                 0F, 0F, 3F + offset,
                 0F, 0F, 0F,
@@ -226,7 +223,7 @@ class ViewMatrixActivity : AppCompatActivity() {
                 }
             }
             mViewMatrix.setLookAtM(
-                0F, 0F, 3F,
+                0F, 0F, 5F,
                 -2F + offset, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -235,7 +232,6 @@ class ViewMatrixActivity : AppCompatActivity() {
         private fun handleOrientation() {
             val offset = mCurrentOffset * 360
             mCurrentOffset += mRatio / 5
-
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
                 0F, 0F, 0F,
