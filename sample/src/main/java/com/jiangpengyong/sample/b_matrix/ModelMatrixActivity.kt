@@ -156,11 +156,6 @@ class ModelMatrixActivity : AppCompatActivity() {
 
         override fun onInit() {
             mCubeProgram.init()
-            mProjectMatrix.setFrustumM(
-                -1F, 1F,
-                -1F, 1F,
-                2F, 10F
-            )
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
                 0F, 0F, 0F,
@@ -171,6 +166,7 @@ class ModelMatrixActivity : AppCompatActivity() {
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
             if (mDisplaySize.width != context.displaySize.width || mDisplaySize.height != context.displaySize.height) {
                 updateModelMatrix(context)
+                updateProjectionMatrix(context)
                 mDisplaySize = context.displaySize
             }
             if (!mDisplaySize.isValid()) return
@@ -195,6 +191,27 @@ class ModelMatrixActivity : AppCompatActivity() {
             }
         }
 
+        private fun updateProjectionMatrix(context: FilterContext) {
+            val displaySize = context.displaySize
+            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
+                val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+                if (displaySize.width > displaySize.height) {
+                    mProjectMatrix.setFrustumM(
+                        -ratio, ratio,
+                        -1F, 1F,
+                        2F, 20F
+                    )
+                } else {
+                    mProjectMatrix.setFrustumM(
+                        -1F, 1F,
+                        -ratio, ratio,
+                        2F, 20F
+                    )
+                }
+                mDisplaySize = displaySize
+            }
+        }
+
         override fun onRelease() {
             mCubeProgram.release()
         }
@@ -211,8 +228,7 @@ class ModelMatrixActivity : AppCompatActivity() {
         }
 
         private fun updateModelMatrix(context: FilterContext) {
-            val width = min(context.displaySize.width, context.displaySize.height)
-            mModelMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+            mModelMatrix.reset()
             when (mMode) {
                 ModelMode.Translation -> {
                     mModelMatrix.translate(mSpace.leftToRightSize.start, mSpace.bottomToTopSize.start, mSpace.nearToFarSize.start)

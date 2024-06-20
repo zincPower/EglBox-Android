@@ -12,7 +12,6 @@ import com.jiangpengyong.eglbox.gles.GLTexture
  * @des 滤镜上下文
  */
 class FilterContext {
-
     private val cachePool = GLCachePool()
 
     var displaySize: Size = Size(0, 0)

@@ -15,9 +15,6 @@ import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.eglbox.program.PureColorCubeProgram
-import com.jiangpengyong.eglbox.program.ScaleType
-import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
-import com.jiangpengyong.eglbox.program.isValid
 import com.jiangpengyong.eglbox.program.toRadians
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
@@ -25,7 +22,6 @@ import com.jiangpengyong.eglbox.utils.ViewMatrix
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.math.cos
-import kotlin.math.min
 import kotlin.math.sin
 
 /**
@@ -129,28 +125,42 @@ class ViewMatrixActivity : AppCompatActivity() {
     class CubeFilter : GLFilter() {
         enum class State { Out, In }
 
+        // 立方体
         private val mCubeProgram = PureColorCubeProgram()
 
+        // 投影矩阵
         private val mProjectMatrix = ProjectMatrix()
+
+        // 视图矩阵
         private val mViewMatrix = ViewMatrix()
 
-        private var mMode = ViewMode.Position
-        private val mRatio = 1 / 100F
-        private var mCurrentOffset = 0F
-        private var mState = State.Out
-
-        private var mDisplay = Size(0, 0)
-
+        // 模型矩阵
+        // 左矩阵
         private val leftMatrix = ModelMatrix()
             .apply {
                 translate(-1.5F, 0F, 0F)
                 rotate(15F, 1F, 0F, 0F)
             }
+
+        // 右矩阵
         private val rightMatrix = ModelMatrix()
             .apply {
                 translate(1.5F, 0F, 0F)
                 rotate(15F, 1F, 0F, 0F)
             }
+
+        // 视图模式
+        private var mMode = ViewMode.Position
+
+        // 步长
+        private val mStepSize = 1 / 100F
+
+        // 当前步长累积
+        private var mCurrentOffset = 0F
+        private var mState = State.Out
+
+        // 预览尺寸
+        private var mDisplaySize = Size(0, 0)
 
         override fun onInit() {
             mCubeProgram.init()
@@ -158,8 +168,11 @@ class ViewMatrixActivity : AppCompatActivity() {
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
             val displaySize = mContext?.displaySize ?: return
-            if (mDisplay.width != displaySize.width || mDisplay.height != displaySize.height) {
+
+            // 计算更新投影矩阵
+            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
                 val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+                // 设置投影矩阵
                 if (displaySize.width > displaySize.height) {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
@@ -173,15 +186,17 @@ class ViewMatrixActivity : AppCompatActivity() {
                         2F, 20F
                     )
                 }
-                mDisplay = displaySize
+                mDisplaySize = displaySize
             }
 
+            // 根据模式更新视图矩阵
             when (mMode) {
                 ViewMode.Position -> handlePosition()
                 ViewMode.Viewpoint -> handleViewpoint()
                 ViewMode.Orientation -> handleOrientation()
             }
 
+            // 设置矩阵并绘制
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
             mCubeProgram.draw()
 
@@ -193,19 +208,22 @@ class ViewMatrixActivity : AppCompatActivity() {
             val offset = 5 * mCurrentOffset
             when (mState) {
                 State.Out -> {
-                    mCurrentOffset += mRatio / 2
+                    mCurrentOffset += mStepSize / 2
                     if (mCurrentOffset >= 1F) mState = State.In
                 }
 
                 State.In -> {
-                    mCurrentOffset -= mRatio / 2
+                    mCurrentOffset -= mStepSize / 2
                     if (mCurrentOffset <= 0F) mState = State.Out
                 }
             }
+            // 摄像机的位置在 (0, 0, 3) 到 (0, 0, 8) 间来回移动
+            // 观察点为 (0, 0, 0)
+            // 观察方向为 (0, 1, 0)
             mViewMatrix.setLookAtM(
                 0F, 0F, 3F + offset,
                 0F, 0F, 0F,
-                0F, 1F, 0F
+                0F, 1F, 0F,
             )
         }
 
@@ -213,15 +231,19 @@ class ViewMatrixActivity : AppCompatActivity() {
             val offset = 4 * mCurrentOffset
             when (mState) {
                 State.Out -> {
-                    mCurrentOffset += mRatio / 2
+                    mCurrentOffset += mStepSize / 2
                     if (mCurrentOffset >= 1F) mState = State.In
                 }
 
                 State.In -> {
-                    mCurrentOffset -= mRatio / 2
+                    mCurrentOffset -= mStepSize / 2
                     if (mCurrentOffset <= 0F) mState = State.Out
                 }
             }
+
+            // 摄像机的位置在 (0, 0, 5)
+            // 观察点在 (-2，0，0) 到 (2, 0, 0) 间来回移动
+            // 观察方向为 (0, 1, 0)
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
                 -2F + offset, 0F, 0F,
@@ -231,7 +253,10 @@ class ViewMatrixActivity : AppCompatActivity() {
 
         private fun handleOrientation() {
             val offset = mCurrentOffset * 360
-            mCurrentOffset += mRatio / 5
+            mCurrentOffset += mStepSize / 5
+            // 摄像机的位置在 (0, 0, 5)
+            // 观察点在 (0，0，0)
+            // 观察方向为与 xy 平面平行的平面中 360 度旋转
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
                 0F, 0F, 0F,
@@ -243,6 +268,7 @@ class ViewMatrixActivity : AppCompatActivity() {
             mCubeProgram.release()
         }
 
+        // 更新视图变化模式
         override fun onUpdateData(inputData: Bundle) {
             val mode = inputData.getInt(MODE, ViewMode.Position.value)
             mMode = when (mode) {
