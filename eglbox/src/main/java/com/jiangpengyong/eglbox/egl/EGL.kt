@@ -1,113 +1,233 @@
-//package com.jiangpengyong.eglbox
-//
-//import android.opengl.EGL14
-//import android.opengl.EGLConfig
-//import android.opengl.EGLContext
-//import android.opengl.EGLDisplay
-//import com.jiangpengyong.eglbox.logger.Logger
-//
-//data class EGLState(var display: EGLDisplay, var config: EGLConfig, var context: EGLContext?)
-//
-//class EGL {
-//
-//    fun init(): Boolean {
-//        val display = getDisplay() ?: return false
-//
-//        eglInitialize(display)
-//
-//        // 6. 创建Context
-//        val contextAttr = intArrayOf(
-//            EGL14.EGL_CONTEXT_CLIENT_VERSION, 2,      // 使用版本为 2
-//            EGL14.EGL_NONE
-//        )
-//        mEglContext = EGL14.eglCreateContext(
-//            mEglDisplay,
-//            mEglConfig,
-//            EGL14.EGL_NO_CONTEXT,                       // 不共享
-//            contextAttr,
-//            0
-//        )
-//        if (mEglContext == EGL14.EGL_NO_CONTEXT) {
-//            val error = EGL14.eglGetError()
-//            if (error == EGL14.EGL_BAD_CONFIG) {
-//                loge("Context create failure because of the bad config.")
-//            } else {
-//                loge("Context create failure.")
-//            }
-//            return false
-//        } else {
-//            logi("EglContext create success.")
-//        }
-//        return true
-//    }
-//
-//    private fun getDisplay(): EGLDisplay? {
-//        val display = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
-//        return if (display == EGL14.EGL_NO_DISPLAY) {
-//            Logger.e("【EGL】Unable to connect window.")
-//            null
-//        } else {
-//            Logger.i("【EGL】Connect to window success.")
-//            display
-//        }
-//    }
-//
-//    private fun eglInitialize(display: EGLDisplay): Boolean {
-//        val version = IntArray(2)
-//        val initRes = EGL14.eglInitialize(display, version, 0, version, 1)
-//        return if (initRes) {
-//            Logger.i("【EGL】Initialize EGL success. Version: ${version[0]}.${version[1]}.")
-//            true
-//        } else {
-//            val errorMsg = when (EGL14.eglGetError()) {
-//                EGL14.EGL_BAD_DISPLAY -> "EGL_BAD_DISPLAY"
-//                EGL14.EGL_NOT_INITIALIZED -> "EGL_NOT_INITIALIZED"
-//                else -> "UN_KNOW"
-//            }
-//            Logger.e("【EGL】Initialize EGL failure. Msg: $errorMsg.")
-//            false
-//        }
-//    }
-//
-//    private fun chooseConfig(display: EGLDisplay, renderableType: Int): EGLConfig? {
-//        // 获取表面配置
-//        val attributeList = intArrayOf(
-//            EGL14.EGL_RED_SIZE, 8,                      // 颜色缓冲区 r 分量位数（单位：bits）- argb
-//            EGL14.EGL_GREEN_SIZE, 8,                    // 颜色缓冲区 g 分量位数（单位：bits）- argb
-//            EGL14.EGL_BLUE_SIZE, 8,                     // 颜色缓冲区 b 分量位数（单位：bits）- argb
-//            EGL14.EGL_ALPHA_SIZE, 8,                    // 颜色缓冲区 a 分量位数（单位：bits）- argb
-////            EGL14.EGL_STENCIL_SIZE, 8,           // 模板缓冲区位数
-////            EGL14.EGL_DEPTH_SIZE, 16,            // 深度缓冲区位数
-//            EGL14.EGL_RENDERABLE_TYPE, renderableType,  // 指定渲染 api 版本
-//            EGL14.EGL_NONE                              // EGL10.EGL_NONE 为结尾符
-//        )
-//
-//        // 从系统中获取对应属性的配置
-//        val numConfig = IntArray(1)
-//        val configs: Array<EGLConfig?> = arrayOfNulls(1)
-//        val chooseResult = EGL14.eglChooseConfig(
-//            display,                            // 窗口
-//            attributeList,                      // 配置属性
-//            0,                // 配置属性存储偏移量
-//            configs,                            // 获取的配置属性
-//            0,                    // 获取的配置属性偏移量
-//            1,              // 获取配置属性量
-//            numConfig,                  // 想要获取的配置数量
-//            0          // 想要获取的配置数量的偏移量
-//        )
-//
-//        return if (chooseResult) {
-//            Logger.i("【EGL】EglChooseConfig obtain success.")
-//            configs[0]
-//        } else {
-//            val errorMsg = when (EGL14.eglGetError()) {
-//                EGL14.EGL_NOT_INITIALIZED -> "EGL_NOT_INITIALIZED"
-//                EGL14.EGL_BAD_PARAMETER -> "EGL_BAD_PARAMETER"
-//                else -> "UN_KNOW"
-//            }
-//            Logger.e("【EGL】EglChooseConfig obtain failed. Msg: $errorMsg.")
-//            null
-//        }
-//    }
-//
-//}
+package com.jiangpengyong.eglbox
+
+import android.opengl.EGL14
+import android.opengl.EGLConfig
+import android.opengl.EGLContext
+import android.opengl.EGLDisplay
+import android.opengl.EGLExt
+import android.util.Log
+import android.view.Surface
+import com.jiangpengyong.eglbox.egl.EglSurface
+import com.jiangpengyong.eglbox.egl.PBufferSurface
+import com.jiangpengyong.eglbox.egl.WindowSurface
+import com.jiangpengyong.eglbox.gles.EGLBox
+import com.jiangpengyong.eglbox.logger.Logger
+
+data class GLVersion(val major: Int, val minor: Int) {
+    override fun toString(): String {
+        return "[ GLVersion major=${major} minor=${minor} ]"
+    }
+}
+
+class EGLState(
+    display: EGLDisplay?,
+    config: EGLConfig?,
+    context: EGLContext?,
+    val glVersion: GLVersion,
+    val eglVersion: GLVersion
+) {
+    var display: EGLDisplay? = display
+        private set
+    var config: EGLConfig? = config
+        private set
+    var context: EGLContext? = context
+        private set
+
+    fun isValid(): Boolean {
+        return display != null && config != null && context != null
+    }
+
+    fun reset() {
+        display = null
+        config = null
+        context = null
+    }
+
+    override fun toString(): String {
+        return "[ EGLState display=${display} config=${config} context=${context} glVersion=${glVersion} eglVersion=${eglVersion} ]"
+    }
+}
+
+class EGL {
+    companion object {
+        private const val TAG = "EGL"
+    }
+
+    private var mState: EGLState? = null
+    private var mDrawSurface: EglSurface? = null
+    private var mReadSurface: EglSurface? = null
+
+    fun init(shareContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
+        if (isInit()) {
+            Logger.e(TAG, "EGL has been initialized. state=${mState}")
+            return
+        }
+
+        // 1、获取窗口系统
+        val display = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
+        if (display == EGL14.EGL_NO_DISPLAY) {
+            Logger.e(TAG, "EglGetDisplay failure.【EGL_NO_DISPLAY】")
+            EGLBox.checkError(TAG)
+            return
+        } else {
+            Logger.i(TAG, "EglGetDisplay success.")
+        }
+
+        // 2、初始化 egl
+        val eglVersion = IntArray(2)
+        val initializedResult = EGL14.eglInitialize(display, eglVersion, 0, eglVersion, 1)
+        if (!initializedResult) {
+            Logger.e(TAG, "EglInitialize failure. result=${initializedResult}")
+            EGLBox.checkError(TAG)
+            EGL14.eglTerminate(display)
+            return
+        } else {
+            Logger.i(TAG, "EglInitialize success. majorVersion=${eglVersion[0]}, minorVersion=${eglVersion[1]}")
+        }
+
+        // 3、确定可用表面配置
+        val (context, config, glVersion) = createContext(display, shareContext)
+        if (context == null || config == null) {
+            Logger.e(TAG, "Create context failure. glVersion=${glVersion}")
+            EGL14.eglTerminate(display)
+            return
+        } else {
+            Logger.i(TAG, "Create context success. glVersion=${glVersion}")
+        }
+
+        val glVer = GLVersion(glVersion, 0)
+        val eglVer = GLVersion(eglVersion[0], eglVersion[1])
+        mState = EGLState(display, config, context, glVer, eglVer)
+        Logger.i(TAG, "Create EGL success. state=${mState}")
+    }
+
+    fun release() {
+        if (!isInit()) return
+        mState?.display?.let { eglDisplay ->
+            EGL14.eglMakeCurrent(eglDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT)
+            mState?.context?.let { eglContext ->
+                EGL14.eglDestroyContext(eglDisplay, eglContext)
+            }
+            EGL14.eglReleaseThread()
+            EGL14.eglTerminate(eglDisplay)
+        }
+        mDrawSurface = null
+        mReadSurface = null
+        mState?.reset()
+        mState = null
+        Log.i(TAG, "Release EGL.")
+    }
+
+    fun isInit(): Boolean {
+        return mState?.isValid() ?: false
+    }
+
+    fun createWindow(window: Surface): WindowSurface? {
+        val state = mState
+        return if (state == null) {
+            Logger.i(TAG, "State is null. Please call init method first.【createWindow】")
+            null
+        } else {
+            return WindowSurface(state, window, 0, 0)
+        }
+    }
+
+    fun createPBuffer(width: Int, height: Int): PBufferSurface? {
+        val state = mState
+        return if (state == null) {
+            Logger.i(TAG, "State is null. Please call init method first.【createPBuffer】")
+            null
+        } else {
+            return PBufferSurface(state, 0, 0)
+        }
+    }
+
+    fun makeCurrent(surface: EglSurface) {
+        makeCurrent(surface, surface)
+    }
+
+    fun makeCurrent(drawSurface: EglSurface, readSurface: EglSurface) {
+        if (!isInit()) {
+            Logger.e(TAG, "EGL isn't initialized. Please call init function first.")
+            return
+        }
+        mDrawSurface = drawSurface
+        mReadSurface = readSurface
+        val result = EGL14.eglMakeCurrent(
+            mState?.display,
+            drawSurface.surface,
+            readSurface.surface,
+            mState?.context
+        );
+        if (!result) {
+            Logger.e(TAG, "EglMakeCurrent failure.【makeCurrent】");
+            EGLBox.checkError(TAG)
+        }
+    }
+
+    fun makeNothingCurrent() {
+        mDrawSurface = null
+        mReadSurface = null
+        val result = EGL14.eglMakeCurrent(
+            mState?.display,
+            EGL14.EGL_NO_SURFACE,
+            EGL14.EGL_NO_SURFACE,
+            EGL14.EGL_NO_CONTEXT
+        )
+        if (!result) {
+            Logger.e(TAG, "EglMakeCurrent failure.【makeNothingCurrent】")
+            EGLBox.checkError(TAG)
+        }
+    }
+
+    private fun createContext(display: EGLDisplay, shareContext: EGLContext): Triple<EGLContext?, EGLConfig?, Int> {
+        var glVersion = 3
+        var config = getEGLConfig(display, glVersion)
+        if (config == null) {
+            glVersion = 2
+            config = getEGLConfig(display, glVersion)
+        }
+        if (config == null) {
+            return Triple(null, null, glVersion)
+        }
+        val attribList = intArrayOf(
+            EGL14.EGL_CONTEXT_CLIENT_VERSION, glVersion,
+            EGL14.EGL_NONE
+        )
+        val context = EGL14.eglCreateContext(display, config, shareContext, attribList, 0)
+        return if (context == EGL14.EGL_NO_CONTEXT) {
+            Logger.e(TAG, "EglCreateContext failure.【EGL_NO_CONTEXT】")
+            EGLBox.checkError(TAG)
+            Triple(null, null, glVersion)
+        } else {
+            Triple(context, config, glVersion)
+        }
+    }
+
+    private fun getEGLConfig(display: EGLDisplay, glVersion: Int): EGLConfig? {
+        val renderType: Int = if (glVersion == 3) {
+            EGLExt.EGL_OPENGL_ES3_BIT_KHR
+        } else {
+            EGL14.EGL_OPENGL_ES2_BIT
+        }
+        val attribList = intArrayOf(
+            EGL14.EGL_RENDERABLE_TYPE, renderType,
+            EGL14.EGL_RED_SIZE, 8,
+            EGL14.EGL_GREEN_SIZE, 8,
+            EGL14.EGL_BLUE_SIZE, 8,
+            EGL14.EGL_ALPHA_SIZE, 8,
+            EGL14.EGL_NONE
+        )
+        val configs = arrayOfNulls<EGLConfig>(1)
+        val numConfigs = IntArray(1)
+        val result = EGL14.eglChooseConfig(display, attribList, 0, configs, 0, 1, numConfigs, 1)
+        return if (result) {
+            Logger.i(TAG, "EglChooseConfig success. renderType=${renderType}, rgba format=8888")
+            configs[0]
+        } else {
+            Logger.e(TAG, "EglChooseConfig failure. renderType=${renderType}, rgba format=8888")
+            EGLBox.checkError(TAG)
+            null
+        }
+    }
+}
