@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="相机位置"
+                android:text="摄像机位置"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
 
@@ -44,7 +44,7 @@
                 android:id="@+id/orientation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="观察方向"
+                android:text="up 向量"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
         </RadioGroup>

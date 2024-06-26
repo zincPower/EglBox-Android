@@ -13,13 +13,11 @@ import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.eglbox.program.PureColorCubeProgram
-import com.jiangpengyong.eglbox.program.ScaleType
-import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
+import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-import kotlin.math.min
 
 /**
  * @author jiang peng yong
@@ -33,6 +31,7 @@ import kotlin.math.min
 class ProjectionActivity : AppCompatActivity() {
     companion object {
         private const val MODE = "projectionMode"
+        private const val VIEWPORT_MODE = "viewportMode"
     }
 
     private lateinit var mRenderView: RenderView
@@ -50,6 +49,17 @@ class ProjectionActivity : AppCompatActivity() {
                 bundle.putInt(MODE, ProjectionMode.Frustum.value)
             } else {
                 bundle.putInt(MODE, ProjectionMode.Ortho.value)
+            }
+            mRenderView.updateFilterData(bundle)
+        }
+
+        val viewport = findViewById<RadioGroup>(R.id.viewport)
+        viewport.setOnCheckedChangeListener { group, checkedId ->
+            val bundle = Bundle()
+            if (checkedId == R.id.full) {
+                bundle.putInt(VIEWPORT_MODE, ViewportMode.Full.value)
+            } else {
+                bundle.putInt(VIEWPORT_MODE, ViewportMode.Half.value)
             }
             mRenderView.updateFilterData(bundle)
         }
@@ -109,9 +119,11 @@ class ProjectionActivity : AppCompatActivity() {
     }
 
     enum class ProjectionMode(val value: Int) { Frustum(1), Ortho(2) }
+    enum class ViewportMode(val value: Int) { Full(1), Half(2) }
 
     class CubeFilter : GLFilter() {
         private var mProjectionMode = ProjectionMode.Frustum
+        private var mViewportMode = ViewportMode.Full
         private val mCubeProgram = PureColorCubeProgram()
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
@@ -131,19 +143,21 @@ class ProjectionActivity : AppCompatActivity() {
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-            val width = min(context.displaySize.width, context.displaySize.height)
-            val leftMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+            // 这里可以不用每次都计算，为了方便阅读
+            updateProjection()
+
+            val leftMatrix = ModelMatrix()
             leftMatrix.translate(-1.5F, -1F, 0F)
             leftMatrix.rotate(30F, 0F, 0F, 1F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
             mCubeProgram.draw()
 
-            val rightMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+            val rightMatrix = ModelMatrix()
             rightMatrix.translate(1.5F, 1F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
             mCubeProgram.draw()
 
-            val centerMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
+            val centerMatrix = ModelMatrix()
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * centerMatrix)
             mCubeProgram.draw()
         }
@@ -153,28 +167,62 @@ class ProjectionActivity : AppCompatActivity() {
         }
 
         private fun updateProjection() {
+            val displaySize = mContext?.displaySize ?: return
+            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+            val left: Float
+            val right: Float
+            val bottom: Float
+            val top: Float
+            if (displaySize.width > displaySize.height) {   // 纵向屏
+                left = -ratio
+                right = ratio
+                bottom = -1F
+                top = 1F
+            } else {                                         // 横向屏
+                left = -1F
+                right = 1F
+                bottom = -ratio
+                top = ratio
+            }
+            // 设置投影矩阵
             if (mProjectionMode == ProjectionMode.Frustum) {
                 mProjectMatrix.setFrustumM(
-                    -1F, 1F,
-                    -1F, 1F,
+                    left, right,
+                    bottom, top,
                     2F, 10F
                 )
             } else {
                 mProjectMatrix.setOrthoM(
-                    -1F, 1F,
-                    -1F, 1F,
+                    left, right,
+                    bottom, top,
                     2F, 10F
                 )
             }
         }
 
+        private fun updateViewport() {
+            val size = mContext?.displaySize ?: return
+            if (mViewportMode == ViewportMode.Full) {
+                GLES20.glViewport(0, 0, size.width, size.height)
+            } else {
+                GLES20.glViewport(size.width / 4, size.height / 4, size.width / 2, size.height / 2)
+            }
+        }
+
         override fun onUpdateData(inputData: Bundle) {
-            mProjectionMode = if (inputData.getInt(MODE, ProjectionMode.Frustum.value) == ProjectionMode.Frustum.value) {
+            mProjectionMode = if (inputData.getInt(MODE, mProjectionMode.value) == ProjectionMode.Frustum.value) {
                 ProjectionMode.Frustum
             } else {
                 ProjectionMode.Ortho
             }
             updateProjection()
+
+            mViewportMode = if (inputData.getInt(VIEWPORT_MODE, mViewportMode.value) == ViewportMode.Full.value) {
+                ViewportMode.Full
+            } else {
+                ViewportMode.Half
+            }
+            updateViewport()
         }
 
         override fun onRestoreData(restoreData: Bundle) {}

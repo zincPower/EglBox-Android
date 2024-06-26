@@ -41,6 +41,37 @@
                 android:textSize="12sp" />
         </RadioGroup>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="视口大小(Viewport)"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/viewport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/full"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="撑满"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/half"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="一半 (width/4, height/4, width/2, height/2) "
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+        </RadioGroup>
+
     </LinearLayout>
 
     <view
