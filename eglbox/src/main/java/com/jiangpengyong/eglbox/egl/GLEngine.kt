@@ -17,4 +17,4 @@ data class Parameters(
     val height: Int = -1,
 )
 
-enum class SurfaceType { PBuffer, Window }
+//enum class SurfaceType { PBuffer, Window }

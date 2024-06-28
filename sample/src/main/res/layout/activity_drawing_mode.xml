@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/drawing_mode_control"
+        android:layout_width="150dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="绘制方式"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/drawing_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/point"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="点"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="线"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/triangle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="三角形"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <view
+        android:id="@+id/surface_view"
+        class="com.jiangpengyong.sample.b_matrix.ViewMatrixActivity$RenderView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
