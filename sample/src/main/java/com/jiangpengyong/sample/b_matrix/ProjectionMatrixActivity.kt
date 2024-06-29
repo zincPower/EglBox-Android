@@ -147,19 +147,19 @@ class ProjectionActivity : AppCompatActivity() {
             updateProjection()
 
             val leftMatrix = ModelMatrix()
-            leftMatrix.translate(-1.5F, -1F, 0F)
-            leftMatrix.rotate(30F, 0F, 0F, 1F)
+            leftMatrix.translate(-1F, 0F, -2F)
+            leftMatrix.rotate(30F, 1F, 0F, 1F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * leftMatrix)
             mCubeProgram.draw()
 
             val rightMatrix = ModelMatrix()
-            rightMatrix.translate(1.5F, 1F, 0F)
+            rightMatrix.translate(1F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
             mCubeProgram.draw()
 
-            val centerMatrix = ModelMatrix()
-            mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * centerMatrix)
-            mCubeProgram.draw()
+//            val centerMatrix = ModelMatrix()
+//            mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * centerMatrix)
+//            mCubeProgram.draw()
         }
 
         override fun onRelease() {
@@ -205,7 +205,7 @@ class ProjectionActivity : AppCompatActivity() {
             if (mViewportMode == ViewportMode.Full) {
                 GLES20.glViewport(0, 0, size.width, size.height)
             } else {
-                GLES20.glViewport(size.width / 4, size.height / 4, size.width / 2, size.height / 2)
+                GLES20.glViewport(0, 0, size.width / 2, size.height / 2)
             }
         }
 

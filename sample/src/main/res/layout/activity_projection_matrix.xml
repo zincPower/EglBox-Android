@@ -67,7 +67,7 @@
                 android:id="@+id/half"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="一半 (width/4, height/4, width/2, height/2) "
+                android:text="一半 (0, 0, width/2, height/2) "
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
         </RadioGroup>

@@ -134,13 +134,14 @@ class ModelMatrixActivity : AppCompatActivity() {
         data class Space(
             val leftToRightSize: Area,
             val bottomToTopSize: Area,
-            val nearToFarSize: Area,
+            val farToNearSize: Area,
         )
 
+        // 移动范围
         private var mSpace = Space(
-            leftToRightSize = Area(start = -2.5F, end = 2.5F),
-            bottomToTopSize = Area(start = -1F, end = 1F),
-            nearToFarSize = Area(start = -1F, end = 1F)
+            leftToRightSize = Area(start = -5F, end = 2.5F),
+            bottomToTopSize = Area(start = -5F, end = 1F),
+            farToNearSize = Area(start = -10F, end = 1F)
         )
 
         private var mState = State.Out
@@ -231,7 +232,7 @@ class ModelMatrixActivity : AppCompatActivity() {
             mModelMatrix.reset()
             when (mMode) {
                 ModelMode.Translation -> {
-                    mModelMatrix.translate(mSpace.leftToRightSize.start, mSpace.bottomToTopSize.start, mSpace.nearToFarSize.start)
+                    mModelMatrix.translate(mSpace.leftToRightSize.start, mSpace.bottomToTopSize.start, mSpace.farToNearSize.start)
                 }
 
                 ModelMode.Scale -> {
@@ -251,11 +252,12 @@ class ModelMatrixActivity : AppCompatActivity() {
         }
 
         private fun handleTranslation() {
-            mCurrentOffset += mRatio
+            val ratio = mRatio / 2
+            mCurrentOffset += ratio
 
-            val tranVer = mSpace.leftToRightSize.width * mRatio
-            val tranHor = mSpace.bottomToTopSize.width * mRatio
-            val tranDis = mSpace.nearToFarSize.width * mRatio
+            val tranVer = mSpace.leftToRightSize.width * ratio
+            val tranHor = mSpace.bottomToTopSize.width * ratio
+            val tranDis = mSpace.farToNearSize.width * ratio
             if (mState == State.Out) {  // 从左向右移动
                 mModelMatrix.translate(tranVer, tranHor, tranDis)
             } else if (mState == State.In) {   // 从右向左移动
