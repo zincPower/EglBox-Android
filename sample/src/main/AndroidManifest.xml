@@ -31,7 +31,7 @@
             android:screenOrientation="landscape" />
 
         <activity
-            android:name="com.jiangpengyong.sample.b_matrix.ProjectionMainActivity"
+            android:name="com.jiangpengyong.sample.b_matrix.MatrixMainActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name="com.jiangpengyong.sample.b_matrix.ProjectionActivity"

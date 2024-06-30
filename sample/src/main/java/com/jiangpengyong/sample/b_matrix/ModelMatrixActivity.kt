@@ -3,7 +3,6 @@ package com.jiangpengyong.sample.b_matrix
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
-import android.opengl.Matrix
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,21 +15,18 @@ import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.eglbox.program.PureColorCubeProgram
-import com.jiangpengyong.eglbox.program.ScaleType
-import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox.program.isValid
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-import kotlin.math.min
 
 /**
  * @author jiang peng yong
  * @date 2024/6/16 15:03
  * @email 56002982@qq.com
- * @des 模型变化
+ * @des 模型矩阵变化
  */
 class ModelMatrixActivity : AppCompatActivity() {
     companion object {
@@ -251,6 +247,7 @@ class ModelMatrixActivity : AppCompatActivity() {
             mState = State.Out
         }
 
+        // 处理移动
         private fun handleTranslation() {
             val ratio = mRatio / 2
             mCurrentOffset += ratio
@@ -270,6 +267,7 @@ class ModelMatrixActivity : AppCompatActivity() {
             }
         }
 
+        // 处理缩放
         private fun handleScale() {
             val beforeScale = mCurrentOffset
             if (mState == State.Out) {          // 变长
@@ -282,8 +280,10 @@ class ModelMatrixActivity : AppCompatActivity() {
             mModelMatrix.scale((1F + mCurrentOffset) / (1F + beforeScale), 1F, 1F)
         }
 
+        // 处理旋转
         private fun handleRotation() {
             mCurrentOffset += mRatio
+            // 以 (1, 1, 1) 向量进行逆时针旋转
             mModelMatrix.rotate(mRatio / 5 * 360, 1F, 1F, 1F)
         }
 

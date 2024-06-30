@@ -289,23 +289,29 @@ class ProjectMatrix : GLMatrix() {
     }
 }
 
+/**
+ * @author jiang peng yong
+ * @date 2024/2/11 21:24
+ * @email 56002982@qq.com
+ * @des 视图矩阵
+ */
 class ViewMatrix : GLMatrix() {
     // 相机位置
     val cameraLocation = floatArrayOf(0f, 0f, 0f)
     val cameraLocationBuffer: FloatBuffer by lazy { allocateFloatBuffer(3) }
 
     /**
-     * 设置摄像机
+     * 设置视图参数
      *
-     * @param eyeX  摄像机位置x
-     * @param eyeY  摄像机位置y
-     * @param eyeZ  摄像机位置z
-     * @param centerX  摄像机目标点x
-     * @param centerY  摄像机目标点y
-     * @param centerZ  摄像机目标点z
-     * @param upx 摄像机UP向量X分量
-     * @param upy 摄像机UP向量Y分量
-     * @param upz 摄像机UP向量Z分量
+     * @param eyeX  摄像机位置 x
+     * @param eyeY  摄像机位置 y
+     * @param eyeZ  摄像机位置 z
+     * @param centerX  观察点 x
+     * @param centerY  观察点 y
+     * @param centerZ  观察点 z
+     * @param upx 摄像机 up 向量X分量
+     * @param upy 摄像机 up 向量Y分量
+     * @param upz 摄像机 up 向量Z分量
      */
     fun setLookAtM(
         eyeX: Float, eyeY: Float, eyeZ: Float,
@@ -345,6 +351,9 @@ open class GLMatrix {
         Matrix.setIdentityM(matrix, 0)
     }
 
+    /**
+     * 矩阵相乘
+     */
     operator fun times(other: GLMatrix): GLMatrix {
         val result = GLMatrix()
         Matrix.multiplyMM(

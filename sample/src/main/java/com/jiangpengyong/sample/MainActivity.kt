@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.sample.a_glsl.GLSLMainActivity
-import com.jiangpengyong.sample.b_matrix.ProjectionMainActivity
+import com.jiangpengyong.sample.b_matrix.MatrixMainActivity
 import com.jiangpengyong.sample.d_texture.TextureMainActivity
 import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.obj.FrustumActivity
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.projection).setOnClickListener {
-            startActivity(Intent(this, ProjectionMainActivity::class.java))
+            startActivity(Intent(this, MatrixMainActivity::class.java))
         }
 
         findViewById<TextView>(R.id.texture).setOnClickListener {

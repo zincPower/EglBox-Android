@@ -156,10 +156,6 @@ class ProjectionActivity : AppCompatActivity() {
             rightMatrix.translate(1F, 0F, 0F)
             mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * rightMatrix)
             mCubeProgram.draw()
-
-//            val centerMatrix = ModelMatrix()
-//            mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * centerMatrix)
-//            mCubeProgram.draw()
         }
 
         override fun onRelease() {
@@ -184,14 +180,15 @@ class ProjectionActivity : AppCompatActivity() {
                 bottom = -ratio
                 top = ratio
             }
-            // 设置投影矩阵
             if (mProjectionMode == ProjectionMode.Frustum) {
+                // 设置投影矩阵
                 mProjectMatrix.setFrustumM(
                     left, right,
                     bottom, top,
                     2F, 10F
                 )
             } else {
+                // 设置正交投影
                 mProjectMatrix.setOrthoM(
                     left, right,
                     bottom, top,

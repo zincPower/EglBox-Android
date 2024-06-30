@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 
-class ProjectionMainActivity: AppCompatActivity() {
+class MatrixMainActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
