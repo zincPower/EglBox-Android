@@ -10,7 +10,7 @@ class MatrixMainActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_projection_main)
+        setContentView(R.layout.activity_matrix_main)
 
         findViewById<View>(R.id.projection_mode).setOnClickListener {
             startActivity(Intent(this, ProjectionActivity::class.java))
