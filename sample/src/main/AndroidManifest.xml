@@ -44,6 +44,10 @@
             android:screenOrientation="landscape" />
 
         <activity
+            android:name="com.jiangpengyong.sample.c_drawing_mode.DrawingModeActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name="com.jiangpengyong.sample.d_texture.TextureMainActivity"
             android:screenOrientation="landscape" />
         <activity

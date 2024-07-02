@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.sample.a_glsl.GLSLMainActivity
 import com.jiangpengyong.sample.b_matrix.MatrixMainActivity
+import com.jiangpengyong.sample.c_drawing_mode.DrawingModeActivity
 import com.jiangpengyong.sample.d_texture.TextureMainActivity
 import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.obj.FrustumActivity
@@ -26,8 +27,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, GLSLMainActivity::class.java))
         }
 
-        findViewById<TextView>(R.id.projection).setOnClickListener {
+        findViewById<TextView>(R.id.matrix).setOnClickListener {
             startActivity(Intent(this, MatrixMainActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.drawing_mode).setOnClickListener {
+            startActivity(Intent(this, DrawingModeActivity::class.java))
         }
 
         findViewById<TextView>(R.id.texture).setOnClickListener {

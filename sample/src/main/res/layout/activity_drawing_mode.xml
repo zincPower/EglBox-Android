@@ -23,28 +23,84 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <RadioButton
-                android:id="@+id/point"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="true"
+                android:padding="5dp"
                 android:text="点"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
 
             <RadioButton
-                android:id="@+id/line"
+                android:id="@+id/gl_points"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="GL_POINTS"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
                 android:text="线"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
 
             <RadioButton
-                android:id="@+id/triangle"
+                android:id="@+id/gl_lines"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="GL_LINES"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/gl_line_strip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GL_LINE_STRIP"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/gl_line_loop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GL_LINE_LOOP"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
                 android:text="三角形"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/gl_triangles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GL_TRIANGLES"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/gl_triangle_strip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GL_TRIANGLE_STRIP"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/gl_triangle_fan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GL_TRIANGLE_FAN"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
         </RadioGroup>
@@ -53,7 +109,7 @@
 
     <view
         android:id="@+id/surface_view"
-        class="com.jiangpengyong.sample.b_matrix.ViewMatrixActivity$RenderView"
+        class="com.jiangpengyong.sample.c_drawing_mode.DrawingModeActivity$RenderView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
