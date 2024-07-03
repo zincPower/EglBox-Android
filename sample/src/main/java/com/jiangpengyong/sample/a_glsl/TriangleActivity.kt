@@ -68,7 +68,6 @@ class TriangleActivity : AppCompatActivity() {
 }
 
 class TriangleFilter : GLFilter() {
-
     private val mTriangleProgram = TriangleProgram()
 
     override fun onInit() {

@@ -9,14 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.ScaleType
 import com.jiangpengyong.eglbox.program.StarProgram
-import com.jiangpengyong.eglbox.program.VertexAlgorithmFactory
+import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
 import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.opengles.GL
 import javax.microedition.khronos.opengles.GL10
-import kotlin.math.min
 
 /**
  * @author jiang peng yong
@@ -58,7 +57,8 @@ class StarActivity : AppCompatActivity() {
             private val mImage = ImageInOut()
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-                GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+                GLES20.glEnable(GLES20.GL_CULL_FACE)
+                GLES20.glFrontFace(GLES20.GL_CW)
                 mFilter.init(mContext)
             }
 
@@ -76,35 +76,25 @@ class StarActivity : AppCompatActivity() {
 }
 
 class StarFilter : GLFilter() {
-    private val mColors = arrayOf(
-        floatArrayOf(0F / 255F, 50F / 255F, 133F / 255F),
-        floatArrayOf(42F / 255F, 98F / 255F, 154F / 255F),
-        floatArrayOf(255F / 255F, 127F / 255F, 62F / 255F),
-        floatArrayOf(255F / 255F, 218F / 255F, 120F / 255F),
-    )
-    private val mStarProgram = StarProgram()
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
+    private val mModelMatrix = ModelMatrix()
+
+    private val mStarProgram = StarProgram()
+    private var mDisplaySize = Size(0, 0)
 
     override fun onInit() {
         mStarProgram.init()
-        mProjectMatrix.setFrustumM(
-//        mProjectMatrix.setOrthoM(
-            -1F, 1F,
-            -1F, 1F,
-            5F, 20F
-        )
         mViewMatrix.setLookAtM(
-            1F, 1F, 10F,
+            0F, 0F, 5F,
             0F, 0F, 0F,
             0F, 1F, 0F
         )
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-        for (index in mColors.indices) {
-            drawStar(context, index, mColors[index])
-        }
+        updateProjectionMatrix(context)
+        drawStar()
     }
 
     override fun onRelease() {
@@ -115,13 +105,30 @@ class StarFilter : GLFilter() {
     override fun onRestoreData(restoreData: Bundle) {}
     override fun onSaveData(saveData: Bundle) {}
 
-    private fun drawStar(context: FilterContext, index: Int, colors: FloatArray) {
-        val width = min(context.displaySize.width, context.displaySize.height)
-        val matrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, context.displaySize, Size(width, width))
-        matrix.scale(0.8F, 0.8F, 1F)
-        matrix.translate(index * 0.5F, index * 0.5F, index * -2F)
-        mStarProgram.setColor(colors[0], colors[1], colors[2], 0F)
-        mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * matrix)
+    private fun drawStar() {
+        mStarProgram.setColor("#FF0000", "#FFFFFF")
+        mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
         mStarProgram.draw()
+    }
+
+    private fun updateProjectionMatrix(context: FilterContext) {
+        val displaySize = context.displaySize
+        if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
+            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+            if (displaySize.width > displaySize.height) {
+                mProjectMatrix.setOrthoM(
+                    -ratio, ratio,
+                    -1F, 1F,
+                    2F, 10F
+                )
+            } else {
+                mProjectMatrix.setOrthoM(
+                    -1F, 1F,
+                    -ratio, ratio,
+                    2F, 10F
+                )
+            }
+            mDisplaySize = displaySize
+        }
     }
 }

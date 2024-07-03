@@ -2,11 +2,12 @@ package com.jiangpengyong.eglbox.program
 
 import android.graphics.Color
 import android.opengl.GLES20
+import android.util.Size
+import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.gles.GLProgram
+import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.GLMatrix
-import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
-import java.lang.Math.toRadians
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -18,92 +19,38 @@ import kotlin.math.sin
  * @des 绘制五角星
  */
 class StarProgram : GLProgram() {
-    private val radius = 1F
-    private val ratio = radius * 0.382F
+    private val mOuterRadius = 1F
+    private val mInnerRadius = mOuterRadius * 0.382F
     private val mVertexBuffer = allocateFloatBuffer(
         floatArrayOf(
-            radius * sin(0.toRadians()).toFloat(), radius * cos(0.toRadians()).toFloat(), 0F,
             0F, 0F, 0F,
-            ratio * sin(36.toRadians()).toFloat(), ratio * cos(36.toRadians()).toFloat(), 0F,
-
-            ratio * sin(36.toRadians()).toFloat(), ratio * cos(36.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(72.toRadians()).toFloat(), radius * cos(72.toRadians()).toFloat(), 0F,
-
-            radius * sin(72.toRadians()).toFloat(), radius * cos(72.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(108.toRadians()).toFloat(), ratio * cos(108.toRadians()).toFloat(), 0F,
-
-            ratio * sin(108.toRadians()).toFloat(), ratio * cos(108.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(144.toRadians()).toFloat(), radius * cos(144.toRadians()).toFloat(), 0F,
-
-            radius * sin(144.toRadians()).toFloat(), radius * cos(144.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(180.toRadians()).toFloat(), ratio * cos(180.toRadians()).toFloat(), 0F,
-
-            ratio * sin(180.toRadians()).toFloat(), ratio * cos(180.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(216.toRadians()).toFloat(), radius * cos(216.toRadians()).toFloat(), 0F,
-
-            radius * sin(216.toRadians()).toFloat(), radius * cos(216.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(252.toRadians()).toFloat(), ratio * cos(252.toRadians()).toFloat(), 0F,
-
-            ratio * sin(252.toRadians()).toFloat(), ratio * cos(252.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(288.toRadians()).toFloat(), radius * cos(288.toRadians()).toFloat(), 0F,
-
-            radius * sin(288.toRadians()).toFloat(), radius * cos(288.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(324.toRadians()).toFloat(), ratio * cos(324.toRadians()).toFloat(), 0F,
-
-            ratio * sin(324.toRadians()).toFloat(), ratio * cos(324.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(0.toRadians()).toFloat(), radius * cos(0.toRadians()).toFloat(), 0F,
+            mOuterRadius * sin(0.toRadians()).toFloat(), mOuterRadius * cos(0.toRadians()).toFloat(), 0F,
+            mInnerRadius * sin(36.toRadians()).toFloat(), mInnerRadius * cos(36.toRadians()).toFloat(), 0F,
+            mOuterRadius * sin(72.toRadians()).toFloat(), mOuterRadius * cos(72.toRadians()).toFloat(), 0F,
+            mInnerRadius * sin(108.toRadians()).toFloat(), mInnerRadius * cos(108.toRadians()).toFloat(), 0F,
+            mOuterRadius * sin(144.toRadians()).toFloat(), mOuterRadius * cos(144.toRadians()).toFloat(), 0F,
+            mInnerRadius * sin(180.toRadians()).toFloat(), mInnerRadius * cos(180.toRadians()).toFloat(), 0F,
+            mOuterRadius * sin(216.toRadians()).toFloat(), mOuterRadius * cos(216.toRadians()).toFloat(), 0F,
+            mInnerRadius * sin(252.toRadians()).toFloat(), mInnerRadius * cos(252.toRadians()).toFloat(), 0F,
+            mOuterRadius * sin(288.toRadians()).toFloat(), mOuterRadius * cos(288.toRadians()).toFloat(), 0F,
+            mInnerRadius * sin(324.toRadians()).toFloat(), mInnerRadius * cos(324.toRadians()).toFloat(), 0F,
+            mOuterRadius * sin(0.toRadians()).toFloat(), mOuterRadius * cos(0.toRadians()).toFloat(), 0F,
         )
     )
     private var mColorBuffer = allocateFloatBuffer(
         floatArrayOf(
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
+            1F, 1F, 1F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
         )
     )
 
@@ -111,30 +58,42 @@ class StarProgram : GLProgram() {
     private var mPositionHandle = 0
     private var mColorHandle = 0
 
-    private val mVertexCount = 30
+    private val mVertexCount = 12
     private var mMatrix: GLMatrix = GLMatrix()
 
     fun setMatrix(matrix: GLMatrix) {
         mMatrix = matrix
     }
 
-    fun setColor(red: Float, green: Float, blue: Float, alpha: Float) {
+    fun setColor(cornerColor: String, centerColor: String) {
+        val realCornerColor = try {
+            Color.parseColor(cornerColor)
+        } catch (e: Exception) {
+            Logger.e(TAG, "SetColor failure. Corner color isn't a valid color.")
+            return
+        }
+        val realCenterColor = try {
+            Color.parseColor(centerColor)
+        } catch (e: Exception) {
+            Logger.e(TAG, "SetColor failure. Center color isn't a valid color.")
+            return
+        }
+
         val colors = FloatArray(mVertexCount * 4)
-        for (i in 0 until (mVertexCount / 3)) {
-            colors[i * 12 + 0] = red
-            colors[i * 12 + 1] = green
-            colors[i * 12 + 2] = blue
-            colors[i * 12 + 3] = alpha
+        colors[0] = Color.red(realCenterColor) / 255F
+        colors[1] = Color.green(realCenterColor) / 255F
+        colors[2] = Color.blue(realCenterColor) / 255F
+        colors[3] = Color.alpha(realCenterColor) / 255F
 
-            colors[i * 12 + 4] = max(red + 0.2F, 0F)
-            colors[i * 12 + 5] = max(green + 0.2F, 0F)
-            colors[i * 12 + 6] = max(blue + 0.2F, 0F)
-            colors[i * 12 + 7] = alpha
-
-            colors[i * 12 + 8] = red
-            colors[i * 12 + 9] = green
-            colors[i * 12 + 10] = blue
-            colors[i * 12 + 11] = alpha
+        val cornerRed = Color.red(realCornerColor) / 255F
+        val cornerGreen = Color.green(realCornerColor) / 255F
+        val cornerBlue = Color.blue(realCornerColor) / 255F
+        val cornerAlpha = Color.alpha(realCornerColor) / 255F
+        for (i in 1 until 12) {
+            colors[i * 4 + 0] = cornerRed
+            colors[i * 4 + 1] = cornerGreen
+            colors[i * 4 + 2] = cornerBlue
+            colors[i * 4 + 3] = cornerAlpha
         }
         mColorBuffer = allocateFloatBuffer(colors)
     }
@@ -151,7 +110,7 @@ class StarProgram : GLProgram() {
         GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * 4, mColorBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mColorHandle)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount)
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mColorHandle)
     }
@@ -185,16 +144,12 @@ class StarProgram : GLProgram() {
             fragColor = vColor;
         }
     """.trimIndent()
-}
 
-fun Double.toRadians(): Double {
-    return Math.toRadians(this)
-}
+    private fun Int.toRadians(): Double {
+        return Math.toRadians(this.toDouble())
+    }
 
-fun Float.toRadians(): Double {
-    return Math.toRadians(this.toDouble())
-}
-
-fun Int.toRadians(): Double {
-    return Math.toRadians(this.toDouble())
+    companion object {
+        private const val TAG = "StarProgram"
+    }
 }
