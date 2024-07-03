@@ -1,11 +1,13 @@
 package com.jiangpengyong.sample.c_drawing_mode
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Size
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
@@ -21,7 +23,6 @@ import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.sin
 
 /**
@@ -32,30 +33,65 @@ import kotlin.math.sin
  */
 class DrawingModeActivity : AppCompatActivity() {
     companion object {
-        private const val MODE = "mode"
+        const val DRAWING_MODE = "drawing_mode"
+        const val CULL_FACE_STATE_MODE = "cull_face_state_mode"
+        const val CULL_FACE_ORIENTATION = "cull_face_orientation"
     }
 
     private lateinit var mRenderView: RenderView
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drawing_mode)
 
         mRenderView = findViewById(R.id.surface_view)
 
-        val model = findViewById<RadioGroup>(R.id.drawing_mode)
-        model.setOnCheckedChangeListener { _, checkedId ->
+        val drawingModel = findViewById<RadioGroup>(R.id.drawing_mode)
+        drawingModel.setOnCheckedChangeListener { _, checkedId ->
             val bundle = Bundle()
             when (checkedId) {
-                R.id.gl_points -> bundle.putInt(MODE, DrawingMode.Points.value)
-                R.id.gl_lines -> bundle.putInt(MODE, DrawingMode.Lines.value)
-                R.id.gl_line_strip -> bundle.putInt(MODE, DrawingMode.LineStrip.value)
-                R.id.gl_line_loop -> bundle.putInt(MODE, DrawingMode.LineLoop.value)
-                R.id.gl_triangles -> bundle.putInt(MODE, DrawingMode.Triangles.value)
-                R.id.gl_triangle_strip -> bundle.putInt(MODE, DrawingMode.TriangleStrip.value)
-                R.id.gl_triangle_fan -> bundle.putInt(MODE, DrawingMode.TriangleFan.value)
+                R.id.gl_points -> bundle.putInt(DRAWING_MODE, DrawingMode.Points.value)
+                R.id.gl_lines -> bundle.putInt(DRAWING_MODE, DrawingMode.Lines.value)
+                R.id.gl_line_strip -> bundle.putInt(DRAWING_MODE, DrawingMode.LineStrip.value)
+                R.id.gl_line_loop -> bundle.putInt(DRAWING_MODE, DrawingMode.LineLoop.value)
+                R.id.gl_triangles -> bundle.putInt(DRAWING_MODE, DrawingMode.Triangles.value)
+                R.id.gl_triangle_strip -> bundle.putInt(DRAWING_MODE, DrawingMode.TriangleStrip.value)
+                R.id.gl_triangle_fan -> bundle.putInt(DRAWING_MODE, DrawingMode.TriangleFan.value)
             }
             mRenderView.updateFilterData(bundle)
+            mRenderView.requestRender()
+        }
+
+        val cullFaceOrientation = findViewById<RadioGroup>(R.id.cull_face_direction)
+        cullFaceOrientation.setOnCheckedChangeListener { _, checkedId ->
+            val bundle = Bundle()
+            when (checkedId) {
+                R.id.cw -> bundle.putInt(CULL_FACE_ORIENTATION, CullFaceOrientation.CW.value)
+                R.id.ccw -> bundle.putInt(CULL_FACE_ORIENTATION, CullFaceOrientation.CCW.value)
+            }
+            mRenderView.updateFilterData(bundle)
+            mRenderView.requestRender()
+        }
+
+        val cullFaceStateModel = findViewById<RadioGroup>(R.id.cull_face_state_mode)
+        cullFaceStateModel.setOnCheckedChangeListener { _, checkedId ->
+            val bundle = Bundle()
+            when (checkedId) {
+                R.id.enable_cull_face -> {
+                    findViewById<RadioButton>(R.id.cw).isEnabled = true
+                    findViewById<RadioButton>(R.id.ccw).isEnabled = true
+                    bundle.putInt(CULL_FACE_STATE_MODE, CullFaceState.Enable.value)
+                }
+
+                R.id.disable_cull_face -> {
+                    findViewById<RadioButton>(R.id.cw).isEnabled = false
+                    findViewById<RadioButton>(R.id.ccw).isEnabled = false
+                    bundle.putInt(CULL_FACE_STATE_MODE, CullFaceState.Disable.value)
+                }
+            }
+            mRenderView.updateFilterData(bundle)
+            mRenderView.requestRender()
         }
     }
 
@@ -81,9 +117,10 @@ class DrawingModeActivity : AppCompatActivity() {
             private val mImage = ImageInOut()
             private var mBundle: Bundle? = null
 
+            private var mCullFaceState = CullFaceState.Disable
+            private var mCullFaceOrientation = CullFaceOrientation.CCW
+
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-                GLES20.glEnable(GLES20.GL_DEPTH_TEST)
-                GLES20.glEnable(GLES20.GL_CULL_FACE)
                 mFilter.init(mContext)
             }
 
@@ -93,6 +130,17 @@ class DrawingModeActivity : AppCompatActivity() {
             }
 
             override fun onDrawFrame(gl: GL10?) {
+                if (mCullFaceState == CullFaceState.Enable) {
+                    GLES20.glEnable(GLES20.GL_CULL_FACE)
+                    if (mCullFaceOrientation == CullFaceOrientation.CW) {
+                        GLES20.glFrontFace(GLES20.GL_CW)
+                    } else {
+                        GLES20.glFrontFace(GLES20.GL_CCW)
+                    }
+                } else {
+                    GLES20.glDisable(GLES20.GL_CULL_FACE)
+                }
+
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
                 synchronized(this) {
                     val temp = mBundle
@@ -103,14 +151,46 @@ class DrawingModeActivity : AppCompatActivity() {
             }
 
             fun updateFilterData(bundle: Bundle) {
-                synchronized(this) { mBundle = bundle }
+                synchronized(this) {
+                    mBundle = bundle
+                    bundle.getInt(CULL_FACE_STATE_MODE, -1).takeIf { it != -1 }?.let {
+                        mCullFaceState = if (it == CullFaceState.Enable.value) {
+                            CullFaceState.Enable
+                        } else {
+                            CullFaceState.Disable
+                        }
+                    }
+                    bundle.getInt(CULL_FACE_ORIENTATION, -1).takeIf { it != -1 }?.let {
+                        mCullFaceOrientation = if (it == CullFaceOrientation.CW.value) {
+                            CullFaceOrientation.CW
+                        } else {
+                            CullFaceOrientation.CCW
+                        }
+                    }
+                }
             }
         }
     }
+}
 
-    enum class DrawingMode(val value: Int) {
-        Points(1), Lines(2), LineStrip(3), LineLoop(4), Triangles(5), TriangleStrip(6), TriangleFan(7),
-    }
+private enum class DrawingMode(val value: Int) {
+    Points(GLES20.GL_POINTS),
+    Lines(GLES20.GL_LINES),
+    LineStrip(GLES20.GL_LINE_STRIP),
+    LineLoop(GLES20.GL_LINE_LOOP),
+    Triangles(GLES20.GL_TRIANGLES),
+    TriangleStrip(GLES20.GL_TRIANGLE_STRIP),
+    TriangleFan(GLES20.GL_TRIANGLE_FAN),
+}
+
+private enum class CullFaceState(val value: Int) {
+    Enable(1),
+    Disable(2),
+}
+
+private enum class CullFaceOrientation(val value: Int) {
+    CW(GLES20.GL_CW),
+    CCW(GLES20.GL_CCW),
 }
 
 private class StarFilter : GLFilter() {
@@ -119,6 +199,7 @@ private class StarFilter : GLFilter() {
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
     private var mDisplaySize = Size(0, 0)
+    private var mDrawingMode = DrawingMode.Points.value
 
     override fun onInit() {
         mStarProgram.init()
@@ -139,13 +220,16 @@ private class StarFilter : GLFilter() {
         mStarProgram.release()
     }
 
-    override fun onUpdateData(inputData: Bundle) {}
+    override fun onUpdateData(inputData: Bundle) {
+        mDrawingMode = inputData.getInt(DrawingModeActivity.DRAWING_MODE, -1).takeIf { it != -1 } ?: return
+    }
+
     override fun onRestoreData(restoreData: Bundle) {}
     override fun onSaveData(saveData: Bundle) {}
 
     private fun drawStar() {
-        mStarProgram.setColor(0F / 255F, 50F / 255F, 133F / 255F, 0F)
         mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+        mStarProgram.setMode(mDrawingMode)
         mStarProgram.draw()
     }
 
@@ -173,92 +257,47 @@ private class StarFilter : GLFilter() {
 }
 
 private class StarProgram : GLProgram() {
-    private val radius = 1F
-    private val ratio = radius * 0.382F
+    // 外圆半径
+    private val outerRadius = 1F
+
+    // 内圆半径
+    private val innerRadius = outerRadius * 0.382F
     private val mVertexBuffer = allocateFloatBuffer(
         floatArrayOf(
-            radius * sin(0.toRadians()).toFloat(), radius * cos(0.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(36.toRadians()).toFloat(), ratio * cos(36.toRadians()).toFloat(), 0F,
-
-            ratio * sin(36.toRadians()).toFloat(), ratio * cos(36.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(72.toRadians()).toFloat(), radius * cos(72.toRadians()).toFloat(), 0F,
-
-            radius * sin(72.toRadians()).toFloat(), radius * cos(72.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(108.toRadians()).toFloat(), ratio * cos(108.toRadians()).toFloat(), 0F,
-
-            ratio * sin(108.toRadians()).toFloat(), ratio * cos(108.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(144.toRadians()).toFloat(), radius * cos(144.toRadians()).toFloat(), 0F,
-
-            radius * sin(144.toRadians()).toFloat(), radius * cos(144.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(180.toRadians()).toFloat(), ratio * cos(180.toRadians()).toFloat(), 0F,
-
-            ratio * sin(180.toRadians()).toFloat(), ratio * cos(180.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(216.toRadians()).toFloat(), radius * cos(216.toRadians()).toFloat(), 0F,
-
-            radius * sin(216.toRadians()).toFloat(), radius * cos(216.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(252.toRadians()).toFloat(), ratio * cos(252.toRadians()).toFloat(), 0F,
-
-            ratio * sin(252.toRadians()).toFloat(), ratio * cos(252.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(288.toRadians()).toFloat(), radius * cos(288.toRadians()).toFloat(), 0F,
-
-            radius * sin(288.toRadians()).toFloat(), radius * cos(288.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            ratio * sin(324.toRadians()).toFloat(), ratio * cos(324.toRadians()).toFloat(), 0F,
-
-            ratio * sin(324.toRadians()).toFloat(), ratio * cos(324.toRadians()).toFloat(), 0F,
-            0F, 0F, 0F,
-            radius * sin(0.toRadians()).toFloat(), radius * cos(0.toRadians()).toFloat(), 0F,
+            // 第一个点
+            outerRadius * sin(0.toRadians()).toFloat(), outerRadius * cos(0.toRadians()).toFloat(), 0F,
+            // 第二个点
+            innerRadius * sin(36.toRadians()).toFloat(), innerRadius * cos(36.toRadians()).toFloat(), 0F,
+            // 第三个点
+            outerRadius * sin(72.toRadians()).toFloat(), outerRadius * cos(72.toRadians()).toFloat(), 0F,
+            // 第四个点
+            innerRadius * sin(108.toRadians()).toFloat(), innerRadius * cos(108.toRadians()).toFloat(), 0F,
+            // 第五个点
+            outerRadius * sin(144.toRadians()).toFloat(), outerRadius * cos(144.toRadians()).toFloat(), 0F,
+            // 第六个点
+            innerRadius * sin(180.toRadians()).toFloat(), innerRadius * cos(180.toRadians()).toFloat(), 0F,
+            // 第七个点
+            outerRadius * sin(216.toRadians()).toFloat(), outerRadius * cos(216.toRadians()).toFloat(), 0F,
+            // 第八个点
+            innerRadius * sin(252.toRadians()).toFloat(), innerRadius * cos(252.toRadians()).toFloat(), 0F,
+            // 第九个点
+            outerRadius * sin(288.toRadians()).toFloat(), outerRadius * cos(288.toRadians()).toFloat(), 0F,
+            // 第十个点
+            innerRadius * sin(324.toRadians()).toFloat(), innerRadius * cos(324.toRadians()).toFloat(), 0F,
         )
     )
     private var mColorBuffer = allocateFloatBuffer(
         floatArrayOf(
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
-
-            1F, 158F / 255F, 170F / 255F, 0F,
-            1F, 208F / 255F, 208F / 255F, 0F,
-            1F, 158F / 255F, 170F / 255F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
+            1F, 0F, 0F, 0F,
         )
     )
 
@@ -266,32 +305,17 @@ private class StarProgram : GLProgram() {
     private var mPositionHandle = 0
     private var mColorHandle = 0
 
-    private val mVertexCount = 30
+    private val mVertexCount = 10
     private var mMatrix: GLMatrix = GLMatrix()
+
+    private var mDrawingMode: Int = DrawingMode.Points.value
 
     fun setMatrix(matrix: GLMatrix) {
         mMatrix = matrix
     }
 
-    fun setColor(red: Float, green: Float, blue: Float, alpha: Float) {
-        val colors = FloatArray(mVertexCount * 4)
-        for (i in 0 until (mVertexCount / 3)) {
-            colors[i * 12 + 0] = red
-            colors[i * 12 + 1] = green
-            colors[i * 12 + 2] = blue
-            colors[i * 12 + 3] = alpha
-
-            colors[i * 12 + 4] = max(red + 0.2F, 0F)
-            colors[i * 12 + 5] = max(green + 0.2F, 0F)
-            colors[i * 12 + 6] = max(blue + 0.2F, 0F)
-            colors[i * 12 + 7] = alpha
-
-            colors[i * 12 + 8] = red
-            colors[i * 12 + 9] = green
-            colors[i * 12 + 10] = blue
-            colors[i * 12 + 11] = alpha
-        }
-        mColorBuffer = allocateFloatBuffer(colors)
+    fun setMode(mode: Int) {
+        mDrawingMode = mode
     }
 
     override fun onInit() {
@@ -306,7 +330,7 @@ private class StarProgram : GLProgram() {
         GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * 4, mColorBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mColorHandle)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
+        GLES20.glDrawArrays(mDrawingMode, 0, mVertexCount)
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mColorHandle)
     }
@@ -328,6 +352,7 @@ private class StarProgram : GLProgram() {
         void main() {
             gl_Position = uMVPMatrix * vec4(aPosition, 1.0);
             vColor = aColor;
+            gl_PointSize = 10.0;
         }
     """.trimIndent()
 
