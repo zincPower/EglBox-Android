@@ -14,7 +14,7 @@ import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.PureColorCubeProgram
+import com.jiangpengyong.eglbox.program.CubeProgram
 import com.jiangpengyong.eglbox.program.isValid
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
@@ -146,7 +146,7 @@ class ModelMatrixActivity : AppCompatActivity() {
         private var mCurrentOffset = 0F
         private var mDisplaySize = Size(0, 0)
 
-        private val mCubeProgram = PureColorCubeProgram()
+        private val mCubeProgram = CubeProgram()
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
         private var mModelMatrix = ModelMatrix()

@@ -2,14 +2,11 @@ package com.jiangpengyong.eglbox.program
 
 import android.graphics.Color
 import android.opengl.GLES20
-import android.util.Size
-import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.gles.GLProgram
 import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.GLMatrix
 import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.sin
 
 /**
@@ -19,7 +16,10 @@ import kotlin.math.sin
  * @des 绘制五角星
  */
 class StarProgram : GLProgram() {
+    // 外圆半径
     private val mOuterRadius = 1F
+
+    // 内圆半径
     private val mInnerRadius = mOuterRadius * 0.382F
     private val mVertexBuffer = allocateFloatBuffer(
         floatArrayOf(

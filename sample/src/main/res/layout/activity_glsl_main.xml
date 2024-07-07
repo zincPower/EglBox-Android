@@ -5,13 +5,18 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/triangle"
+        style="@style/common_button"
+        android:text="三角形" />
+
+    <TextView
         android:id="@+id/star"
         style="@style/common_button"
         android:text="五角星" />
 
     <TextView
-        android:id="@+id/triangle"
+        android:id="@+id/cube"
         style="@style/common_button"
-        android:text="三角形" />
+        android:text="立方体" />
 
 </LinearLayout>

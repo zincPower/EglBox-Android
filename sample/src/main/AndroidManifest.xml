@@ -29,6 +29,9 @@
         <activity
             android:name="com.jiangpengyong.sample.a_glsl.StarActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.a_glsl.CubeActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.b_matrix.MatrixMainActivity"

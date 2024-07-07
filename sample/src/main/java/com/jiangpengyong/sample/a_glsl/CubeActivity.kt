@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.StarProgram
+import com.jiangpengyong.eglbox.program.CubeProgram
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
@@ -20,9 +20,9 @@ import javax.microedition.khronos.opengles.GL10
  * @author jiang peng yong
  * @date 2024/2/9 15:33
  * @email 56002982@qq.com
- * @des 三角形
+ * @des 立方体
  */
-class StarActivity : AppCompatActivity() {
+class CubeActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,13 +51,14 @@ class StarActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilter = StarFilter()
+            private val mFilter = CubeFilter()
             private val mContext = FilterContext()
             private val mImage = ImageInOut()
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                GLES20.glFrontFace(GLES20.GL_CW)
+                GLES20.glFrontFace(GLES20.GL_CCW)
+                GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 mFilter.init(mContext)
             }
 
@@ -74,39 +75,40 @@ class StarActivity : AppCompatActivity() {
     }
 }
 
-private class StarFilter : GLFilter() {
+private class CubeFilter : GLFilter() {
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
 
-    private val mStarProgram = StarProgram()
+    private val mCubeProgram = CubeProgram()
     private var mDisplaySize = Size(0, 0)
 
     override fun onInit() {
-        mStarProgram.init()
+        mCubeProgram.init()
         mViewMatrix.setLookAtM(
             0F, 0F, 5F,
             0F, 0F, 0F,
             0F, 1F, 0F
         )
+        mModelMatrix.rotate(30F, 1F, 1F, 1F)
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         updateProjectionMatrix(context)
-        drawStar()
+        drawCube()
     }
 
     override fun onRelease() {
-        mStarProgram.release()
+        mCubeProgram.release()
     }
 
     override fun onUpdateData(inputData: Bundle) {}
     override fun onRestoreData(restoreData: Bundle) {}
     override fun onSaveData(saveData: Bundle) {}
 
-    private fun drawStar() {
-        mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-        mStarProgram.draw()
+    private fun drawCube() {
+        mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+        mCubeProgram.draw()
     }
 
     private fun updateProjectionMatrix(context: FilterContext) {
@@ -114,13 +116,13 @@ private class StarFilter : GLFilter() {
         if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
             val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
             if (displaySize.width > displaySize.height) {
-                mProjectMatrix.setOrthoM(
+                mProjectMatrix.setFrustumM(
                     -ratio, ratio,
                     -1F, 1F,
                     2F, 10F
                 )
             } else {
-                mProjectMatrix.setOrthoM(
+                mProjectMatrix.setFrustumM(
                     -1F, 1F,
                     -ratio, ratio,
                     2F, 10F

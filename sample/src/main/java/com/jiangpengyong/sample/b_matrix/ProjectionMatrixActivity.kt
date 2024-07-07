@@ -12,7 +12,7 @@ import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.PureColorCubeProgram
+import com.jiangpengyong.eglbox.program.CubeProgram
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
@@ -124,7 +124,7 @@ class ProjectionActivity : AppCompatActivity() {
     class CubeFilter : GLFilter() {
         private var mProjectionMode = ProjectionMode.Frustum
         private var mViewportMode = ViewportMode.Full
-        private val mCubeProgram = PureColorCubeProgram()
+        private val mCubeProgram = CubeProgram()
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
 

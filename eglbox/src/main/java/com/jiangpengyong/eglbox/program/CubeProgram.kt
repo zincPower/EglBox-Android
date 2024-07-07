@@ -1,7 +1,11 @@
 package com.jiangpengyong.eglbox.program
 
+import android.graphics.Color
 import android.opengl.GLES20
+import android.view.Display.Mode
 import com.jiangpengyong.eglbox.gles.GLProgram
+import com.jiangpengyong.eglbox.logger.Logger
+import com.jiangpengyong.eglbox.program.StarProgram.Companion
 import com.jiangpengyong.eglbox.utils.GLMatrix
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
@@ -19,140 +23,79 @@ class CubeProgram : GLProgram() {
     private val mVertexBuffer = allocateFloatBuffer(
         floatArrayOf(
             /**
-             * 正面 向量向屏幕外
-             *
-             *  1-----------0
-             *  ᐱ +y        │
-             *  │           │
-             *  │    原点    │
-             *  │           │
-             *  │           │
-             *  2---------->3
-             *             +x
+             *        ᐱ +y
+             *  1-----│-----0
+             *  │     │     │
+             *  │     │     │
+             * -│----原点----│->+x
+             *  │     │     │
+             *  │     │     │
+             *  2-----│-----3
+             *        │
              */
-            halfSideLength, halfSideLength, halfSideLength,     // 0
-            -halfSideLength, halfSideLength, halfSideLength,    // 1
-            -halfSideLength, -halfSideLength, halfSideLength,   // 2
-            halfSideLength, halfSideLength, halfSideLength,     // 0
-            -halfSideLength, -halfSideLength, halfSideLength,   // 2
-            halfSideLength, -halfSideLength, halfSideLength,    // 3
-            /**
-             * 后面 向量向屏幕里
-             *
-             *  3-----------0
-             *  ᐱ +y        │
-             *  │           │
-             *  │    原点    │
-             *  │           │
-             *  │           │
-             *  2---------->1
-             *             +x
-             */
-            halfSideLength, halfSideLength, -halfSideLength,    // 0
-            halfSideLength, -halfSideLength, -halfSideLength,   // 1
-            -halfSideLength, -halfSideLength, -halfSideLength,  // 2
-            halfSideLength, halfSideLength, -halfSideLength,    // 0
-            -halfSideLength, -halfSideLength, -halfSideLength,  // 2
-            -halfSideLength, halfSideLength, -halfSideLength,   // 3
-            /**
-             *  左面 向量向屏幕外
-             *
-             *  1-----------0
-             *  ᐱ +y        │
-             *  │           │
-             *  │    原点    │
-             *  │           │
-             *  │           │
-             *  2---------->3
-             *             +z
-             */
-            -halfSideLength, halfSideLength, halfSideLength,    // 0
-            -halfSideLength, halfSideLength, -halfSideLength,   // 1
-            -halfSideLength, -halfSideLength, -halfSideLength,  // 2
-            -halfSideLength, halfSideLength, halfSideLength,    // 0
-            -halfSideLength, -halfSideLength, -halfSideLength,  // 2
-            -halfSideLength, -halfSideLength, halfSideLength,   // 3
-            /**
-             * 右面 向量向屏幕内
-             *
-             *  3-----------0
-             *  ᐱ +y        │
-             *  │           │
-             *  │    原点    │
-             *  │           │
-             *  │           │
-             *  2---------->1
-             *             +z
-             */
-            halfSideLength, halfSideLength, halfSideLength,     // 0
-            halfSideLength, -halfSideLength, halfSideLength,    // 1
-            halfSideLength, -halfSideLength, -halfSideLength,   // 2
-            halfSideLength, halfSideLength, halfSideLength,     // 0
-            halfSideLength, -halfSideLength, -halfSideLength,   // 2
-            halfSideLength, halfSideLength, -halfSideLength,    // 3
-            /**
-             * 上面 向量向屏幕外
-             *
-             *  3-----------0
-             *  ᐱ +z        │
-             *  │           │
-             *  │    原点    │
-             *  │           │
-             *  │           │
-             *  2<----------1
-             *   +x
-             */
-            halfSideLength, halfSideLength, halfSideLength,     // 3
-            halfSideLength, halfSideLength, -halfSideLength,    // 2
-            -halfSideLength, halfSideLength, -halfSideLength,   // 1
-            halfSideLength, halfSideLength, halfSideLength,     // 3
-            -halfSideLength, halfSideLength, -halfSideLength,   // 1
-            -halfSideLength, halfSideLength, halfSideLength,    // 0
-            /**
-             *  上面 向量向屏幕内
-             *
-             *  3-----------0
-             *  ᐱ +z        │
-             *  │           │
-             *  │    原点    │
-             *  │           │
-             *  │           │
-             *  2<----------1
-             *             +x
-             */
-            -halfSideLength, -halfSideLength, -halfSideLength,  // 1
-            halfSideLength, -halfSideLength, -halfSideLength,   // 2
-            halfSideLength, -halfSideLength, halfSideLength,    // 3
-            -halfSideLength, -halfSideLength, halfSideLength,   // 0
-            -halfSideLength, -halfSideLength, -halfSideLength,  // 1
-            halfSideLength, -halfSideLength, halfSideLength,    // 3
+            0F, 0F, 0F,
+            halfSideLength, halfSideLength, 0F,     // 0
+            -halfSideLength, halfSideLength, 0F,    // 1
+            -halfSideLength, -halfSideLength, 0F,   // 2
+            halfSideLength, -halfSideLength, 0F,    // 3
+            halfSideLength, halfSideLength, 0F,     // 0
         )
     )
-    private val mColorBuffer: FloatBuffer
+    private lateinit var mColorBuffer: FloatBuffer
 
     private var mMVPMatrixHandle = 0
     private var mPositionHandle = 0
     private var mColorHandle = 0
 
-    private val mVertexCount = 6 * 6
+    private val mVertexCount = 6
 
     private var mMatrix = GLMatrix()
 
+    private var mFaceMatrix = ModelMatrix()
+
     init {
-        val colors = FloatArray(mVertexCount * 4)
-        for (i in 0 until 6) {
-            for (j in 0 until 6) {
-                colors[i * 24 + j * 4 + 0] = (10F + 200 / 6 * i) / 255F
-                colors[i * 24 + j * 4 + 1] = (100F + 90 / 6 * i) / 255F
-                colors[i * 24 + j * 4 + 2] = (50F + 150 / 6 * i) / 255F
-                colors[i * 24 + j * 4 + 3] = 0F
-            }
-        }
-        mColorBuffer = allocateFloatBuffer(colors)
+        calculateColor("#4E8CC3", "#FFFFFF")
     }
 
     fun setMatrix(matrix: GLMatrix) {
         mMatrix = matrix
+    }
+
+    fun setColor(cornerColor: String, centerColor: String) {
+        calculateColor(cornerColor, centerColor)
+    }
+
+    private fun calculateColor(cornerColor: String, centerColor: String) {
+        val realCornerColor = try {
+            Color.parseColor(cornerColor)
+        } catch (e: Exception) {
+            Logger.e(TAG, "SetColor failure. Corner color isn't a valid color.")
+            return
+        }
+        val realCenterColor = try {
+            Color.parseColor(centerColor)
+        } catch (e: Exception) {
+            Logger.e(TAG, "SetColor failure. Center color isn't a valid color.")
+            return
+        }
+
+        val colors = FloatArray(mVertexCount * 4)
+        colors[0] = Color.red(realCenterColor) / 255F
+        colors[1] = Color.green(realCenterColor) / 255F
+        colors[2] = Color.blue(realCenterColor) / 255F
+        colors[3] = Color.alpha(realCenterColor) / 255F
+
+        val cornerRed = Color.red(realCornerColor) / 255F
+        val cornerGreen = Color.green(realCornerColor) / 255F
+        val cornerBlue = Color.blue(realCornerColor) / 255F
+        val cornerAlpha = Color.alpha(realCornerColor) / 255F
+        for (i in 1 until mVertexCount) {
+            colors[i * 4 + 0] = cornerRed
+            colors[i * 4 + 1] = cornerGreen
+            colors[i * 4 + 2] = cornerBlue
+            colors[i * 4 + 3] = cornerAlpha
+        }
+        mColorBuffer = allocateFloatBuffer(colors)
     }
 
     override fun onInit() {
@@ -162,14 +105,48 @@ class CubeProgram : GLProgram() {
     }
 
     override fun onDraw() {
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMatrix.matrix, 0)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * 4, mColorBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mColorHandle)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
+
+        // 后乘规则
+        mFaceMatrix.reset()
+        mFaceMatrix.translate(0F, 0F, halfSideLength)
+        drawFace(mFaceMatrix)
+
+        mFaceMatrix.reset()
+        mFaceMatrix.translate(0F, -halfSideLength, 0F)
+        mFaceMatrix.rotate(90F, 1F, 0F, 0F)
+        drawFace(mFaceMatrix)
+
+        mFaceMatrix.reset()
+        mFaceMatrix.translate(0F, 0F, -halfSideLength)
+        mFaceMatrix.rotate(180F, 1F, 0F, 0F)
+        drawFace(mFaceMatrix)
+
+        mFaceMatrix.reset()
+        mFaceMatrix.translate(0F, halfSideLength, 0F)
+        mFaceMatrix.rotate(270F, 1F, 0F, 0F)
+        drawFace(mFaceMatrix)
+
+        mFaceMatrix.reset()
+        mFaceMatrix.translate(halfSideLength, 0F, 0F)
+        mFaceMatrix.rotate(90F, 0F, 1F, 0F)
+        drawFace(mFaceMatrix)
+
+        mFaceMatrix.reset()
+        mFaceMatrix.translate(-halfSideLength, 0F, 0F)
+        mFaceMatrix.rotate(270F, 0F, 1F, 0F)
+        drawFace(mFaceMatrix)
+
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mColorHandle)
+    }
+
+    private fun drawFace(matrix: GLMatrix) {
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, (mMatrix * matrix).matrix, 0)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount)
     }
 
     override fun onRelease() {
@@ -201,4 +178,8 @@ class CubeProgram : GLProgram() {
             fragColor = vColor;
         }
     """.trimIndent()
+
+    companion object {
+        private const val TAG = "CubeProgram"
+    }
 }

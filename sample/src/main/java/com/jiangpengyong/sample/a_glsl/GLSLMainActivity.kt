@@ -18,12 +18,16 @@ class GLSLMainActivity :AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_glsl_main)
 
+        findViewById<View>(R.id.triangle).setOnClickListener{
+            startActivity(Intent(this, TriangleActivity::class.java))
+        }
+
         findViewById<View>(R.id.star).setOnClickListener{
             startActivity(Intent(this, StarActivity::class.java))
         }
 
-        findViewById<View>(R.id.triangle).setOnClickListener{
-            startActivity(Intent(this, TriangleActivity::class.java))
+        findViewById<View>(R.id.cube).setOnClickListener{
+            startActivity(Intent(this, CubeActivity::class.java))
         }
     }
 

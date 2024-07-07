@@ -322,6 +322,8 @@ private class StarProgram : GLProgram() {
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
         mPositionHandle = getAttribLocation("aPosition")
         mColorHandle = getAttribLocation("aColor")
+
+        GLES20.glLineWidth(10.0F)
     }
 
     override fun onDraw() {

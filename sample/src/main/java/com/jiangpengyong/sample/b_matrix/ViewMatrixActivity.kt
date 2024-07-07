@@ -14,7 +14,7 @@ import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.PureColorCubeProgram
+import com.jiangpengyong.eglbox.program.CubeProgram
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
@@ -127,7 +127,7 @@ class ViewMatrixActivity : AppCompatActivity() {
         enum class State { Out, In }
 
         // 立方体
-        private val mCubeProgram = PureColorCubeProgram()
+        private val mCubeProgram = CubeProgram()
 
         // 投影矩阵
         private val mProjectMatrix = ProjectMatrix()
