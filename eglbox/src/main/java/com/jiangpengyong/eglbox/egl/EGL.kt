@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox
+package com.jiangpengyong.eglbox.egl
 
 import android.opengl.EGL14
 import android.opengl.EGLConfig
@@ -7,9 +7,6 @@ import android.opengl.EGLDisplay
 import android.opengl.EGLExt
 import android.util.Log
 import android.view.Surface
-import com.jiangpengyong.eglbox.egl.EglSurface
-import com.jiangpengyong.eglbox.egl.PBufferSurface
-import com.jiangpengyong.eglbox.egl.WindowSurface
 import com.jiangpengyong.eglbox.gles.EGLBox
 import com.jiangpengyong.eglbox.logger.Logger
 

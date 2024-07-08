@@ -3,7 +3,6 @@ package com.jiangpengyong.eglbox.egl
 import android.opengl.EGL14
 import android.opengl.EGLSurface
 import android.view.Surface
-import com.jiangpengyong.eglbox.EGLState
 import com.jiangpengyong.eglbox.logger.Logger
 
 enum class EglSurfaceType { Window, PBuffer }
@@ -24,6 +23,11 @@ open class EglSurface(
         private set
     var height: Int = height
         private set
+
+    fun updateSize(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
 
     fun release() {
         Logger.i(TAG, "Release EglSurface.");

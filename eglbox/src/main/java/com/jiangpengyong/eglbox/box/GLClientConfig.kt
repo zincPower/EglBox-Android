@@ -13,5 +13,12 @@ data class GLClientConfig(
     val surfaceType: EglSurfaceType,
     val width: Int,
     val height: Int,
-    val drawFrameListener: DrawFrameListener?
-)
+) {
+    var drawFrameListener: DrawFrameListener? = null
+        set(value) = synchronized(this) {
+            field = value
+        }
+        get() = synchronized(this) {
+            field
+        }
+}
