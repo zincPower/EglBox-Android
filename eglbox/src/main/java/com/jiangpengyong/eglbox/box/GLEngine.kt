@@ -34,31 +34,31 @@ import com.jiangpengyong.eglbox.logger.Logger
  *
  * 通过 [getLooper] 获取 EGL 线程的 [Looper] ，然后创建相应的 [Handler] ，[Handler] 的处理操作则在 EGL 环境中，可以解耦外部操作。
  */
-class GLEngine private constructor(config: GLClientConfig) {
+class GLEngine private constructor(config: GLEngineConfig) {
     companion object {
         const val TAG = "GLEngine"
 
         fun createWindowType(): GLEngine {
-            val config = GLClientConfig(EglSurfaceType.Window, 0, 0)
+            val config = GLEngineConfig(EglSurfaceType.Window, 0, 0)
             return GLEngine(config)
         }
 
         fun createPBufferType(width: Int, height: Int): GLEngine {
-            val config = GLClientConfig(EglSurfaceType.PBuffer, width, height)
+            val config = GLEngineConfig(EglSurfaceType.PBuffer, width, height)
             return GLEngine(config)
         }
     }
 
     private var mGLThread: GLThread? = null
-    private val mConfig: GLClientConfig = config
+    private val mConfig: GLEngineConfig = config
 
     fun start(renderer: GLRenderer) {
         val thread = mGLThread
         if (thread != null && thread.isRunning()) {
-            Logger.e(TAG, "GLClient 已经启动了!!!")
+            Logger.e(TAG, "GLEngine has been launched.")
             return
         }
-        Logger.i(TAG, "GLClient 启动")
+        Logger.i(TAG, "GLEngine launch.")
         mGLThread = GLThread(mConfig)
             .also {
                 it.setRenderer(renderer)
@@ -68,7 +68,7 @@ class GLEngine private constructor(config: GLClientConfig) {
     }
 
     fun stop() {
-        Logger.i(TAG, "GLClient release.")
+        Logger.i(TAG, "GLEngine release.")
         mGLThread?.quit()
         mGLThread = null
     }

@@ -1,8 +1,10 @@
 package com.jiangpengyong.eglbox.box
 
+import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Surface
+import com.jiangpengyong.eglbox.GLThread
 import com.jiangpengyong.eglbox.egl.EGL
 import com.jiangpengyong.eglbox.egl.EglSurface
 import com.jiangpengyong.eglbox.egl.EglSurfaceType
@@ -14,22 +16,57 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author: jiang peng yong
  * @date: 2023/9/25 23:04
  * @email: 56002982@qq.com
- * @desc: GL 线程
+ * @desc: GL 线程，负责启动一个线程，并在该线程附加一个 [EGL] 环境
  *
+ * 一、创建 [GLThread] 对象，需要提供 [GLEngineConfig] 配置，[GLThread] 启动后会根据 [GLEngineConfig] 配置的参数进行初始化 EGL 环境。
+ *
+ * 二、调用 [start] 启动 [GLThread] 前，必须通过 [setRenderer] 方法进行设置 [GLRenderer] 渲染回调对象，
+ * 后续 EGL 的生命周期和渲染驱动会回调到 [GLRenderer] 相应方法：
+ * 1、[GLRenderer.onEGLCreated] EGL 创建成功时回调
+ * 2、[GLRenderer.onSurfaceSizeChanged] EGL 的 [EglSurface] 创建成功时回调。[GLRenderer.onEGLCreated] 回调后，
+ * 如果能够创建 [EglSurface] ，则会立马创建 [EglSurface] 并且调用该方法。否则会在满足条件时，创建 [EglSurface] 后调用该方法。
+ * 如果 [EglSurface] 尺寸有大小的变动也会调用此方法
+ * 3、[GLRenderer.onDrawFrame] 在调用 [GLThread.requestRender] 方法之后会在 EGL 线程中调用 [GLRenderer.onDrawFrame] 方法，
+ * 内部可以进行 GL 渲染操作
+ * 4、[GLRenderer.onEGLDestroy] EGL 销毁前会调用该方法，调用此方法意味着 [GLThread] 已经退出 [Looper] 循环处理，线程将终止运行，
+ * 需要在该方法中进行回收相应自愿。
+ *
+ * 调用 [start] 进行启动 [GLThread] 线程，调用前必须要保证通过 [setRenderer] 设置渲染回调对象，而且该线程没有在运行状态，
+ * 否则 [GLThread] 不会正常启动，但不会抛异常，会有日志提示。
+ *
+ * 三、调用 [quit] 进行退出线程，但 [GLThread] 并不会立马退出，[quit] 会向 [Looper] 压入退出 [Message]，直到运行到该 [Message] 才会退出线程，
+ * 这是一种安全的做法，但不是同步即时生效的。
+ *
+ * 四、调用 [waitUntilReady] 方法会阻塞当前线程，直到 GL 线程初始化 EGL 完成
+ *
+ * 五、调用 [isRunning] 可以获取线程是否还在运行
+ *
+ * 六、调用 [requestRender] 驱动 GL 渲染，会向 GL 线程压渲染任务，后续调用 [GLRenderer.onDrawFrame] 驱动渲染
+ *
+ * 七、如果传入 [GLEngineConfig] 配置是 [EglSurfaceType.Window] 类型，则需要在后续传入 [Surface] ，并相应的调用以下方法：
+ * - [handleWindowCreated] ：[Surface] 创建时，调用该方法
+ * - [handleWindowSizeChanged] ：[Surface] 尺寸变动时调用该方法
+ * - [handleWindowDestroy] ：[Surface] 销毁时调用该方法
+ * 调用后，[GLThread] 会负责维护该 [Surface] 创建的 [EglSurface] ，并附加在当前的 EGL 环境中。
+ *
+ * 八、[enqueueEvent] 向 GL 线程压入闭包，闭包的内容会在 GL 线程中执行
+ *
+ * 九、[getLooper] 获取 GL 线程的 [Looper] ，可以用于创建 [Handler]
  */
-class GLThread(val config: GLClientConfig) : Thread(TAG) {
+class GLThread(val config: GLEngineConfig) : Thread(TAG) {
     private var mEGL: EGL? = null
     private var mHandler: GLHandler? = null
     private var mRenderer: GLRenderer? = null
     private var mEglSurface: EglSurface? = null
     private var mLooper: Looper? = null
 
+    // 是否已经调用了 EGLCreated 回调
     private var mIsCalledOnEglCreated = false
 
-    // 用于限制多次初始化
+    // 是否已经运行
     private var mIsRunning = AtomicBoolean(false)
 
-    // 用于控制线程已经初始化好 TODO
+    // 用于控制线程已经初始化好
     private var mIsThreadReady = false
     private val mReadyLock = Object()
 
@@ -58,14 +95,149 @@ class GLThread(val config: GLClientConfig) : Thread(TAG) {
     }
 
     fun quit() {
-        Log.i(TAG, "Quit GLThread. mIsRunning=${mIsRunning}")
+        Log.i(TAG, "Quit GLThread. Running status=${mIsRunning}")
         if (mIsRunning.get()) mHandler?.sendRelease()
     }
 
     fun waitUntilReady() = synchronized(mReadyLock) {
-        // todo
         while (!mIsThreadReady) {
             mReadyLock.wait()
+        }
+    }
+
+    fun requestRender() {
+        this.mHandler?.sendRequestRenderMessage()
+    }
+
+    fun handleWindowCreated(window: Surface?) = synchronized(mWindowLock) {
+        mWindowControlFinish = false
+        val result = mHandler?.post {
+            val egl = mEGL
+            if (egl == null) {
+                Log.e(TAG, "EGL is null【handleWindowCreated】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            val renderer = mRenderer
+            if (renderer == null) {
+                Log.e(TAG, "Renderer is null【handleWindowCreated】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            if (window == null) {
+                Log.e(TAG, "Param is invalid【handleWindowCreated】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            mEglSurface?.release()
+            mEglSurface = null
+            mEglSurface = egl.createWindow(window)
+            mEglSurface?.let { egl.makeCurrent(it) }
+            if (!mIsCalledOnEglCreated) {
+                renderer.onEGLCreated(egl, mHandler)
+                mIsCalledOnEglCreated = true
+            }
+
+            notifyWindowControlFinish()
+        } ?: false
+        waitWindowControlFinish(result)
+    }
+
+    fun handleWindowSizeChanged(window: Surface?, width: Int, height: Int) = synchronized(mWindowLock) {
+        mWindowControlFinish = false
+        val result = mHandler?.post {
+            val renderer = mRenderer
+            if (renderer == null) {
+                Log.e(TAG, "Renderer is null【handleWindowChangeSize】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            if (window == null || width <= 0 || height <= 0) {
+                Log.e(TAG, "Param is invalid【handleWindowChangeSize】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            val eglSurface = mEglSurface
+            if (eglSurface == null) {
+                Log.e(TAG, "Surface is null【handleWindowChangeSize】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            val windowSurface = eglSurface as? WindowSurface
+            windowSurface?.updateSize(width, height)
+            renderer.onSurfaceSizeChanged(eglSurface, width, height)
+            notifyWindowControlFinish()
+        } ?: false
+        waitWindowControlFinish(result)
+    }
+
+    fun handleWindowDestroy(window: Surface?) = synchronized(mWindowLock) {
+        mWindowControlFinish = false
+        val result = mHandler?.post {
+            val egl = mEGL
+            if (egl == null) {
+                Log.e(TAG, "EGL is null【handleWindowDestroy】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            val renderer = mRenderer
+            if (renderer == null) {
+                Log.e(TAG, "Renderer is null【handleWindowDestroy】.")
+                notifyWindowControlFinish()
+                return@post
+            }
+            egl.makeNothingCurrent()
+            mEglSurface?.release()
+            mEglSurface = null
+            notifyWindowControlFinish()
+        } ?: false
+        waitWindowControlFinish(result)
+    }
+
+    fun enqueueEvent(block: () -> Unit): Boolean {
+        return mHandler?.post(block) ?: false
+    }
+
+    fun getLooper(): Looper? = mLooper
+
+    @GLThread
+    fun handleRequestRender() {
+        val egl = mEGL
+        if (egl == null) {
+            Log.e(TAG, "EGL is null【handleRequestRender】.")
+            return
+        }
+        val renderer = mRenderer
+        if (renderer == null) {
+            Log.e(TAG, "Renderer is null【handleRequestRender】.")
+            return
+        }
+        val eglSurface = mEglSurface
+        if (eglSurface == null) {
+            Log.e(TAG, "EglSurface is null【handleRequestRender】.")
+            return
+        }
+        config.drawFrameListener?.onStartDrawFrame()
+        egl.makeCurrent(eglSurface)
+        renderer.onDrawFrame()
+        if (config.surfaceType == EglSurfaceType.Window) {
+            (eglSurface as? WindowSurface)?.swapBuffer()
+        }
+        config.drawFrameListener?.onFinishDrawFrame()
+    }
+
+    private fun notifyWindowControlFinish() = synchronized(mWindowLock) {
+        mWindowControlFinish = true
+        mWindowLock.notify()
+    }
+
+    private fun waitWindowControlFinish(isNeedWait: Boolean) = synchronized(mWindowLock) {
+        if (isNeedWait) {
+            while (!mWindowControlFinish) {
+                mWindowLock.wait()
+            }
+        } else {
+            mWindowControlFinish = true
         }
     }
 
@@ -114,13 +286,13 @@ class GLThread(val config: GLClientConfig) : Thread(TAG) {
             }
         }
 
-        Log.i(TAG, "------------------------ 进入事件循环 ------------------------")
+        Log.i(TAG, "------------------------ loop start ------------------------")
         Looper.loop()
-        Log.i(TAG, "------------------------ 退出事件循环 ------------------------")
+        Log.i(TAG, "------------------------ loop finish  ------------------------")
 
-        Log.i(TAG, "------------------------ 开始释放资源 ------------------------")
+        Log.i(TAG, "------------------------ release resource ------------------------")
         if (mIsCalledOnEglCreated) {
-            Log.i(TAG, "释放 renderer");
+            Log.i(TAG, "Release renderer.")
             mRenderer?.onEGLDestroy()
             mRenderer = null
             mIsCalledOnEglCreated = false
@@ -128,20 +300,20 @@ class GLThread(val config: GLClientConfig) : Thread(TAG) {
 
         mEGL?.makeNothingCurrent()
 
-        Log.i(TAG, "释放 EglSurface")
+        Log.i(TAG, "Release EglSurface.")
         mEglSurface?.release()
         mEglSurface = null
 
-        Log.i(TAG, "释放 EGL")
+        Log.i(TAG, "Release EGL.")
         mEGL?.release()
         mEGL = null
 
-        Log.i(TAG, "释放 Handler")
+        Log.i(TAG, "Release Handler.")
         mHandler?.removeCallbacksAndMessages(null)
         mHandler = null
 
         quitLoop()
-        Log.i(TAG, "------------------------ 退出 GLThread 线程 ------------------------")
+        Log.i(TAG, "------------------------ quit GLThread ------------------------")
     }
 
     private fun quitLoop() = synchronized(mReadyLock) {
@@ -150,121 +322,6 @@ class GLThread(val config: GLClientConfig) : Thread(TAG) {
         mIsThreadReady = false
         mReadyLock.notify()
     }
-
-    fun requestRender() {
-        this.mHandler?.sendRequestRenderMessage()
-    }
-
-    fun handleRequestRender() {
-        val egl = mEGL
-        if (egl == null) {
-            Log.e(TAG, "EGL is null【handleRequestRender】.")
-            return
-        }
-        val renderer = mRenderer
-        if (renderer == null) {
-            Log.e(TAG, "Renderer is null【handleRequestRender】.")
-            return
-        }
-        val eglSurface = mEglSurface
-        if (eglSurface == null) {
-            Log.e(TAG, "EglSurface is null【handleRequestRender】.")
-            return
-        }
-        config.drawFrameListener?.onStartDrawFrame()
-        egl.makeCurrent(eglSurface)
-        renderer.onDrawFrame()
-        if (config.surfaceType == EglSurfaceType.Window) {
-            (eglSurface as? WindowSurface)?.swapBuffer()
-        }
-        config.drawFrameListener?.onFinishDrawFrame()
-    }
-
-    fun handleWindowCreated(window: Surface?) = synchronized(mWindowLock) {
-        mWindowControlFinish = false
-        val result = mHandler?.post {
-            val egl = mEGL
-            if (egl == null) {
-                Log.e(TAG, "EGL is null【handleWindowCreated】.")
-                return@post
-            }
-            val renderer = mRenderer
-            if (renderer == null) {
-                Log.e(TAG, "Renderer is null【handleWindowCreated】.")
-                return@post
-            }
-            if (window == null) {
-                Log.e(TAG, "Param is invalid【handleWindowCreated】.")
-                return@post
-            }
-            mEglSurface?.release()
-            mEglSurface = null
-            mEglSurface = egl.createWindow(window)
-            mEglSurface?.let { egl.makeCurrent(it) }
-            if (!mIsCalledOnEglCreated) {
-                renderer.onEGLCreated(egl, mHandler)
-                mIsCalledOnEglCreated = true
-            }
-
-            mWindowControlFinish = true
-            mWindowLock.notify()
-        } ?: false
-        if (result) {
-            while (!mWindowControlFinish) {
-                mWindowLock.wait()
-            }
-        } else {
-            mWindowControlFinish = true
-        }
-
-    }
-
-    // TODO 加锁
-    fun handleWindowSizeChanged(window: Surface?, width: Int, height: Int) {
-        mHandler?.post {
-            val renderer = mRenderer
-            if (renderer == null) {
-                Log.e(TAG, "Renderer is null【handleWindowChangeSize】.")
-                return@post
-            }
-            if (window == null || width <= 0 || height <= 0) {
-                Log.e(TAG, "Param is invalid【handleWindowChangeSize】.")
-                return@post
-            }
-            val eglSurface = mEglSurface
-            if (eglSurface == null) {
-                Log.e(TAG, "Surface is null【handleWindowChangeSize】.")
-                return@post
-            }
-            val windowSurface = eglSurface as? WindowSurface
-            windowSurface?.updateSize(width, height)
-            renderer.onSurfaceSizeChanged(eglSurface, width, height)
-        }
-    }
-
-    fun handleWindowDestroy(window: Surface?) {
-        mHandler?.post {
-            val egl = mEGL
-            if (egl == null) {
-                Log.e(TAG, "EGL is null【handleWindowDestroy】.")
-                return@post
-            }
-            val renderer = mRenderer
-            if (renderer == null) {
-                Log.e(TAG, "Renderer is null【handleWindowDestroy】.")
-                return@post
-            }
-            egl.makeNothingCurrent()
-            mEglSurface?.release()
-            mEglSurface = null
-        }
-    }
-
-    fun enqueueEvent(block: () -> Unit): Boolean {
-        return mHandler?.post(block) ?: false
-    }
-
-    fun getLooper(): Looper? = mLooper
 
     private fun createPBuffer(width: Int, height: Int) {
         val egl = mEGL
