@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream
  * @des 着色器工具
  */
 object GLShaderExt {
-    private val TAG = "GLShaderExt"
+    private const val TAG = "GLShaderExt"
 
     /**
      * 加载着色器

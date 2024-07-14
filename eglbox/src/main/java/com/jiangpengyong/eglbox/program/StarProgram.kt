@@ -89,7 +89,7 @@ class StarProgram : GLProgram() {
         val cornerGreen = Color.green(realCornerColor) / 255F
         val cornerBlue = Color.blue(realCornerColor) / 255F
         val cornerAlpha = Color.alpha(realCornerColor) / 255F
-        for (i in 1 until 12) {
+        for (i in 1 until mVertexCount) {
             colors[i * 4 + 0] = cornerRed
             colors[i * 4 + 1] = cornerGreen
             colors[i * 4 + 2] = cornerBlue
@@ -116,8 +116,6 @@ class StarProgram : GLProgram() {
     }
 
     override fun onRelease() {
-        mVertexBuffer.clear()
-        mColorBuffer.clear()
         mMVPMatrixHandle = 0
         mPositionHandle = 0
         mColorHandle = 0

@@ -10,7 +10,6 @@ import com.jiangpengyong.eglbox.logger.Logger
  * @des OpenGL 滤镜链
  */
 abstract class GLFilter {
-    private val TAG = "GLFilter"
     protected var mContext: FilterContext? = null
 
     fun init(context: FilterContext) {
@@ -59,4 +58,8 @@ abstract class GLFilter {
     protected abstract fun onUpdateData(inputData: Bundle)
     protected abstract fun onRestoreData(restoreData: Bundle)
     protected abstract fun onSaveData(saveData: Bundle)
+
+    companion object {
+        private const val TAG = "GLFilter"
+    }
 }

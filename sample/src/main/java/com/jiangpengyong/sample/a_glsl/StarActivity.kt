@@ -27,6 +27,7 @@ class StarActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 创建 GLSurfaceView 的子类，并作为视图 View
         mRenderView = RenderView(this)
         setContentView(mRenderView)
     }
@@ -45,9 +46,11 @@ class StarActivity : AppCompatActivity() {
         private val mRenderer = Renderer()
 
         init {
+            // 选择 EGL 为 3.0 版本
             setEGLContextClientVersion(3)
             setRenderer(mRenderer)
-            renderMode = RENDERMODE_CONTINUOUSLY
+            // 按需驱动渲染
+            renderMode = RENDERMODE_WHEN_DIRTY
         }
 
         private class Renderer : GLSurfaceView.Renderer {
@@ -56,7 +59,9 @@ class StarActivity : AppCompatActivity() {
             private val mImage = ImageInOut()
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+                // 开启卷绕
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
+                // 按顺时针卷绕
                 GLES20.glFrontFace(GLES20.GL_CW)
                 mFilter.init(mContext)
             }
@@ -92,7 +97,7 @@ private class StarFilter : GLFilter() {
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-        updateProjectionMatrix(context)
+        updateProjectMatrix(context)
         drawStar()
     }
 
@@ -105,11 +110,12 @@ private class StarFilter : GLFilter() {
     override fun onSaveData(saveData: Bundle) {}
 
     private fun drawStar() {
+//        mStarProgram.setColor("#FFFF00", "#FFFF00")
         mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
         mStarProgram.draw()
     }
 
-    private fun updateProjectionMatrix(context: FilterContext) {
+    private fun updateProjectMatrix(context: FilterContext) {
         val displaySize = context.displaySize
         if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
             val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()

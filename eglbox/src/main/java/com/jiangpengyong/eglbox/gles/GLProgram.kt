@@ -76,7 +76,6 @@ abstract class GLProgram : GLObject {
     protected fun getAttribLocation(attributeName: String): Int {
         if (!isInit()) {
             Logger.e(TAG, "Program isn't initialized. Please call init function first. attributeName=$attributeName")
-
             return 0
         }
         return GLES20.glGetAttribLocation(id, attributeName)
