@@ -40,3 +40,15 @@ fun allocateFloatBuffer(data: FloatArray): FloatBuffer {
     floatBuffer.position(0)
     return floatBuffer
 }
+
+/**
+ * 申请 ByteBuffer，同时放入数据
+ *
+ * @param data 需要放入的数据
+ */
+fun allocateByteBuffer(data: ByteArray): ByteBuffer {
+    val byteBuffer = allocateByteBuffer(data.size)
+    byteBuffer.put(data)
+    byteBuffer.position(0)
+    return byteBuffer
+}

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
+import com.jiangpengyong.eglbox.gles.EGLBox
 import com.jiangpengyong.eglbox.gles.GLProgram
 import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.GLMatrix
@@ -28,9 +29,9 @@ import kotlin.math.sin
  * @author jiang peng yong
  * @date 2024/7/14 12:01
  * @email 56002982@qq.com
- * @des glDrawRangeElements 方式绘制
+ * @des glDrawElements 方式绘制
  */
-class DrawRangeElementsModeActivity : AppCompatActivity() {
+class LayoutGLSLActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,7 +116,7 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
 
         private fun drawStar() {
             // 设置颜色
-            mStarProgram.setColor("#00FFFF", "#FFFFFF")
+            mStarProgram.setColor("#FF00FF", "#FFFFFF")
             mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
             mStarProgram.draw()
         }
@@ -149,8 +150,6 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
         // 内圆半径
         private val mInnerRadius = mOuterRadius * 0.382F
 
-        // 【增加此处】索引点
-        private val mIndexBuffer = allocateByteBuffer(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1))
         private val mVertexBuffer = allocateFloatBuffer(
             floatArrayOf(
                 0F, 0F, 0F,
@@ -164,6 +163,7 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
                 mInnerRadius * sin(252.toRadians()).toFloat(), mInnerRadius * cos(252.toRadians()).toFloat(), 0F,
                 mOuterRadius * sin(288.toRadians()).toFloat(), mOuterRadius * cos(288.toRadians()).toFloat(), 0F,
                 mInnerRadius * sin(324.toRadians()).toFloat(), mInnerRadius * cos(324.toRadians()).toFloat(), 0F,
+                mOuterRadius * sin(0.toRadians()).toFloat(), mOuterRadius * cos(0.toRadians()).toFloat(), 0F,
             )
         )
         private var mColorBuffer = allocateFloatBuffer(
@@ -179,12 +179,14 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
                 1F, 0F, 0F, 0F,
                 1F, 0F, 0F, 0F,
                 1F, 0F, 0F, 0F,
+                1F, 0F, 0F, 0F,
             )
         )
 
-        private var mMVPMatrixHandle = 0
-        private var mPositionHandle = 0
-        private var mColorHandle = 0
+        // 【修改此处】因为 GLSL 中使用 layout(location=xx) 固定了值，需要和 GLSL 中保持一致
+        private var mMVPMatrixHandle = 10
+        private var mPositionHandle = 11
+        private var mColorHandle = 12
 
         private val mVertexCount = 12
         private var mMatrix: GLMatrix = GLMatrix()
@@ -207,8 +209,7 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
                 return
             }
 
-            val count = 11
-            val colors = FloatArray(count * 4)
+            val colors = FloatArray(mVertexCount * 4)
             colors[0] = Color.red(realCenterColor) / 255F
             colors[1] = Color.green(realCenterColor) / 255F
             colors[2] = Color.blue(realCenterColor) / 255F
@@ -218,7 +219,7 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
             val cornerGreen = Color.green(realCornerColor) / 255F
             val cornerBlue = Color.blue(realCornerColor) / 255F
             val cornerAlpha = Color.alpha(realCornerColor) / 255F
-            for (i in 1 until count) {
+            for (i in 1 until mVertexCount) {
                 colors[i * 4 + 0] = cornerRed
                 colors[i * 4 + 1] = cornerGreen
                 colors[i * 4 + 2] = cornerBlue
@@ -228,9 +229,14 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
         }
 
         override fun onInit() {
+            // 单独一致变量不能使用 layout(location=xx) ，所以还是继续获取
             mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
-            mPositionHandle = getAttribLocation("aPosition")
-            mColorHandle = getAttribLocation("aColor")
+
+            // 【修改此处】因为 GLSL 中使用 layout(location=xx) 固定了值，更改为 glBindAttribLocation 进行绑定索引数值
+            // mPositionHandle = getAttribLocation("aPosition")
+            // mColorHandle = getAttribLocation("aColor")
+            GLES20.glBindAttribLocation(id, mPositionHandle, "aPosition")
+            GLES20.glBindAttribLocation(id, mColorHandle, "aColor")
         }
 
         override fun onDraw() {
@@ -239,8 +245,7 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
             GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * 4, mColorBuffer)
             GLES20.glEnableVertexAttribArray(mPositionHandle)
             GLES20.glEnableVertexAttribArray(mColorHandle)
-            // 【增加此处】glDrawArrays 改为 glDrawRangeElements
-            GLES30.glDrawRangeElements(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount - 1, mVertexCount, GLES30.GL_UNSIGNED_BYTE, mIndexBuffer)
+            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount)
             GLES20.glDisableVertexAttribArray(mPositionHandle)
             GLES20.glDisableVertexAttribArray(mColorHandle)
         }
@@ -254,8 +259,8 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
         override fun getVertexShaderSource(): String = """
             #version 300 es
             uniform mat4 uMVPMatrix;
-            in vec3 aPosition;
-            in vec4 aColor;
+            layout(location=11) in vec3 aPosition;
+            layout(location=12) in vec4 aColor;
             out vec4 vColor;
             void main() {
                 gl_Position = uMVPMatrix * vec4(aPosition, 1.0);
@@ -267,7 +272,7 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
             #version 300 es
             precision mediump float;
             in vec4 vColor;
-            out vec4 fragColor;
+            layout(location=0) out vec4 fragColor;
             void main() {
                 fragColor = vColor;
             }

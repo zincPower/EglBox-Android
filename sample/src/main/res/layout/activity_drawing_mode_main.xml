@@ -18,4 +18,9 @@
         style="@style/common_button"
         android:text="glDrawRangeElements" />
 
+    <TextView
+        android:id="@+id/layout"
+        style="@style/common_button"
+        android:text="layout" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>

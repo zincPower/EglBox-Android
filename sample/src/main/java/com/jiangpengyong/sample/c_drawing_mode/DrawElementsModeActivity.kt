@@ -10,12 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
+import com.jiangpengyong.eglbox.gles.EGLBox
 import com.jiangpengyong.eglbox.gles.GLProgram
 import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.GLMatrix
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
+import com.jiangpengyong.eglbox.utils.allocateByteBuffer
 import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -113,7 +115,7 @@ class DrawElementsModeActivity : AppCompatActivity() {
 
         private fun drawStar() {
             // 设置颜色
-            // mStarProgram.setColor("#FFFF00", "#FFFF00")
+            mStarProgram.setColor("#FFFF00", "#FFFFFF")
             mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
             mStarProgram.draw()
         }
@@ -146,6 +148,9 @@ class DrawElementsModeActivity : AppCompatActivity() {
 
         // 内圆半径
         private val mInnerRadius = mOuterRadius * 0.382F
+
+        // 【增加此处】索引点
+        private val mIndexBuffer = allocateByteBuffer(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1))
         private val mVertexBuffer = allocateFloatBuffer(
             floatArrayOf(
                 0F, 0F, 0F,
@@ -159,7 +164,6 @@ class DrawElementsModeActivity : AppCompatActivity() {
                 mInnerRadius * sin(252.toRadians()).toFloat(), mInnerRadius * cos(252.toRadians()).toFloat(), 0F,
                 mOuterRadius * sin(288.toRadians()).toFloat(), mOuterRadius * cos(288.toRadians()).toFloat(), 0F,
                 mInnerRadius * sin(324.toRadians()).toFloat(), mInnerRadius * cos(324.toRadians()).toFloat(), 0F,
-                mOuterRadius * sin(0.toRadians()).toFloat(), mOuterRadius * cos(0.toRadians()).toFloat(), 0F,
             )
         )
         private var mColorBuffer = allocateFloatBuffer(
@@ -204,7 +208,8 @@ class DrawElementsModeActivity : AppCompatActivity() {
                 return
             }
 
-            val colors = FloatArray(mVertexCount * 4)
+            val count = 11
+            val colors = FloatArray(count * 4)
             colors[0] = Color.red(realCenterColor) / 255F
             colors[1] = Color.green(realCenterColor) / 255F
             colors[2] = Color.blue(realCenterColor) / 255F
@@ -214,7 +219,7 @@ class DrawElementsModeActivity : AppCompatActivity() {
             val cornerGreen = Color.green(realCornerColor) / 255F
             val cornerBlue = Color.blue(realCornerColor) / 255F
             val cornerAlpha = Color.alpha(realCornerColor) / 255F
-            for (i in 1 until mVertexCount) {
+            for (i in 1 until count) {
                 colors[i * 4 + 0] = cornerRed
                 colors[i * 4 + 1] = cornerGreen
                 colors[i * 4 + 2] = cornerBlue
@@ -235,7 +240,8 @@ class DrawElementsModeActivity : AppCompatActivity() {
             GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * 4, mColorBuffer)
             GLES20.glEnableVertexAttribArray(mPositionHandle)
             GLES20.glEnableVertexAttribArray(mColorHandle)
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount)
+            // 【更换此处】glDrawArrays 改为 glDrawElements 方法
+            GLES20.glDrawElements(GLES20.GL_TRIANGLE_FAN, mVertexCount, GLES20.GL_UNSIGNED_BYTE, mIndexBuffer)
             GLES20.glDisableVertexAttribArray(mPositionHandle)
             GLES20.glDisableVertexAttribArray(mColorHandle)
         }
@@ -247,26 +253,26 @@ class DrawElementsModeActivity : AppCompatActivity() {
         }
 
         override fun getVertexShaderSource(): String = """
-        #version 300 es
-        uniform mat4 uMVPMatrix;
-        in vec3 aPosition;
-        in vec4 aColor;
-        out vec4 vColor;
-        void main() {
-            gl_Position = uMVPMatrix * vec4(aPosition, 1.0);
-            vColor = aColor;
-        }
-    """.trimIndent()
+            #version 300 es
+            uniform mat4 uMVPMatrix;
+            in vec3 aPosition;
+            in vec4 aColor;
+            out vec4 vColor;
+            void main() {
+                gl_Position = uMVPMatrix * vec4(aPosition, 1.0);
+                vColor = aColor;
+            }
+        """.trimIndent()
 
         override fun getFragmentShaderSource(): String = """
-        #version 300 es
-        precision mediump float;
-        in vec4 vColor;
-        out vec4 fragColor;
-        void main() {
-            fragColor = vColor;
-        }
-    """.trimIndent()
+            #version 300 es
+            precision mediump float;
+            in vec4 vColor;
+            out vec4 fragColor;
+            void main() {
+                fragColor = vColor;
+            }
+        """.trimIndent()
 
         private fun Int.toRadians(): Double {
             return Math.toRadians(this.toDouble())

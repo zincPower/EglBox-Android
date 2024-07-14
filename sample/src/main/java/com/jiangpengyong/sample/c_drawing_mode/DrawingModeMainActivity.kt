@@ -24,12 +24,22 @@ class DrawingModeMainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.draw_elements)
             .setOnClickListener{
-                startActivity(Intent(this, DrawingModeActivity::class.java))
+                startActivity(Intent(this, DrawElementsModeActivity::class.java))
             }
 
         findViewById<View>(R.id.draw_range_elements)
             .setOnClickListener{
-                startActivity(Intent(this, DrawingModeActivity::class.java))
+                startActivity(Intent(this, DrawRangeElementsModeActivity::class.java))
+            }
+
+        findViewById<View>(R.id.draw_range_elements)
+            .setOnClickListener{
+                startActivity(Intent(this, DrawRangeElementsModeActivity::class.java))
+            }
+
+        findViewById<View>(R.id.layout)
+            .setOnClickListener{
+                startActivity(Intent(this, LayoutGLSLActivity::class.java))
             }
     }
 }
