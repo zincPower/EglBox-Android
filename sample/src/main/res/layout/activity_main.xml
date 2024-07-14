@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.jiangpengyong.sample.widget.FlowLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -20,18 +21,18 @@
         android:text="3、绘制方式" />
 
     <TextView
+        android:id="@+id/light"
+        style="@style/common_button"
+        android:text="4、光效" />
+
+    <TextView
         android:id="@+id/texture"
         style="@style/common_button"
-        android:text="纹理" />
+        android:text="5、纹理" />
 
     <TextView
         android:id="@+id/font"
         style="@style/common_button"
         android:text="字体" />
 
-    <TextView
-        android:id="@+id/frustum"
-        style="@style/common_button"
-        android:text="视景体" />
-
-</LinearLayout>
+</com.jiangpengyong.sample.widget.FlowLayout>

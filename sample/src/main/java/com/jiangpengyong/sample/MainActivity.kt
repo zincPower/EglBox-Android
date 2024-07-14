@@ -8,7 +8,9 @@ import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.sample.a_glsl.GLSLMainActivity
 import com.jiangpengyong.sample.b_matrix.MatrixMainActivity
 import com.jiangpengyong.sample.c_drawing_mode.DrawingModeActivity
-import com.jiangpengyong.sample.d_texture.TextureMainActivity
+import com.jiangpengyong.sample.c_drawing_mode.DrawingModeMainActivity
+import com.jiangpengyong.sample.d_light.LightMainActivity
+import com.jiangpengyong.sample.e_texture.TextureMainActivity
 import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.obj.FrustumActivity
 
@@ -32,7 +34,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.drawing_mode).setOnClickListener {
-            startActivity(Intent(this, DrawingModeActivity::class.java))
+            startActivity(Intent(this, DrawingModeMainActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.light).setOnClickListener {
+            startActivity(Intent(this, LightMainActivity::class.java))
         }
 
         findViewById<TextView>(R.id.texture).setOnClickListener {
@@ -41,10 +47,6 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.font).setOnClickListener {
             startActivity(Intent(this, FontActivity::class.java))
-        }
-
-        findViewById<TextView>(R.id.frustum).setOnClickListener {
-            startActivity(Intent(this, FrustumActivity::class.java))
         }
     }
 }

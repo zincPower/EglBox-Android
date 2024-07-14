@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_texture
+package com.jiangpengyong.sample.e_texture
 
 import android.content.Intent
 import android.os.Bundle

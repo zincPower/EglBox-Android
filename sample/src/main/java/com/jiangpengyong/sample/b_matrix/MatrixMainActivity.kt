@@ -6,8 +6,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 
+/**
+ * @author jiang peng yong
+ * @date 2024/7/14 11:26
+ * @email 56002982@qq.com
+ * @des 矩阵入口
+ */
 class MatrixMainActivity: AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_matrix_main)

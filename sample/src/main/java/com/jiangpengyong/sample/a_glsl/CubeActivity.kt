@@ -47,7 +47,7 @@ class CubeActivity : AppCompatActivity() {
         init {
             setEGLContextClientVersion(3)
             setRenderer(mRenderer)
-            renderMode = RENDERMODE_CONTINUOUSLY
+            renderMode = RENDERMODE_WHEN_DIRTY
         }
 
         private class Renderer : GLSurfaceView.Renderer {

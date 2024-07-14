@@ -2,10 +2,8 @@ package com.jiangpengyong.eglbox.program
 
 import android.graphics.Color
 import android.opengl.GLES20
-import android.view.Display.Mode
 import com.jiangpengyong.eglbox.gles.GLProgram
 import com.jiangpengyong.eglbox.logger.Logger
-import com.jiangpengyong.eglbox.program.StarProgram.Companion
 import com.jiangpengyong.eglbox.utils.GLMatrix
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.allocateFloatBuffer

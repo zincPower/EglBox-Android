@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jiangpengyong.sample.widget.FlowLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/drawing_mode_share"
+        style="@style/common_button"
+        android:text="绘制模式讲解" />
+
+    <TextView
+        android:id="@+id/draw_elements"
+        style="@style/common_button"
+        android:text="glDrawElements" />
+
+    <TextView
+        android:id="@+id/draw_range_elements"
+        style="@style/common_button"
+        android:text="glDrawRangeElements" />
+
+</com.jiangpengyong.sample.widget.FlowLayout>

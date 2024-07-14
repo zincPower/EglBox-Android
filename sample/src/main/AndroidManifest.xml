@@ -47,14 +47,27 @@
             android:screenOrientation="landscape" />
 
         <activity
+            android:name="com.jiangpengyong.sample.c_drawing_mode.DrawingModeMainActivity"
+            android:screenOrientation="landscape" />
+        <activity
             android:name="com.jiangpengyong.sample.c_drawing_mode.DrawingModeActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.c_drawing_mode.DrawElementsModeActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.c_drawing_mode.DrawRangeElementsModeActivity"
             android:screenOrientation="landscape" />
 
         <activity
-            android:name="com.jiangpengyong.sample.d_texture.TextureMainActivity"
+            android:name="com.jiangpengyong.sample.d_light.LightMainActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name="com.jiangpengyong.sample.e_texture.TextureMainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_texture.Texture2DActivity"
+            android:name="com.jiangpengyong.sample.e_texture.Texture2DActivity"
             android:screenOrientation="landscape" />
 
         <activity

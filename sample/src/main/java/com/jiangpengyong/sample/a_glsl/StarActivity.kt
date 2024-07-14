@@ -27,7 +27,6 @@ class StarActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 创建 GLSurfaceView 的子类，并作为视图 View
         mRenderView = RenderView(this)
         setContentView(mRenderView)
     }
@@ -110,7 +109,8 @@ private class StarFilter : GLFilter() {
     override fun onSaveData(saveData: Bundle) {}
 
     private fun drawStar() {
-//        mStarProgram.setColor("#FFFF00", "#FFFF00")
+        // 设置颜色
+        // mStarProgram.setColor("#FFFF00", "#FFFF00")
         mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
         mStarProgram.draw()
     }

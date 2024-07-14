@@ -12,23 +12,21 @@ import com.jiangpengyong.eglbox.R
  * @email 56002982@qq.com
  * @des GLSL 主入口
  */
-class GLSLMainActivity :AppCompatActivity() {
-
+class GLSLMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_glsl_main)
 
-        findViewById<View>(R.id.triangle).setOnClickListener{
+        findViewById<View>(R.id.triangle).setOnClickListener {
             startActivity(Intent(this, TriangleActivity::class.java))
         }
 
-        findViewById<View>(R.id.star).setOnClickListener{
+        findViewById<View>(R.id.star).setOnClickListener {
             startActivity(Intent(this, StarActivity::class.java))
         }
 
-        findViewById<View>(R.id.cube).setOnClickListener{
+        findViewById<View>(R.id.cube).setOnClickListener {
             startActivity(Intent(this, CubeActivity::class.java))
         }
     }
-
 }

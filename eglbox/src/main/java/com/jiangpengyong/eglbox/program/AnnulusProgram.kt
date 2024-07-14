@@ -9,8 +9,6 @@ import com.jiangpengyong.eglbox.gles.GLProgram
  * @des 绘制圆环
  */
 class AnnulusProgram(val segments: Int) : GLProgram() {
-
-
     override fun onInit() {
         TODO("Not yet implemented")
     }
