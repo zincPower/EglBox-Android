@@ -106,7 +106,7 @@ private class StarFilter : GLFilter() {
 
     override fun onUpdateData(inputData: Bundle) {}
     override fun onRestoreData(restoreData: Bundle) {}
-    override fun onSaveData(saveData: Bundle) {}
+    override fun onStoreData(saveData: Bundle) {}
 
     private fun drawStar() {
         // 设置颜色

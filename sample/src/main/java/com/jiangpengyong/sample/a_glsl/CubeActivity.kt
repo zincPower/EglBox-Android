@@ -104,7 +104,7 @@ private class CubeFilter : GLFilter() {
 
     override fun onUpdateData(inputData: Bundle) {}
     override fun onRestoreData(restoreData: Bundle) {}
-    override fun onSaveData(saveData: Bundle) {}
+    override fun onStoreData(saveData: Bundle) {}
 
     private fun drawCube() {
         mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)

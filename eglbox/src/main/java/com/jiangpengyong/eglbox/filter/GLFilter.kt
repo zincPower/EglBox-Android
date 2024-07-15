@@ -1,18 +1,23 @@
 package com.jiangpengyong.eglbox.filter
 
 import android.os.Bundle
+import android.os.Message
 import com.jiangpengyong.eglbox.logger.Logger
 
 /**
  * @author jiang peng yong
- * @date 2024/2/11 21:55
+ * @date 2024/7/10 13:09
  * @email 56002982@qq.com
- * @des OpenGL 滤镜链
+ * @des 滤镜处理节点
  */
-abstract class GLFilter {
+abstract class GLFilter : Comparable<GLFilter> {
+    var id = ""
+    var name = ""
+    var order = 0
+
     protected var mContext: FilterContext? = null
 
-    fun init(context: FilterContext) {
+    open fun init(context: FilterContext) {
         if (isInit()) {
             Logger.e(TAG, "GLFilter has been initialized.")
             return
@@ -21,33 +26,43 @@ abstract class GLFilter {
         onInit()
     }
 
-    fun draw(imageInOut: ImageInOut) {
+    open fun draw(image: ImageInOut) {
         if (!isInit()) {
             Logger.e(TAG, "GLFilter hasn't initialized.")
             return
         }
-        onDraw(mContext!!, imageInOut)
+        onDraw(mContext!!, image)
     }
 
-    fun release() {
+    open fun release() {
         if (!isInit()) return
         onRelease()
         mContext = null
     }
 
-    fun updateData(inputData: Bundle) {
+    open fun updateData(filterId: String, updateData: Bundle) {
         if (!isInit()) return
-        onUpdateData(inputData)
+        if (filterId == id) onUpdateData(updateData)
     }
 
-    fun restoreData(restoreData: Bundle) {
-        if (!isInit()) return
-        onRestoreData(restoreData)
+    open fun storeData(): FilterData? {
+        if (!isInit()) return null
+        val data = Bundle()
+        onStoreData(data)
+        return FilterData(id, name, order, data)
     }
 
-    fun saveData(saveData: Bundle) {
+    open fun restoreData(inputData: FilterData) {
         if (!isInit()) return
-        onSaveData(saveData)
+        // 恢复数据以名字是否匹配为主，主要以逻辑能扣接为主
+        // id 不比对，由外部进行逻辑组合
+        if (inputData.name != name) return
+        onRestoreData(inputData.data)
+    }
+
+    open fun receiveMessage(filterId: String, message: Message) {
+        if (!isInit()) return
+        if (filterId == id) onReceiveMessage(message)
     }
 
     fun isInit(): Boolean = mContext != null
@@ -55,9 +70,18 @@ abstract class GLFilter {
     protected abstract fun onInit()
     protected abstract fun onDraw(context: FilterContext, imageInOut: ImageInOut)
     protected abstract fun onRelease()
-    protected abstract fun onUpdateData(inputData: Bundle)
-    protected abstract fun onRestoreData(restoreData: Bundle)
-    protected abstract fun onSaveData(saveData: Bundle)
+    protected abstract fun onUpdateData(updateData: Bundle)
+    protected abstract fun onRestoreData(inputData: Bundle)
+    protected abstract fun onStoreData(outputData: Bundle)
+    protected abstract fun onReceiveMessage(message: Message)
+
+    override fun compareTo(other: GLFilter): Int {
+        return this.order - other.order
+    }
+
+    override fun toString(): String {
+        return "[GLFilter id=$id name=$name order=$order isInit=${isInit()}]"
+    }
 
     companion object {
         private const val TAG = "GLFilter"

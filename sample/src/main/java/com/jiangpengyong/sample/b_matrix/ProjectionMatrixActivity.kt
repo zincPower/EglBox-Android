@@ -223,6 +223,6 @@ class ProjectionActivity : AppCompatActivity() {
         }
 
         override fun onRestoreData(restoreData: Bundle) {}
-        override fun onSaveData(saveData: Bundle) {}
+        override fun onStoreData(saveData: Bundle) {}
     }
 }

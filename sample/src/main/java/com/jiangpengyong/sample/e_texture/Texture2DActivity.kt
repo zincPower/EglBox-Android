@@ -109,5 +109,5 @@ class Texture2DFilter : GLFilter() {
 
     override fun onUpdateData(inputData: Bundle) {}
     override fun onRestoreData(restoreData: Bundle) {}
-    override fun onSaveData(saveData: Bundle) {}
+    override fun onStoreData(saveData: Bundle) {}
 }
