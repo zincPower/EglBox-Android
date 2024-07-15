@@ -5,6 +5,7 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.os.Message
 import android.util.AttributeSet
 import android.util.Size
 import android.widget.RadioButton
@@ -112,7 +113,10 @@ class DrawingModeActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilter = StarFilter()
+            private val mFilter = StarFilter().apply {
+                id = "StarFilter"
+                name = "StarFilter"
+            }
             private val mContext = FilterContext()
             private val mImage = ImageInOut()
             private var mBundle: Bundle? = null
@@ -146,7 +150,7 @@ class DrawingModeActivity : AppCompatActivity() {
                     val temp = mBundle
                     mBundle = null
                     temp
-                }?.let { mFilter.updateData(it) }
+                }?.let { mFilter.updateData("StarFilter", it) }
                 mFilter.draw(mImage)
             }
 
@@ -220,12 +224,13 @@ private class StarFilter : GLFilter() {
         mStarProgram.release()
     }
 
-    override fun onUpdateData(inputData: Bundle) {
-        mDrawingMode = inputData.getInt(DrawingModeActivity.DRAWING_MODE, -1).takeIf { it != -1 } ?: return
+    override fun onUpdateData(updateData: Bundle) {
+        mDrawingMode = updateData.getInt(DrawingModeActivity.DRAWING_MODE, -1).takeIf { it != -1 } ?: return
     }
 
-    override fun onRestoreData(restoreData: Bundle) {}
-    override fun onStoreData(saveData: Bundle) {}
+    override fun onRestoreData(inputData: Bundle) {}
+    override fun onStoreData(outputData: Bundle) {}
+    override fun onReceiveMessage(message: Message) {}
 
     private fun drawStar() {
         mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)

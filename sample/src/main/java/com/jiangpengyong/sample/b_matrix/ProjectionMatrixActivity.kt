@@ -4,6 +4,7 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.os.Message
 import android.util.AttributeSet
 import android.util.Size
 import android.widget.RadioGroup
@@ -83,7 +84,10 @@ class ProjectionActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilter = CubeFilter()
+            private val mFilter = CubeFilter().apply {
+                id = "CubeFilter"
+                name = "CubeFilter"
+            }
             private val mContext = FilterContext()
             private val mImage = ImageInOut()
             private var mBundle: Bundle? = null
@@ -108,7 +112,7 @@ class ProjectionActivity : AppCompatActivity() {
                     mBundle = null
                     temp
                 }
-                bundle?.let { mFilter.updateData(it) }
+                bundle?.let { mFilter.updateData("CubeFilter", it) }
                 mFilter.draw(mImage)
             }
 
@@ -206,15 +210,15 @@ class ProjectionActivity : AppCompatActivity() {
             }
         }
 
-        override fun onUpdateData(inputData: Bundle) {
-            mProjectionMode = if (inputData.getInt(MODE, mProjectionMode.value) == ProjectionMode.Frustum.value) {
+        override fun onUpdateData(updateData: Bundle) {
+            mProjectionMode = if (updateData.getInt(MODE, mProjectionMode.value) == ProjectionMode.Frustum.value) {
                 ProjectionMode.Frustum
             } else {
                 ProjectionMode.Ortho
             }
             updateProjection()
 
-            mViewportMode = if (inputData.getInt(VIEWPORT_MODE, mViewportMode.value) == ViewportMode.Full.value) {
+            mViewportMode = if (updateData.getInt(VIEWPORT_MODE, mViewportMode.value) == ViewportMode.Full.value) {
                 ViewportMode.Full
             } else {
                 ViewportMode.Half
@@ -222,7 +226,8 @@ class ProjectionActivity : AppCompatActivity() {
             updateViewport()
         }
 
-        override fun onRestoreData(restoreData: Bundle) {}
-        override fun onStoreData(saveData: Bundle) {}
+        override fun onRestoreData(inputData: Bundle) {}
+        override fun onStoreData(outputData: Bundle) {}
+        override fun onReceiveMessage(message: Message) {}
     }
 }

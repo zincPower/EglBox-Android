@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.os.Message
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.gles.GLTexture
@@ -107,7 +108,8 @@ class Texture2DFilter : GLFilter() {
         mTexture2DProgram.release()
     }
 
-    override fun onUpdateData(inputData: Bundle) {}
-    override fun onRestoreData(restoreData: Bundle) {}
-    override fun onStoreData(saveData: Bundle) {}
+    override fun onUpdateData(updateData: Bundle) {}
+    override fun onRestoreData(inputData: Bundle) {}
+    override fun onStoreData(outputData: Bundle) {}
+    override fun onReceiveMessage(message: Message) {}
 }

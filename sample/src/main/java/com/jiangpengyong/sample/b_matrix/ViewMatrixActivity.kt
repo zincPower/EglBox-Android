@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Message
 import android.util.AttributeSet
 import android.util.Size
 import android.widget.RadioGroup
@@ -86,7 +87,10 @@ class ViewMatrixActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilter = CubeFilter()
+            private val mFilter = CubeFilter().apply {
+                id = "CubeFilter"
+                name = "CubeFilter"
+            }
             private val mContext = FilterContext()
             private val mImage = ImageInOut()
             private var mBundle: Bundle? = null
@@ -111,7 +115,7 @@ class ViewMatrixActivity : AppCompatActivity() {
                     val temp = mBundle
                     mBundle = null
                     temp
-                }?.let { mFilter.updateData(it) }
+                }?.let { mFilter.updateData("CubeFilter", it) }
                 mFilter.draw(mImage)
             }
 
@@ -270,8 +274,8 @@ class ViewMatrixActivity : AppCompatActivity() {
         }
 
         // 更新视图变化模式
-        override fun onUpdateData(inputData: Bundle) {
-            val mode = inputData.getInt(MODE, ViewMode.Position.value)
+        override fun onUpdateData(updateData: Bundle) {
+            val mode = updateData.getInt(MODE, ViewMode.Position.value)
             mMode = when (mode) {
                 ViewMode.Position.value -> ViewMode.Position
                 ViewMode.Viewpoint.value -> ViewMode.Viewpoint
@@ -281,7 +285,8 @@ class ViewMatrixActivity : AppCompatActivity() {
             mCurrentOffset = 0F
         }
 
-        override fun onRestoreData(restoreData: Bundle) {}
-        override fun onStoreData(saveData: Bundle) {}
+        override fun onRestoreData(inputData: Bundle) {}
+        override fun onStoreData(outputData: Bundle) {}
+        override fun onReceiveMessage(message: Message) {}
     }
 }

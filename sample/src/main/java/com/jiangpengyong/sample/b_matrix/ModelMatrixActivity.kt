@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Message
 import android.util.AttributeSet
 import android.util.Size
 import android.widget.RadioGroup
@@ -84,7 +85,10 @@ class ModelMatrixActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilter = CubeFilter()
+            private val mFilter = CubeFilter().apply {
+                id = "CubeFilter"
+                name = "CubeFilter"
+            }
             private val mContext = FilterContext()
             private val mImage = ImageInOut()
             private var mBundle: Bundle? = null
@@ -108,7 +112,7 @@ class ModelMatrixActivity : AppCompatActivity() {
                     val temp = mBundle
                     mBundle = null
                     temp
-                }?.let { mFilter.updateData(it) }
+                }?.let { mFilter.updateData("CubeFilter", it) }
                 mFilter.draw(mImage)
             }
 
@@ -213,8 +217,8 @@ class ModelMatrixActivity : AppCompatActivity() {
             mCubeProgram.release()
         }
 
-        override fun onUpdateData(inputData: Bundle) {
-            val mode = inputData.getInt(MODE, ModelMode.Translation.value)
+        override fun onUpdateData(updateData: Bundle) {
+            val mode = updateData.getInt(MODE, ModelMode.Translation.value)
             mMode = when (mode) {
                 ModelMode.Translation.value -> ModelMode.Translation
                 ModelMode.Scale.value -> ModelMode.Scale
@@ -287,7 +291,8 @@ class ModelMatrixActivity : AppCompatActivity() {
             mModelMatrix.rotate(mRatio / 5 * 360, 1F, 1F, 1F)
         }
 
-        override fun onRestoreData(restoreData: Bundle) {}
-        override fun onStoreData(saveData: Bundle) {}
+        override fun onRestoreData(inputData: Bundle) {}
+        override fun onStoreData(outputData: Bundle) {}
+        override fun onReceiveMessage(message: Message) {}
     }
 }

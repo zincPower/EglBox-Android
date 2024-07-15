@@ -5,12 +5,12 @@ import android.graphics.Color
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.os.Message
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.gles.EGLBox
 import com.jiangpengyong.eglbox.gles.GLProgram
 import com.jiangpengyong.eglbox.logger.Logger
 import com.jiangpengyong.eglbox.utils.GLMatrix
@@ -109,9 +109,10 @@ class DrawElementsModeActivity : AppCompatActivity() {
             mStarProgram.release()
         }
 
-        override fun onUpdateData(inputData: Bundle) {}
-        override fun onRestoreData(restoreData: Bundle) {}
-        override fun onSaveData(saveData: Bundle) {}
+        override fun onUpdateData(updateData: Bundle) {}
+        override fun onRestoreData(inputData: Bundle) {}
+        override fun onStoreData(outputData: Bundle) {}
+        override fun onReceiveMessage(message: Message) {}
 
         private fun drawStar() {
             // 设置颜色
