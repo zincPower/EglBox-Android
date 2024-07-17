@@ -116,7 +116,7 @@ class DrawElementsModeActivity : AppCompatActivity() {
 
         private fun drawStar() {
             // 设置颜色
-            mStarProgram.setColor("#FFFF00", "#FFFFFF")
+            mStarProgram.setColor("#D8906A", "#FFFFFF")
             mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
             mStarProgram.draw()
         }

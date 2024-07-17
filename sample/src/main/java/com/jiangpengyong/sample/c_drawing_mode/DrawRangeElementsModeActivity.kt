@@ -117,7 +117,7 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
 
         private fun drawStar() {
             // 设置颜色
-            mStarProgram.setColor("#00FFFF", "#FFFFFF")
+            mStarProgram.setColor("#593747", "#FFFFFF")
             mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
             mStarProgram.draw()
         }
@@ -242,7 +242,10 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
             GLES20.glEnableVertexAttribArray(mPositionHandle)
             GLES20.glEnableVertexAttribArray(mColorHandle)
             // 【增加此处】glDrawArrays 改为 glDrawRangeElements
-            GLES30.glDrawRangeElements(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount - 1, mVertexCount, GLES30.GL_UNSIGNED_BYTE, mIndexBuffer)
+            // start 和 end 只是让绘制提高效率，并不是设置绘制的顶点范围
+//            GLES30.glDrawRangeElements(GLES20.GL_TRIANGLE_FAN, 6, 11, 6, GLES30.GL_UNSIGNED_BYTE, mIndexBuffer)
+            mIndexBuffer.position(6)
+            GLES30.glDrawRangeElements(GLES20.GL_TRIANGLE_FAN, 6, 11, 6, GLES30.GL_UNSIGNED_BYTE, mIndexBuffer)
             GLES20.glDisableVertexAttribArray(mPositionHandle)
             GLES20.glDisableVertexAttribArray(mColorHandle)
         }

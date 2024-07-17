@@ -115,7 +115,7 @@ class LayoutGLSLActivity : AppCompatActivity() {
 
         private fun drawStar() {
             // 设置颜色
-            mStarProgram.setColor("#FF00FF", "#FFFFFF")
+            mStarProgram.setColor("#FFD38F", "#FFFFFF")
             mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
             mStarProgram.draw()
         }
