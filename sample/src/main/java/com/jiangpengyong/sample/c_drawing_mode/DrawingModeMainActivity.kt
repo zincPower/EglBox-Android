@@ -41,5 +41,10 @@ class DrawingModeMainActivity : AppCompatActivity() {
             .setOnClickListener{
                 startActivity(Intent(this, LayoutGLSLActivity::class.java))
             }
+
+        findViewById<View>(R.id.vertex_attrib)
+            .setOnClickListener{
+                startActivity(Intent(this, VertexAttribActivity::class.java))
+            }
     }
 }

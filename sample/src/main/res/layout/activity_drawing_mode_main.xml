@@ -21,6 +21,11 @@
     <TextView
         android:id="@+id/layout"
         style="@style/common_button"
-        android:text="layout" />
+        android:text="layout GLSL" />
+
+    <TextView
+        android:id="@+id/vertex_attrib"
+        style="@style/common_button"
+        android:text="glVertexAttrib" />
 
 </com.jiangpengyong.sample.widget.FlowLayout>

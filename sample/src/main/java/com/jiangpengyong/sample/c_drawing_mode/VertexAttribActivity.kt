@@ -25,11 +25,11 @@ import kotlin.math.sin
 
 /**
  * @author jiang peng yong
- * @date 2024/7/14 12:01
+ * @date 2024/2/9 15:33
  * @email 56002982@qq.com
- * @des glDrawElements 方式绘制
+ * @des 顶点常量
  */
-class LayoutGLSLActivity : AppCompatActivity() {
+class VertexAttribActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,8 +52,10 @@ class LayoutGLSLActivity : AppCompatActivity() {
         private val mRenderer = Renderer()
 
         init {
+            // 选择 EGL 为 3.0 版本
             setEGLContextClientVersion(3)
             setRenderer(mRenderer)
+            // 按需驱动渲染
             renderMode = RENDERMODE_WHEN_DIRTY
         }
 
@@ -82,7 +84,7 @@ class LayoutGLSLActivity : AppCompatActivity() {
         }
     }
 
-    class StarFilter : GLFilter() {
+    private class StarFilter : GLFilter() {
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
@@ -115,7 +117,7 @@ class LayoutGLSLActivity : AppCompatActivity() {
 
         private fun drawStar() {
             // 设置颜色
-            mStarProgram.setColor("#F37B6A", "#FFFFFF")
+            mStarProgram.setColor("#FFFF00")
             mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
             mStarProgram.draw()
         }
@@ -148,7 +150,6 @@ class LayoutGLSLActivity : AppCompatActivity() {
 
         // 内圆半径
         private val mInnerRadius = mOuterRadius * 0.382F
-
         private val mVertexBuffer = allocateFloatBuffer(
             floatArrayOf(
                 0F, 0F, 0F,
@@ -165,27 +166,13 @@ class LayoutGLSLActivity : AppCompatActivity() {
                 mOuterRadius * sin(0.toRadians()).toFloat(), mOuterRadius * cos(0.toRadians()).toFloat(), 0F,
             )
         )
-        private var mColorBuffer = allocateFloatBuffer(
-            floatArrayOf(
-                1F, 1F, 1F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-            )
-        )
 
-        // 【修改此处】因为 GLSL 中使用 layout(location=xx) 固定了值，需要和 GLSL 中保持一致
-        private var mMVPMatrixHandle = 10
-        private var mPositionHandle = 11
-        private var mColorHandle = 12
+        // 【更改此处】颜色改为一个数组
+        private var mColors = floatArrayOf(1F, 1F, 0F, 1F)
+
+        private var mMVPMatrixHandle = 0
+        private var mPositionHandle = 0
+        private var mColorHandle = 0
 
         private val mVertexCount = 12
         private var mMatrix: GLMatrix = GLMatrix()
@@ -194,56 +181,40 @@ class LayoutGLSLActivity : AppCompatActivity() {
             mMatrix = matrix
         }
 
-        fun setColor(cornerColor: String, centerColor: String) {
-            val realCornerColor = try {
-                Color.parseColor(cornerColor)
+        fun setColor(color: String) {
+            val realColor = try {
+                Color.parseColor(color)
             } catch (e: Exception) {
                 Logger.e(TAG, "SetColor failure. Corner color isn't a valid color.")
                 return
             }
-            val realCenterColor = try {
-                Color.parseColor(centerColor)
-            } catch (e: Exception) {
-                Logger.e(TAG, "SetColor failure. Center color isn't a valid color.")
-                return
-            }
-
-            val colors = FloatArray(mVertexCount * 4)
-            colors[0] = Color.red(realCenterColor) / 255F
-            colors[1] = Color.green(realCenterColor) / 255F
-            colors[2] = Color.blue(realCenterColor) / 255F
-            colors[3] = Color.alpha(realCenterColor) / 255F
-
-            val cornerRed = Color.red(realCornerColor) / 255F
-            val cornerGreen = Color.green(realCornerColor) / 255F
-            val cornerBlue = Color.blue(realCornerColor) / 255F
-            val cornerAlpha = Color.alpha(realCornerColor) / 255F
-            for (i in 1 until mVertexCount) {
-                colors[i * 4 + 0] = cornerRed
-                colors[i * 4 + 1] = cornerGreen
-                colors[i * 4 + 2] = cornerBlue
-                colors[i * 4 + 3] = cornerAlpha
-            }
-            mColorBuffer = allocateFloatBuffer(colors)
+            mColors[0] = Color.red(realColor) / 255F
+            mColors[1] = Color.green(realColor) / 255F
+            mColors[2] = Color.blue(realColor) / 255F
+            mColors[3] = Color.alpha(realColor) / 255F
         }
 
         override fun onInit() {
-            // 单独一致变量不能使用 layout(location=xx) ，所以还是继续获取
             mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
-
-            // 【修改此处】因为 GLSL 中使用 layout(location=xx) 固定了值，更改为 glBindAttribLocation 进行绑定索引数值
-            // mPositionHandle = getAttribLocation("aPosition")
-            // mColorHandle = getAttribLocation("aColor")
-            GLES20.glBindAttribLocation(id, mPositionHandle, "aPosition")
-            GLES20.glBindAttribLocation(id, mColorHandle, "aColor")
+            mPositionHandle = getAttribLocation("aPosition")
+            mColorHandle = getAttribLocation("aColor")
         }
 
         override fun onDraw() {
             GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMatrix.matrix, 0)
             GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
-            GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * 4, mColorBuffer)
             GLES20.glEnableVertexAttribArray(mPositionHandle)
-            GLES20.glEnableVertexAttribArray(mColorHandle)
+
+            // 【更改此处】因为是顶点常量，传递三种方式：
+            // 第一种：glVertexAttrib4f
+            GLES20.glVertexAttrib4f(mColorHandle, mColors[0], mColors[1], mColors[2], mColors[3])
+            // 第二种：glVertexAttrib4fv
+//            GLES20.glVertexAttrib4fv(mColorHandle, allocateFloatBuffer(mColors))
+            // 第三种：glVertexAttrib4fv
+//            GLES20.glVertexAttrib4fv(mColorHandle, mColors, 0)
+//            GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 4 * 4, mColorBuffer)
+//            GLES20.glEnableVertexAttribArray(mColorHandle)
+
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount)
             GLES20.glDisableVertexAttribArray(mPositionHandle)
             GLES20.glDisableVertexAttribArray(mColorHandle)
@@ -258,8 +229,8 @@ class LayoutGLSLActivity : AppCompatActivity() {
         override fun getVertexShaderSource(): String = """
             #version 300 es
             uniform mat4 uMVPMatrix;
-            layout(location=11) in vec3 aPosition;
-            layout(location=12) in vec4 aColor;
+            in vec3 aPosition;
+            in vec4 aColor;
             out vec4 vColor;
             void main() {
                 gl_Position = uMVPMatrix * vec4(aPosition, 1.0);
@@ -271,7 +242,7 @@ class LayoutGLSLActivity : AppCompatActivity() {
             #version 300 es
             precision mediump float;
             in vec4 vColor;
-            layout(location=0) out vec4 fragColor;
+            out vec4 fragColor;
             void main() {
                 fragColor = vColor;
             }
