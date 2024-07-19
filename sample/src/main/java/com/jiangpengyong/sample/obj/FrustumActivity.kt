@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox.box.RenderType
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.ImageInOut
 import com.jiangpengyong.sample.a_glsl.TriangleFilter
@@ -46,7 +47,7 @@ private class RenderView(context: Context?) : GLSurfaceView(context) {
     private class Renderer : GLSurfaceView.Renderer {
 
         private val mTriangleFilter = TriangleFilter()
-        private val mContext = FilterContext()
+        private val mContext = FilterContext(RenderType.OnScreen)
         private val mImage = ImageInOut()
 
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {

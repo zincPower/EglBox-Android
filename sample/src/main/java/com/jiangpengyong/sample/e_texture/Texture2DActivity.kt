@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox.box.RenderType
 import com.jiangpengyong.eglbox.gles.GLTexture
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
@@ -53,7 +54,7 @@ class RenderView(context: Context?) : GLSurfaceView(context) {
 
     private class Renderer : GLSurfaceView.Renderer {
         private val mFilter = Texture2DFilter()
-        private val mContext = FilterContext()
+        private val mContext = FilterContext(RenderType.OnScreen)
         private val mTexture = GLTexture()
         private val mImage = ImageInOut()
 

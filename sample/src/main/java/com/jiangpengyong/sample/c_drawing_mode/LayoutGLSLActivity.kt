@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox.box.RenderType
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
@@ -59,7 +60,7 @@ class LayoutGLSLActivity : AppCompatActivity() {
 
         private class Renderer : GLSurfaceView.Renderer {
             private val mFilter = StarFilter()
-            private val mContext = FilterContext()
+            private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {

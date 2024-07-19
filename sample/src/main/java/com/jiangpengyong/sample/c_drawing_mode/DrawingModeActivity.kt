@@ -12,6 +12,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
+import com.jiangpengyong.eglbox.box.RenderType
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
@@ -117,7 +118,7 @@ class DrawingModeActivity : AppCompatActivity() {
                 id = "StarFilter"
                 name = "StarFilter"
             }
-            private val mContext = FilterContext()
+            private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
             private var mBundle: Bundle? = null
 

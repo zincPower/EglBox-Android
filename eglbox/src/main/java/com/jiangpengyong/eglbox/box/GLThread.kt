@@ -134,7 +134,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
             mEglSurface = egl.createWindow(window)
             mEglSurface?.let { egl.makeCurrent(it) }
             if (!mIsCalledOnEglCreated) {
-                renderer.onEGLCreated(egl, mHandler)
+                renderer.onEGLCreated(egl)
                 mIsCalledOnEglCreated = true
             }
 
@@ -343,7 +343,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
         mEglSurface = egl.createPBuffer(width, height)
         mEglSurface?.let { egl.makeCurrent(it) }
         if (!mIsCalledOnEglCreated) {
-            renderer.onEGLCreated(egl, mHandler)
+            renderer.onEGLCreated(egl)
             mIsCalledOnEglCreated = true
         }
         mEglSurface?.let { renderer.onSurfaceSizeChanged(it) }
