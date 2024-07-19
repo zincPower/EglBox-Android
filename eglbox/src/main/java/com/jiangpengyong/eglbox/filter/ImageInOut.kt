@@ -3,8 +3,13 @@ package com.jiangpengyong.eglbox.filter
 import com.jiangpengyong.eglbox.gles.GLFrameBuffer
 import com.jiangpengyong.eglbox.gles.GLTexture
 
+/**
+ * @author jiang peng yong
+ * @date 2024/7/18 12:50
+ * @email 56002982@qq.com
+ * @des 图像信息
+ */
 class ImageInOut {
-
     private var mContext: FilterContext? = null
     var texture: GLTexture? = null
         private set

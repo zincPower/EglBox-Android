@@ -165,7 +165,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
             }
             val windowSurface = eglSurface as? WindowSurface
             windowSurface?.updateSize(width, height)
-            renderer.onSurfaceSizeChanged(eglSurface, width, height)
+            renderer.onSurfaceSizeChanged(eglSurface)
             notifyWindowControlFinish()
         } ?: false
         waitWindowControlFinish(result)
@@ -346,7 +346,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
             renderer.onEGLCreated(egl, mHandler)
             mIsCalledOnEglCreated = true
         }
-        mEglSurface?.let { renderer.onSurfaceSizeChanged(it, width, height) }
+        mEglSurface?.let { renderer.onSurfaceSizeChanged(it) }
     }
 
     companion object {

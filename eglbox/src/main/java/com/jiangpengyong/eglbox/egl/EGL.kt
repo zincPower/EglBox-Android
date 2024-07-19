@@ -135,7 +135,7 @@ class EGL {
             Logger.i(TAG, "State is null. Please call init method first.【createPBuffer】")
             null
         } else {
-            return PBufferSurface(state, 0, 0)
+            return PBufferSurface(state, width, height)
         }
     }
 
