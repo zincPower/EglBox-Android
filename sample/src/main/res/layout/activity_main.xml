@@ -1,38 +1,321 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.jiangpengyong.sample.widget.FlowLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/glsl"
-        style="@style/common_button"
-        android:text="1、GLSL" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/matrix"
-        style="@style/common_button"
-        android:text="2、矩阵" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/primary_orange"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp">
 
-    <TextView
-        android:id="@+id/drawing_mode"
-        style="@style/common_button"
-        android:text="3、绘制方式" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OpenGL 知识体系"
+                android:textColor="@android:color/white"
+                android:textSize="15dp"
+                android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/light"
-        style="@style/common_button"
-        android:text="4、光效" />
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="8dp"
+                android:src="@mipmap/ic_knowledge" />
 
-    <TextView
-        android:id="@+id/texture"
-        style="@style/common_button"
-        android:text="5、纹理" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/font"
-        style="@style/common_button"
-        android:text="字体" />
+        <com.jiangpengyong.sample.widget.FlowLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
-</com.jiangpengyong.sample.widget.FlowLayout>
+            <LinearLayout
+                android:id="@+id/glsl"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1、GLSL"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_glsl" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/matrix"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2、矩阵"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="29dp"
+                    android:layout_height="29dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_matrix" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/drawing_mode"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3、绘制方式"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_render" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/light"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4、光效"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_light" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/texture"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5、纹理"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_texture" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/model"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="6、模型"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_3d_model" />
+
+            </LinearLayout>
+
+        </com.jiangpengyong.sample.widget.FlowLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/primary_orange"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="更多玩法"
+                android:textColor="@android:color/white"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:src="@mipmap/ic_idea" />
+
+        </LinearLayout>
+
+
+        <com.jiangpengyong.sample.widget.FlowLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <LinearLayout
+                android:id="@+id/font"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1、字体"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_font" />
+
+            </LinearLayout>
+
+        </com.jiangpengyong.sample.widget.FlowLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:background="@color/primary_orange"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="库"
+                android:textColor="@android:color/white"
+                android:textSize="15dp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="8dp"
+                android:src="@mipmap/ic_lib" />
+
+        </LinearLayout>
+
+        <com.jiangpengyong.sample.widget.FlowLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
+
+            <LinearLayout
+                android:id="@+id/ocrop"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1、OCrop"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_crop" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/camera"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2、相机"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_camera" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/player"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3、播放器"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_player" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/editor"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4、编辑器"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_video_editor" />
+
+            </LinearLayout>
+
+        </com.jiangpengyong.sample.widget.FlowLayout>
+
+    </LinearLayout>
+
+</ScrollView>
