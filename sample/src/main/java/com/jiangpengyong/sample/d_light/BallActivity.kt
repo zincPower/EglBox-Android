@@ -1,11 +1,14 @@
 package com.jiangpengyong.sample.d_light
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Message
 import android.util.Size
+import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
@@ -14,6 +17,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
+import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -24,12 +28,45 @@ import javax.microedition.khronos.opengles.GL10
  * @des 球体
  */
 class BallActivity : AppCompatActivity() {
+    companion object {
+        private const val TOUCH_SCALE_FACTOR = 1 / 4F
+    }
+
     private lateinit var mRenderView: RenderView
 
+    // 上次触控位置坐标
+    private var mBeforeY = 0f
+    private var mBeforeX = 0f
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mRenderView = RenderView(this)
         setContentView(mRenderView)
+        mRenderView.setOnTouchListener { v, event ->
+            val y = event.y
+            val x = event.x
+            when (event.action) {
+                MotionEvent.ACTION_MOVE -> {
+                    val dy: Float = y - mBeforeY
+                    val yAngle = dy * TOUCH_SCALE_FACTOR
+
+                    val dx: Float = x - mBeforeX
+                    val xAngle = dx * TOUCH_SCALE_FACTOR
+
+                    mRenderView.updateFilterData(
+                        Bundle().apply {
+                            putFloat("xAngle", xAngle)
+                            putFloat("yAngle", yAngle)
+                        }
+                    )
+                    mRenderView.requestRender()
+                }
+            }
+            mBeforeY = y
+            mBeforeX = x
+            true
+        }
     }
 
     override fun onResume() {
@@ -45,6 +82,10 @@ class BallActivity : AppCompatActivity() {
     class RenderView(context: Context?) : GLSurfaceView(context) {
         private val mRenderer = Renderer()
 
+        fun updateFilterData(bundle: Bundle) {
+            mRenderer.updateFilterData(bundle)
+        }
+
         init {
             setEGLContextClientVersion(3)
             setRenderer(mRenderer)
@@ -52,9 +93,13 @@ class BallActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mBallFilter = BallFilter()
+            private val mBallFilter = BallFilter().apply { id = "BallFilter" }
             private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
+
+            fun updateFilterData(bundle: Bundle) {
+                mBallFilter.updateData("BallFilter", bundle)
+            }
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 mBallFilter.init(mContext)
@@ -82,6 +127,9 @@ class BallActivity : AppCompatActivity() {
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
+
+        private var xAngle = 0F
+        private var yAngle = 0F
 
         private var mDisplaySize = Size(0, 0)
 
@@ -125,7 +173,14 @@ class BallActivity : AppCompatActivity() {
             }
         }
 
-        override fun onUpdateData(updateData: Bundle) {}
+        override fun onUpdateData(updateData: Bundle) {
+            xAngle += updateData.getFloat("xAngle", 0F)
+            yAngle += updateData.getFloat("yAngle", 0F)
+            mModelMatrix.reset()
+            mModelMatrix.rotate(xAngle, 0F, 1F, 0F)
+            mModelMatrix.rotate(yAngle, 1F, 0F, 0F)
+        }
+
         override fun onRestoreData(inputData: Bundle) {}
         override fun onStoreData(outputData: Bundle) {}
         override fun onReceiveMessage(message: Message) {}
