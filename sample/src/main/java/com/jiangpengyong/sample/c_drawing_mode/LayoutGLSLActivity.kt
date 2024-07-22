@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.os.Message
 import android.util.Size
 import androidx.appcompat.app.AppCompatActivity
-import com.jiangpengyong.eglbox.box.RenderType
+import com.jiangpengyong.eglbox.engine.RenderType
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut

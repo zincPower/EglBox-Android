@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox.box
+package com.jiangpengyong.eglbox.engine
 
 import com.jiangpengyong.eglbox.egl.EglSurfaceType
 

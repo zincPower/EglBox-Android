@@ -1,8 +1,9 @@
-package com.jiangpengyong.eglbox.box
+package com.jiangpengyong.eglbox.engine
 
 import com.jiangpengyong.eglbox.GLThread
 import com.jiangpengyong.eglbox.egl.EGL
 import com.jiangpengyong.eglbox.egl.EglSurface
+import com.jiangpengyong.eglbox.filter.FilterChain
 
 /**
  * @author: jiang peng yong

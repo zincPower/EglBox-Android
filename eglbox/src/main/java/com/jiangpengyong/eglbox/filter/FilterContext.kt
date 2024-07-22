@@ -2,10 +2,7 @@ package com.jiangpengyong.eglbox.filter
 
 import android.os.Message
 import android.util.Size
-import com.jiangpengyong.eglbox.box.FilterChainListener
-import com.jiangpengyong.eglbox.box.FilterChainListenerImpl
-import com.jiangpengyong.eglbox.box.MessageListener
-import com.jiangpengyong.eglbox.box.RenderType
+import com.jiangpengyong.eglbox.engine.RenderType
 import com.jiangpengyong.eglbox.egl.EGL
 import com.jiangpengyong.eglbox.egl.PBufferSurface
 import com.jiangpengyong.eglbox.egl.WindowSurface

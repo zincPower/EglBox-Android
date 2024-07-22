@@ -1,18 +1,14 @@
-package com.jiangpengyong.eglbox.box
+package com.jiangpengyong.eglbox.filter
 
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.util.Log
 import androidx.annotation.MainThread
 import com.jiangpengyong.eglbox.GLThread
+import com.jiangpengyong.eglbox.engine.RenderType
 import com.jiangpengyong.eglbox.egl.EGL
 import com.jiangpengyong.eglbox.egl.EglSurface
-import com.jiangpengyong.eglbox.filter.FilterContext
-import com.jiangpengyong.eglbox.filter.GLFilter
-import com.jiangpengyong.eglbox.filter.GLFilterGroup
-import com.jiangpengyong.eglbox.filter.SourceFilter
 import com.jiangpengyong.eglbox.logger.Logger
 
 /**
