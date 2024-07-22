@@ -1,10 +1,10 @@
 package com.jiangpengyong.sample.d_light
 
 import android.opengl.GLES20
-import com.jiangpengyong.eglbox.gles.GLProgram
-import com.jiangpengyong.eglbox.utils.GLMatrix
-import com.jiangpengyong.eglbox.utils.GLShaderExt.loadFromAssetsFile
-import com.jiangpengyong.eglbox.utils.allocateFloatBuffer
+import com.jiangpengyong.eglbox_core.gles.GLProgram
+import com.jiangpengyong.eglbox_core.utils.GLMatrix
+import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
+import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
 import java.nio.FloatBuffer
 import kotlin.math.cos

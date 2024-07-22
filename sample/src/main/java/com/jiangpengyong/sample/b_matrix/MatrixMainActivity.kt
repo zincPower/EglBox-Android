@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.jiangpengyong.eglbox.R
+import com.jiangpengyong.eglbox_sample.R
 
 /**
  * @author jiang peng yong

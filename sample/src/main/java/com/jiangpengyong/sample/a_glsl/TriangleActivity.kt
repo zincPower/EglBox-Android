@@ -6,11 +6,11 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Message
 import androidx.appcompat.app.AppCompatActivity
-import com.jiangpengyong.eglbox.engine.RenderType
-import com.jiangpengyong.eglbox.filter.FilterContext
-import com.jiangpengyong.eglbox.filter.GLFilter
-import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.TriangleProgram
+import com.jiangpengyong.eglbox_core.engine.RenderType
+import com.jiangpengyong.eglbox_core.filter.FilterContext
+import com.jiangpengyong.eglbox_core.filter.GLFilter
+import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_model.TriangleProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

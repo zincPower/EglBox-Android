@@ -1,7 +1,7 @@
 package com.jiangpengyong.sample.utils
 
 import android.content.res.AssetManager
-import com.jiangpengyong.eglbox.logger.Logger
+import com.jiangpengyong.eglbox_core.logger.Logger
 import java.io.Closeable
 import java.io.File
 import java.io.FileOutputStream

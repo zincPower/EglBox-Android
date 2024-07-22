@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.jiangpengyong.eglbox'
+    namespace 'com.jiangpengyong.eglbox_sample'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.jiangpengyong.eglbox"
+        applicationId "com.jiangpengyong.eglbox_sample"
         minSdk 21
         targetSdk 33
         versionCode 1
@@ -46,6 +46,6 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
-
-    implementation project(':eglbox')
+    implementation project(':eglbox-core')
+    implementation project(':eglbox-model')
 }

@@ -3,7 +3,7 @@ package com.jiangpengyong.sample.font
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.jiangpengyong.eglbox.R
+import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.EglBoxSample
 import java.io.File
 
