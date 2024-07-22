@@ -67,25 +67,25 @@ class TriangleActivity : AppCompatActivity() {
             }
         }
     }
-}
 
-class TriangleFilter : GLFilter() {
-    private val mTriangleProgram = TriangleProgram()
+    class TriangleFilter : GLFilter() {
+        private val mTriangleProgram = TriangleProgram()
 
-    override fun onInit() {
-        mTriangleProgram.init()
+        override fun onInit() {
+            mTriangleProgram.init()
+        }
+
+        override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+            mTriangleProgram.draw()
+        }
+
+        override fun onRelease() {
+            mTriangleProgram.release()
+        }
+
+        override fun onUpdateData(updateData: Bundle) {}
+        override fun onRestoreData(inputData: Bundle) {}
+        override fun onStoreData(outputData: Bundle) {}
+        override fun onReceiveMessage(message: Message) {}
     }
-
-    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-        mTriangleProgram.draw()
-    }
-
-    override fun onRelease() {
-        mTriangleProgram.release()
-    }
-
-    override fun onUpdateData(updateData: Bundle) {}
-    override fun onRestoreData(inputData: Bundle) {}
-    override fun onStoreData(outputData: Bundle) {}
-    override fun onReceiveMessage(message: Message) {}
 }

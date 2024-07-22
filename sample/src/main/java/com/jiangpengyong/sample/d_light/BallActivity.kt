@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.a_glsl
+package com.jiangpengyong.sample.d_light
 
 import android.content.Context
 import android.opengl.GLES20
@@ -11,7 +11,6 @@ import com.jiangpengyong.eglbox.box.RenderType
 import com.jiangpengyong.eglbox.filter.FilterContext
 import com.jiangpengyong.eglbox.filter.GLFilter
 import com.jiangpengyong.eglbox.filter.ImageInOut
-import com.jiangpengyong.eglbox.program.StarProgram
 import com.jiangpengyong.eglbox.utils.ModelMatrix
 import com.jiangpengyong.eglbox.utils.ProjectMatrix
 import com.jiangpengyong.eglbox.utils.ViewMatrix
@@ -20,11 +19,11 @@ import javax.microedition.khronos.opengles.GL10
 
 /**
  * @author jiang peng yong
- * @date 2024/2/9 15:33
+ * @date 2024/7/20 14:47
  * @email 56002982@qq.com
- * @des 三角形
+ * @des 球体
  */
-class StarActivity : AppCompatActivity() {
+class BallActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,24 +46,21 @@ class StarActivity : AppCompatActivity() {
         private val mRenderer = Renderer()
 
         init {
-            // 选择 EGL 为 3.0 版本
             setEGLContextClientVersion(3)
             setRenderer(mRenderer)
-            // 按需驱动渲染
             renderMode = RENDERMODE_WHEN_DIRTY
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilter = StarFilter()
+            private val mBallFilter = BallFilter()
             private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-                // 开启卷绕
+                mBallFilter.init(mContext)
+                GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                // 按顺时针卷绕
                 GLES20.glFrontFace(GLES20.GL_CW)
-                mFilter.init(mContext)
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -73,62 +69,53 @@ class StarActivity : AppCompatActivity() {
             }
 
             override fun onDrawFrame(gl: GL10?) {
+                GLES20.glClearColor(0F, 0F, 0F, 1F)
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-                mFilter.draw(mImage)
+                mBallFilter.draw(mImage)
             }
         }
     }
 
-    private class StarFilter : GLFilter() {
+    class BallFilter : GLFilter() {
+        private val mProgram = TrigonometricBallProgram()
+
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
 
-        private val mStarProgram = StarProgram()
         private var mDisplaySize = Size(0, 0)
 
         override fun onInit() {
-            mStarProgram.init()
+            mProgram.init()
             mViewMatrix.setLookAtM(
-                0F, 0F, 5F,
+                0F, 0F, 3F,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-            updateProjectMatrix(context)
-            drawStar()
+            updateProjectionMatrix(context)
+            mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+            mProgram.draw()
         }
 
         override fun onRelease() {
-            mStarProgram.release()
+            mProgram.release()
         }
 
-        override fun onUpdateData(updateData: Bundle) {}
-        override fun onRestoreData(inputData: Bundle) {}
-        override fun onStoreData(outputData: Bundle) {}
-        override fun onReceiveMessage(message: Message) {}
-
-        private fun drawStar() {
-            // 设置颜色
-            // mStarProgram.setColor("#FFFF00", "#FFFF00")
-            mStarProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-            mStarProgram.draw()
-        }
-
-        private fun updateProjectMatrix(context: FilterContext) {
+        private fun updateProjectionMatrix(context: FilterContext) {
             val displaySize = context.displaySize
             if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
                 val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
                 if (displaySize.width > displaySize.height) {
-                    mProjectMatrix.setOrthoM(
+                    mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
                         2F, 10F
                     )
                 } else {
-                    mProjectMatrix.setOrthoM(
+                    mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
                         2F, 10F
@@ -137,5 +124,10 @@ class StarActivity : AppCompatActivity() {
                 mDisplaySize = displaySize
             }
         }
+
+        override fun onUpdateData(updateData: Bundle) {}
+        override fun onRestoreData(inputData: Bundle) {}
+        override fun onStoreData(outputData: Bundle) {}
+        override fun onReceiveMessage(message: Message) {}
     }
 }

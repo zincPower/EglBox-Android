@@ -110,8 +110,8 @@ class ViewMatrixActivity : AppCompatActivity() {
             }
 
             override fun onDrawFrame(gl: GL10?) {
-                GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
                 GLES20.glClearColor(0F, 0F, 0F, 1F)
+                GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
                 synchronized(this) {
                     val temp = mBundle
                     mBundle = null

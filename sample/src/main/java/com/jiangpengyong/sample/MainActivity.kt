@@ -3,17 +3,14 @@ package com.jiangpengyong.sample
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 import com.jiangpengyong.sample.a_glsl.GLSLMainActivity
 import com.jiangpengyong.sample.b_matrix.MatrixMainActivity
-import com.jiangpengyong.sample.c_drawing_mode.DrawingModeActivity
 import com.jiangpengyong.sample.c_drawing_mode.DrawingModeMainActivity
 import com.jiangpengyong.sample.d_light.LightMainActivity
 import com.jiangpengyong.sample.e_texture.TextureMainActivity
 import com.jiangpengyong.sample.font.FontActivity
-import com.jiangpengyong.sample.obj.FrustumActivity
 
 /**
  * @author jiang peng yong

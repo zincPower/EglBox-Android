@@ -75,63 +75,63 @@ class CubeActivity : AppCompatActivity() {
             }
         }
     }
-}
 
-private class CubeFilter : GLFilter() {
-    private val mProjectMatrix = ProjectMatrix()
-    private val mViewMatrix = ViewMatrix()
-    private val mModelMatrix = ModelMatrix()
+    private class CubeFilter : GLFilter() {
+        private val mProjectMatrix = ProjectMatrix()
+        private val mViewMatrix = ViewMatrix()
+        private val mModelMatrix = ModelMatrix()
 
-    private val mCubeProgram = CubeProgram()
-    private var mDisplaySize = Size(0, 0)
+        private val mCubeProgram = CubeProgram()
+        private var mDisplaySize = Size(0, 0)
 
-    override fun onInit() {
-        mCubeProgram.init()
-        mViewMatrix.setLookAtM(
-            0F, 0F, 5F,
-            0F, 0F, 0F,
-            0F, 1F, 0F
-        )
-        mModelMatrix.rotate(30F, 1F, 1F, 1F)
-    }
+        override fun onInit() {
+            mCubeProgram.init()
+            mViewMatrix.setLookAtM(
+                0F, 0F, 5F,
+                0F, 0F, 0F,
+                0F, 1F, 0F
+            )
+            mModelMatrix.rotate(30F, 1F, 1F, 1F)
+        }
 
-    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-        updateProjectionMatrix(context)
-        drawCube()
-    }
+        override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+            updateProjectionMatrix(context)
+            drawCube()
+        }
 
-    override fun onRelease() {
-        mCubeProgram.release()
-    }
+        override fun onRelease() {
+            mCubeProgram.release()
+        }
 
-    override fun onUpdateData(updateData: Bundle) {}
-    override fun onRestoreData(inputData: Bundle) {}
-    override fun onStoreData(outputData: Bundle) {}
-    override fun onReceiveMessage(message: Message) {}
+        override fun onUpdateData(updateData: Bundle) {}
+        override fun onRestoreData(inputData: Bundle) {}
+        override fun onStoreData(outputData: Bundle) {}
+        override fun onReceiveMessage(message: Message) {}
 
-    private fun drawCube() {
-        mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-        mCubeProgram.draw()
-    }
+        private fun drawCube() {
+            mCubeProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+            mCubeProgram.draw()
+        }
 
-    private fun updateProjectionMatrix(context: FilterContext) {
-        val displaySize = context.displaySize
-        if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
-            if (displaySize.width > displaySize.height) {
-                mProjectMatrix.setFrustumM(
-                    -ratio, ratio,
-                    -1F, 1F,
-                    2F, 10F
-                )
-            } else {
-                mProjectMatrix.setFrustumM(
-                    -1F, 1F,
-                    -ratio, ratio,
-                    2F, 10F
-                )
+        private fun updateProjectionMatrix(context: FilterContext) {
+            val displaySize = context.displaySize
+            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
+                val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+                if (displaySize.width > displaySize.height) {
+                    mProjectMatrix.setFrustumM(
+                        -ratio, ratio,
+                        -1F, 1F,
+                        2F, 10F
+                    )
+                } else {
+                    mProjectMatrix.setFrustumM(
+                        -1F, 1F,
+                        -ratio, ratio,
+                        2F, 10F
+                    )
+                }
+                mDisplaySize = displaySize
             }
-            mDisplaySize = displaySize
         }
     }
 }

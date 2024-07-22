@@ -1,6 +1,8 @@
 package com.jiangpengyong.sample.d_light
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox.R
 
@@ -15,6 +17,10 @@ class LightMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_light_main)
+
+        findViewById<View>(R.id.ball).setOnClickListener {
+            startActivity(Intent(this, BallActivity::class.java))
+        }
     }
 
 }
