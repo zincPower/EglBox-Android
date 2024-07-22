@@ -6,9 +6,14 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Message
+import android.util.AttributeSet
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
+import android.widget.RadioGroup
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
@@ -30,42 +35,48 @@ import javax.microedition.khronos.opengles.GL10
 class BallActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
+        private const val RESET = 10000
     }
 
     private lateinit var mRenderView: RenderView
-
-    // 上次触控位置坐标
-    private var mBeforeY = 0f
-    private var mBeforeX = 0f
+    private lateinit var mSpanAngleTitle: TextView
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mRenderView = RenderView(this)
-        setContentView(mRenderView)
-        mRenderView.setOnTouchListener { v, event ->
-            val y = event.y
-            val x = event.x
-            when (event.action) {
-                MotionEvent.ACTION_MOVE -> {
-                    val dy: Float = y - mBeforeY
-                    val yAngle = dy * TOUCH_SCALE_FACTOR
-
-                    val dx: Float = x - mBeforeX
-                    val xAngle = dx * TOUCH_SCALE_FACTOR
-
-                    mRenderView.updateFilterData(
-                        Bundle().apply {
-                            putFloat("xAngle", xAngle)
-                            putFloat("yAngle", yAngle)
-                        }
-                    )
+        setContentView(R.layout.activity_ball)
+        mRenderView = findViewById(R.id.surface_view)
+        mSpanAngleTitle = findViewById(R.id.span_angle_title)
+        findViewById<View>(R.id.reset).setOnClickListener {
+            mRenderView.sendMessageToFilter(Message.obtain().apply { what = RESET })
+            mRenderView.requestRender()
+        }
+        mSpanAngleTitle.text = "圆切割度数（10度）"
+        findViewById<SeekBar>(R.id.span_angle).apply {
+            setProgress(2)
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val spanAngle = (progress + 1) * 5
+                    mSpanAngleTitle.text = "圆切割度数（${spanAngle}度）"
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putInt("spanAngle", spanAngle)
+                    })
                     mRenderView.requestRender()
                 }
-            }
-            mBeforeY = y
-            mBeforeX = x
-            true
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+        findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
+            mRenderView.updateFilterData(Bundle().apply {
+                when (checkedId) {
+                    R.id.gl_points -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Point.value)
+                    R.id.gl_lines -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Line.value)
+                    R.id.gl_triangles -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Face.value)
+                }
+            })
+            mRenderView.requestRender()
         }
     }
 
@@ -79,11 +90,22 @@ class BallActivity : AppCompatActivity() {
         mRenderView.onPause()
     }
 
-    class RenderView(context: Context?) : GLSurfaceView(context) {
+    class RenderView : GLSurfaceView {
         private val mRenderer = Renderer()
+
+        // 上次触控位置坐标
+        private var mBeforeY = 0f
+        private var mBeforeX = 0f
+
+        constructor(context: Context?) : super(context)
+        constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
         fun updateFilterData(bundle: Bundle) {
             mRenderer.updateFilterData(bundle)
+        }
+
+        fun sendMessageToFilter(message: Message) {
+            mRenderer.sendMessageToFilter(message)
         }
 
         init {
@@ -92,13 +114,41 @@ class BallActivity : AppCompatActivity() {
             renderMode = RENDERMODE_WHEN_DIRTY
         }
 
+        @SuppressLint("ClickableViewAccessibility")
+        override fun onTouchEvent(event: MotionEvent?): Boolean {
+            event ?: return false
+            val y = event.y
+            val x = event.x
+            when (event.action) {
+                MotionEvent.ACTION_MOVE -> {
+                    val dy: Float = y - mBeforeY
+                    val yAngle = dy * TOUCH_SCALE_FACTOR
+
+                    val dx: Float = x - mBeforeX
+                    val xAngle = dx * TOUCH_SCALE_FACTOR
+
+                    mRenderer.updateFilterData(
+                        Bundle().apply {
+                            putFloat("xAngle", xAngle)
+                            putFloat("yAngle", yAngle)
+                        }
+                    )
+                    requestRender()
+                }
+            }
+            mBeforeY = y
+            mBeforeX = x
+            return true
+        }
+
         private class Renderer : GLSurfaceView.Renderer {
-            private val mBallFilter = BallFilter().apply { id = "BallFilter" }
+            private val mFilterId = "BallFilter"
+            private val mBallFilter = BallFilter().apply { id = mFilterId }
             private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
 
             fun updateFilterData(bundle: Bundle) {
-                mBallFilter.updateData("BallFilter", bundle)
+                mBallFilter.updateData(mFilterId, bundle)
             }
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
@@ -117,6 +167,10 @@ class BallActivity : AppCompatActivity() {
                 GLES20.glClearColor(0F, 0F, 0F, 1F)
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
                 mBallFilter.draw(mImage)
+            }
+
+            fun sendMessageToFilter(message: Message) {
+                mBallFilter.receiveMessage(mFilterId, message)
             }
         }
     }
@@ -143,9 +197,13 @@ class BallActivity : AppCompatActivity() {
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+            GLES20.glClearColor(0F, 0F, 0F, 1F)
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
-            mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-            mProgram.draw()
+            synchronized(this) {
+                mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+                mProgram.draw()
+            }
         }
 
         override fun onRelease() {
@@ -174,15 +232,39 @@ class BallActivity : AppCompatActivity() {
         }
 
         override fun onUpdateData(updateData: Bundle) {
-            xAngle += updateData.getFloat("xAngle", 0F)
-            yAngle += updateData.getFloat("yAngle", 0F)
-            mModelMatrix.reset()
-            mModelMatrix.rotate(xAngle, 0F, 1F, 0F)
-            mModelMatrix.rotate(yAngle, 1F, 0F, 0F)
+            synchronized(this) {
+                xAngle += updateData.getFloat("xAngle", 0F)
+                yAngle += updateData.getFloat("yAngle", 0F)
+                mModelMatrix.reset()
+                mModelMatrix.rotate(xAngle, 0F, 1F, 0F)
+                mModelMatrix.rotate(yAngle, 1F, 0F, 0F)
+
+                val mode = updateData.getInt("drawingMode", 0)
+                if (mode != 0) {
+                    when (mode) {
+                        TrigonometricBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Point)
+                        TrigonometricBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Line)
+                        TrigonometricBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Face)
+                    }
+                }
+
+                val spanAngle = updateData.getInt("spanAngle", 0)
+                if (spanAngle != 0) {
+                    mProgram.setAngleSpan(spanAngle)
+                }
+            }
         }
 
         override fun onRestoreData(inputData: Bundle) {}
         override fun onStoreData(outputData: Bundle) {}
-        override fun onReceiveMessage(message: Message) {}
+        override fun onReceiveMessage(message: Message) {
+            synchronized(this) {
+                if (message.what == RESET) {
+                    xAngle = 0F
+                    yAngle = 0F
+                    mModelMatrix.reset()
+                }
+            }
+        }
     }
 }

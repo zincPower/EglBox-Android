@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/reset"
+            style="@style/common_button"
+            android:text="方向复位"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/span_angle_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="圆切割度数（-度）"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <SeekBar
+            android:id="@+id/span_angle"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:max="5" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="绘制方式"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/drawing_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/gl_points"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="点（GL_POINTS）"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/gl_lines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="线（GL_LINES）"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/gl_triangles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="面（GL_TRIANGLES）"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <view
+        android:id="@+id/surface_view"
+        class="com.jiangpengyong.sample.d_light.BallActivity$RenderView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+</LinearLayout>

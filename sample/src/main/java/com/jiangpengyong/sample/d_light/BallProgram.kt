@@ -17,7 +17,13 @@ import kotlin.math.sin
  * @des 绘制球
  */
 class TrigonometricBallProgram : GLProgram() {
-    private val mAngleSpan = 10
+    enum class DrawMode(val value: Int) {
+        Point(1),
+        Line(2),
+        Face(3)
+    }
+
+    private var mAngleSpan = 10
     private lateinit var mVertexBuffer: FloatBuffer
 
     private var mRadius = 1F
@@ -28,6 +34,7 @@ class TrigonometricBallProgram : GLProgram() {
 
     private var mVertexCount = 0
     private var mMatrix: GLMatrix = GLMatrix()
+    private var mDrawMode: DrawMode = DrawMode.Face
 
     init {
         calculateVertex()
@@ -35,6 +42,15 @@ class TrigonometricBallProgram : GLProgram() {
 
     fun setMatrix(matrix: GLMatrix) {
         mMatrix = matrix
+    }
+
+    fun setDrawMode(mode: DrawMode) {
+        mDrawMode = mode
+    }
+
+    fun setAngleSpan(angleSpan: Int) {
+        mAngleSpan = angleSpan
+        calculateVertex()
     }
 
     override fun onInit() {
@@ -46,7 +62,11 @@ class TrigonometricBallProgram : GLProgram() {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMatrix.matrix, 0)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
+        when (mDrawMode) {
+            DrawMode.Point -> GLES20.glDrawArrays(GLES20.GL_POINTS, 0, mVertexCount)
+            DrawMode.Line -> GLES20.glDrawArrays(GLES20.GL_LINES, 0, mVertexCount)
+            DrawMode.Face -> GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
+        }
         GLES20.glDisableVertexAttribArray(mPositionHandle)
     }
 
