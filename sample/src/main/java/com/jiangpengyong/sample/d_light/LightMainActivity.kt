@@ -13,7 +13,6 @@ import com.jiangpengyong.eglbox_sample.R
  * @des 光效主入口
  */
 class LightMainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_light_main)
@@ -21,6 +20,17 @@ class LightMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.ball).setOnClickListener {
             startActivity(Intent(this, BallActivity::class.java))
         }
-    }
 
+        findViewById<View>(R.id.ambient_light).setOnClickListener {
+            startActivity(Intent(this, AmbientLightActivity::class.java))
+        }
+
+        findViewById<View>(R.id.scattered_light).setOnClickListener {
+            startActivity(Intent(this, AmbientLightActivity::class.java))
+        }
+
+        findViewById<View>(R.id.specular_reflection).setOnClickListener {
+            startActivity(Intent(this, AmbientLightActivity::class.java))
+        }
+    }
 }

@@ -71,6 +71,9 @@
         <activity
             android:name="com.jiangpengyong.sample.d_light.BallActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.d_light.AmbientLightActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.e_texture.TextureMainActivity"

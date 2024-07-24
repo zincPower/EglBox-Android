@@ -8,4 +8,19 @@
         style="@style/common_button"
         android:text="球体" />
 
+    <TextView
+        android:id="@+id/ambient_light"
+        style="@style/common_button"
+        android:text="环境光" />
+
+    <TextView
+        android:id="@+id/scattered_light"
+        style="@style/common_button"
+        android:text="散射光" />
+
+    <TextView
+        android:id="@+id/specular_reflection"
+        style="@style/common_button"
+        android:text="镜面光" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>
