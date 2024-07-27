@@ -30,7 +30,6 @@ class AmbientLightBallProgram : GLProgram() {
 
     private var mMVPMatrixHandle = 0
     private var mPositionHandle = 0
-    private var mColorHandle = 0
 
     private var mVertexCount = 0
     private var mMatrix: GLMatrix = GLMatrix()
@@ -73,7 +72,6 @@ class AmbientLightBallProgram : GLProgram() {
     override fun onRelease() {
         mMVPMatrixHandle = 0
         mPositionHandle = 0
-        mColorHandle = 0
     }
 
     override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/ambient_light/vertex.glsl")

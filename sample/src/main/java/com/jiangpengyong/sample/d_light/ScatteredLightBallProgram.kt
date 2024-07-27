@@ -14,9 +14,9 @@ import kotlin.math.sin
  * @author jiang peng yong
  * @date 2024/6/19 10:08
  * @email 56002982@qq.com
- * @des 绘制球
+ * @des 绘制球 —— 散射光
  */
-class TrigonometricBallProgram : GLProgram() {
+class ScatteredLightBallProgram : GLProgram() {
     enum class DrawMode(val value: Int) {
         Point(1),
         Line(2),
@@ -25,22 +25,37 @@ class TrigonometricBallProgram : GLProgram() {
 
     private var mAngleSpan = 10
     private lateinit var mVertexBuffer: FloatBuffer
+    private lateinit var mNormalBuffer: FloatBuffer
 
     private var mRadius = 1F
 
     private var mMVPMatrixHandle = 0
+    private var mMMatrixHandle = 0
+    private var mLightPositionHandle = 0
     private var mPositionHandle = 0
+    private var mNormalHandle = 0
 
     private var mVertexCount = 0
-    private var mMatrix: GLMatrix = GLMatrix()
+    private var mMVPMatrix: GLMatrix = GLMatrix()
+    private var mMMatrix: GLMatrix = GLMatrix()
     private var mDrawMode: DrawMode = DrawMode.Face
+
+    private var mLightPosition = FloatArray(3)
 
     init {
         calculateVertex()
     }
 
-    fun setMatrix(matrix: GLMatrix) {
-        mMatrix = matrix
+    fun setMVPMatrix(matrix: GLMatrix) {
+        mMVPMatrix = matrix
+    }
+
+    fun setMMatrix(matrix: GLMatrix) {
+        mMMatrix = matrix
+    }
+
+    fun setLightPosition(lightPosition: FloatArray) {
+        mLightPosition = lightPosition
     }
 
     fun setDrawMode(mode: DrawMode) {
@@ -54,29 +69,42 @@ class TrigonometricBallProgram : GLProgram() {
 
     override fun onInit() {
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
+        mMMatrixHandle = getUniformLocation("uMMatrix")
+        mLightPositionHandle = getUniformLocation("uLightPosition")
         mPositionHandle = getAttribLocation("aPosition")
+        mNormalHandle = getAttribLocation("aNormal")
     }
 
     override fun onDraw() {
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMatrix.matrix, 0)
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
+        // 模型矩阵
+        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
+        GLES20.glUniform3f(mLightPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
+        // 法向量
+        GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
+        GLES20.glEnableVertexAttribArray(mNormalHandle)
         when (mDrawMode) {
             DrawMode.Point -> GLES20.glDrawArrays(GLES20.GL_POINTS, 0, mVertexCount)
             DrawMode.Line -> GLES20.glDrawArrays(GLES20.GL_LINES, 0, mVertexCount)
             DrawMode.Face -> GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
         }
         GLES20.glDisableVertexAttribArray(mPositionHandle)
+        GLES20.glDisableVertexAttribArray(mNormalHandle)
     }
 
     override fun onRelease() {
         mMVPMatrixHandle = 0
+        mMMatrixHandle = 0
+        mLightPositionHandle = 0
         mPositionHandle = 0
+        mNormalHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/ball/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/scattered_light/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/ball/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/scattered_light/fragment.glsl")
 
     private fun calculateVertex() {
         val vertexList = ArrayList<Float>()
@@ -161,6 +189,8 @@ class TrigonometricBallProgram : GLProgram() {
         }
         mVertexCount = vertexList.size / 3
         mVertexBuffer = allocateFloatBuffer(vertexList.toFloatArray())
+        // 因为球体的几何体征，球心在原点，所以各个点法向量和顶点位置刚好一致，不用再次计算
+        mNormalBuffer = allocateFloatBuffer(vertexList.toFloatArray())
     }
 
     private fun Double.toRadians(): Double {

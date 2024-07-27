@@ -66,6 +66,7 @@
                 android:id="@+id/gl_triangles"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:checked="true"
                 android:text="面（GL_TRIANGLES）"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp" />
