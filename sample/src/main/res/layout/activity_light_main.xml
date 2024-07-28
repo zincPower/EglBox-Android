@@ -6,21 +6,26 @@
     <TextView
         android:id="@+id/ball"
         style="@style/common_button"
-        android:text="球体" />
+        android:text="1、球体" />
 
     <TextView
         android:id="@+id/ambient_light"
         style="@style/common_button"
-        android:text="环境光" />
+        android:text="2、环境光" />
 
     <TextView
         android:id="@+id/scattered_light"
         style="@style/common_button"
-        android:text="散射光" />
+        android:text="3、散射光" />
 
     <TextView
         android:id="@+id/specular_reflection"
         style="@style/common_button"
-        android:text="镜面光" />
+        android:text="4、镜面光" />
+
+    <TextView
+        android:id="@+id/full_light"
+        style="@style/common_button"
+        android:text="5、全光效" />
 
 </com.jiangpengyong.sample.widget.FlowLayout>

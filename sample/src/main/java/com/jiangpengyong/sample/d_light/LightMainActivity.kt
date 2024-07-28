@@ -32,5 +32,9 @@ class LightMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.specular_reflection).setOnClickListener {
             startActivity(Intent(this, SpecularLightActivity::class.java))
         }
+
+        findViewById<View>(R.id.full_light).setOnClickListener {
+            startActivity(Intent(this, FullLightActivity::class.java))
+        }
     }
 }

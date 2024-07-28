@@ -15,10 +15,34 @@ in vec3 aNormal;
 // 光滑度
 in float aShininess;
 
+// 控制三种光是否现实
+uniform int uIsAddAmbientLight;
+uniform int uIsAddScatteredLight;
+uniform int uIsAddSpecularLight;
+
 // 将未转换的顶点位置传递给片元着色器
 out vec3 vPosition;
+// 环境光强度
+out vec4 vAmbientLight;
+// 该顶点散射光最终亮度
+out vec4 vScatteredLight;
 // 该顶点镜面光最终亮度
 out vec4 vSpecularLight;
+
+// 计算该顶点的散射光最终强度
+vec4 calScatteredLight(
+    vec3 normal, // 法向量（相对于原点）
+    vec3 lightLocation,
+    vec4 ligthIntensity
+) {
+    // 将向量移动到顶点位置，表示该顶点的法向量
+    vec3 realNormal = normalize(aPosition + normalize(normal));
+    // 计算顶点到光源的向量
+    vec3 lightVector = normalize(lightLocation - (uMMatrix * vec4(aPosition, 1.0)).xyz);
+    // 利用点积，计算 cos 的值，并限制在 [0, 1] 之间
+    float dotResult = max(0.0, dot(realNormal, lightVector));
+    return ligthIntensity * dotResult;
+}
 
 // 计算该顶点的镜面光最终强度
 vec4 calSpecularLight(
@@ -51,9 +75,28 @@ void main() {
     // 将未转换的顶点位置传给片元着色器
     vPosition = aPosition;
 
+    // 环境光
+    if (uIsAddAmbientLight == 1) {
+        vAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
+    } else {
+        vAmbientLight = vec4(0);
+    }
+
+    // 散射光
+    if (uIsAddScatteredLight == 1) {
+        vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
+        vScatteredLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
+    } else {
+        vScatteredLight = vec4(0);
+    }
+
     // 镜面光
-    vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
-    vSpecularLight = calSpecularLight(aNormal, uLightPosition, specularLightIntensity);
+    if (uIsAddSpecularLight == 1) {
+        vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
+        vSpecularLight = calSpecularLight(aNormal, uLightPosition, specularLightIntensity);
+    } else {
+        vSpecularLight = vec4(0);
+    }
 
     // 为了点绘制时，方便查看点绘制
     gl_PointSize = 10.0;
