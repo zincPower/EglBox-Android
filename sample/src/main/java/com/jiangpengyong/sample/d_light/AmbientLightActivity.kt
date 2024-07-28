@@ -44,7 +44,7 @@ class AmbientLightActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ambient_light)
+        setContentView(R.layout.activity_light_ambient)
         mRenderView = findViewById(R.id.surface_view)
         mSpanAngleTitle = findViewById(R.id.span_angle_title)
         findViewById<View>(R.id.reset).setOnClickListener {

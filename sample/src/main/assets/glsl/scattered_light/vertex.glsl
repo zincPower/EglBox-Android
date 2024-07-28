@@ -22,15 +22,11 @@ vec4 calScatteredLight(
     vec4 ligthIntensity
 ) {
     // 将向量移动到顶点位置，表示该顶点的法向量
-    vec3 positionNormal = aPosition + normalize(normal);
-
-    vec3 realNormal = (uMMatrix * vec4(positionNormal, 1.0)).xyz - (uMMatrix * vec4(aPosition, 1.0)).xyz;
-    // 归一化向量
-    vec3 newNormal = normalize(positionNormal);
-
+    vec3 realNormal = normalize(aPosition + normalize(normal));
+    // 计算顶点到光源的向量
     vec3 lightVector = normalize(lightLocation - (uMMatrix * vec4(aPosition, 1.0)).xyz);
     // 利用点积，计算 cos 的值，并限制在 [0, 1] 之间
-    float dotResult = max(0.0, dot(newNormal, lightVector));
+    float dotResult = max(0.0, dot(realNormal, lightVector));
     return ligthIntensity * dotResult;
 }
 

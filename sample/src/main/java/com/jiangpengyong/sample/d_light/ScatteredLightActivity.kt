@@ -6,12 +6,10 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Message
-import android.text.Layout
 import android.util.AttributeSet
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
-import android.view.WindowManager.LayoutParams
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -50,7 +48,7 @@ class ScatteredLightActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scattered_light)
+        setContentView(R.layout.activity_light_scattered)
         mRenderView = findViewById(R.id.surface_view)
         mSpanAngleTitle = findViewById(R.id.span_angle_title)
         mLightPositionTip = findViewById(R.id.light_position_tip)

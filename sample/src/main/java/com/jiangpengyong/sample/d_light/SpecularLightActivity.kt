@@ -26,13 +26,14 @@ import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
+
 /**
  * @author jiang peng yong
- * @date 2024/7/20 14:47
+ * @date 2024/7/25 09:00
  * @email 56002982@qq.com
- * @des 球体
+ * @des 镜面光
  */
-class BallActivity : AppCompatActivity() {
+class SpecularLightActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -40,13 +41,19 @@ class BallActivity : AppCompatActivity() {
 
     private lateinit var mRenderView: RenderView
     private lateinit var mSpanAngleTitle: TextView
+    private lateinit var mLightPositionTip: TextView
+    private lateinit var mShininessTitle: TextView
+
+    private val mLightPosition = floatArrayOf(0F, 0F, 0F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_ball)
+        setContentView(R.layout.activity_light_specular)
         mRenderView = findViewById(R.id.surface_view)
         mSpanAngleTitle = findViewById(R.id.span_angle_title)
+        mLightPositionTip = findViewById(R.id.light_position_tip)
+        mShininessTitle = findViewById(R.id.shininess_title)
         findViewById<View>(R.id.reset).setOnClickListener {
             mRenderView.sendMessageToFilter(Message.obtain().apply { what = RESET })
             mRenderView.requestRender()
@@ -71,13 +78,84 @@ class BallActivity : AppCompatActivity() {
         findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
             mRenderView.updateFilterData(Bundle().apply {
                 when (checkedId) {
-                    R.id.gl_points -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Point.value)
-                    R.id.gl_lines -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Line.value)
-                    R.id.gl_triangles -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Face.value)
+                    R.id.gl_points -> putInt("drawingMode", SpecularLightBallProgram.DrawMode.Point.value)
+                    R.id.gl_lines -> putInt("drawingMode", SpecularLightBallProgram.DrawMode.Line.value)
+                    R.id.gl_triangles -> putInt("drawingMode", SpecularLightBallProgram.DrawMode.Face.value)
                 }
             })
             mRenderView.requestRender()
         }
+
+        findViewById<SeekBar>(R.id.light_x_position).apply {
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    // x 在 [-2, 2] 区间游走
+                    val x = progress / max.toFloat() * 4 - 2
+                    mLightPosition[0] = x
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putFloat("lightXPosition", x)
+                    })
+                    updateLightPositionTip()
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+        findViewById<SeekBar>(R.id.light_y_position).apply {
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    // y 在 [-2, 2] 区间游走
+                    val y = progress / max.toFloat() * 4 - 2
+                    mLightPosition[1] = y
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putFloat("lightYPosition", y)
+                    })
+                    updateLightPositionTip()
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+        findViewById<SeekBar>(R.id.light_z_position).apply {
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    // z 在 [-5, 5] 区间游走
+                    val z = progress / max.toFloat() * 10 - 5
+                    mLightPosition[2] = z
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putFloat("lightZPosition", z)
+                    })
+                    updateLightPositionTip()
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+        findViewById<SeekBar>(R.id.shininess).apply {
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val value = progress + 1
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putFloat("shininess", value.toFloat())
+                    })
+                    mShininessTitle.text = "光滑度（${value}）"
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+    }
+
+    private fun updateLightPositionTip() {
+        mLightPositionTip.text = "(${String.format("%.2f", mLightPosition[0])}, ${String.format("%.2f", mLightPosition[1])}, ${String.format("%.2f", mLightPosition[2])})"
     }
 
     override fun onResume() {
@@ -127,12 +205,10 @@ class BallActivity : AppCompatActivity() {
                     val dx: Float = x - mBeforeX
                     val xAngle = dx * TOUCH_SCALE_FACTOR
 
-                    mRenderer.updateFilterData(
-                        Bundle().apply {
-                            putFloat("xAngle", xAngle)
-                            putFloat("yAngle", yAngle)
-                        }
-                    )
+                    mRenderer.updateFilterData(Bundle().apply {
+                        putFloat("xAngle", xAngle)
+                        putFloat("yAngle", yAngle)
+                    })
                     requestRender()
                 }
             }
@@ -176,21 +252,24 @@ class BallActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = TrigonometricBallProgram()
+        private val mProgram = SpecularLightBallProgram()
 
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
 
-        private var xAngle = 0F
-        private var yAngle = 0F
+        private var mXAngle = 0F
+        private var mYAngle = 0F
 
         private var mDisplaySize = Size(0, 0)
+
+        private var mLightPosition = floatArrayOf(-2F, 0F, 5F)
+        private var mCameraPosition = floatArrayOf(0F, 0F, 3F)
 
         override fun onInit() {
             mProgram.init()
             mViewMatrix.setLookAtM(
-                0F, 0F, 3F,
+                mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -201,7 +280,10 @@ class BallActivity : AppCompatActivity() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
             synchronized(this) {
-                mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+                mProgram.setMMatrix(mModelMatrix)
+                mProgram.setLightPosition(mLightPosition)
+                mProgram.setCameraPosition(mCameraPosition)
                 mProgram.draw()
             }
         }
@@ -233,18 +315,18 @@ class BallActivity : AppCompatActivity() {
 
         override fun onUpdateData(updateData: Bundle) {
             synchronized(this) {
-                xAngle += updateData.getFloat("xAngle", 0F)
-                yAngle += updateData.getFloat("yAngle", 0F)
+                mXAngle += updateData.getFloat("xAngle", 0F)
+                mYAngle += updateData.getFloat("yAngle", 0F)
                 mModelMatrix.reset()
-                mModelMatrix.rotate(xAngle, 0F, 1F, 0F)
-                mModelMatrix.rotate(yAngle, 1F, 0F, 0F)
+                mModelMatrix.rotate(mXAngle, 0F, 1F, 0F)
+                mModelMatrix.rotate(mYAngle, 1F, 0F, 0F)
 
                 val mode = updateData.getInt("drawingMode", 0)
                 if (mode != 0) {
                     when (mode) {
-                        TrigonometricBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Point)
-                        TrigonometricBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Line)
-                        TrigonometricBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Face)
+                        SpecularLightBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(SpecularLightBallProgram.DrawMode.Point)
+                        SpecularLightBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(SpecularLightBallProgram.DrawMode.Line)
+                        SpecularLightBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(SpecularLightBallProgram.DrawMode.Face)
                     }
                 }
 
@@ -252,6 +334,31 @@ class BallActivity : AppCompatActivity() {
                 if (spanAngle != 0) {
                     mProgram.setAngleSpan(spanAngle)
                 }
+
+                updateData.getFloat("lightXPosition", -10000F)
+                    .takeIf { it != -10000F }
+                    ?.let {
+                        mLightPosition[0] = it
+                        mProgram.setLightPosition(mLightPosition)
+                    }
+                updateData.getFloat("lightYPosition", -10000F)
+                    .takeIf { it != -10000F }
+                    ?.let {
+                        mLightPosition[1] = it
+                        mProgram.setLightPosition(mLightPosition)
+                    }
+                updateData.getFloat("lightZPosition", -10000F)
+                    .takeIf { it != -10000F }
+                    ?.let {
+                        mLightPosition[2] = it
+                        mProgram.setLightPosition(mLightPosition)
+                    }
+
+                updateData.getFloat("shininess", -10000F)
+                    .takeIf { it != -10000F }
+                    ?.let {
+                        mProgram.setShininess(it)
+                    }
             }
         }
 
@@ -260,8 +367,8 @@ class BallActivity : AppCompatActivity() {
         override fun onReceiveMessage(message: Message) {
             synchronized(this) {
                 if (message.what == RESET) {
-                    xAngle = 0F
-                    yAngle = 0F
+                    mXAngle = 0F
+                    mYAngle = 0F
                     mModelMatrix.reset()
                 }
             }
