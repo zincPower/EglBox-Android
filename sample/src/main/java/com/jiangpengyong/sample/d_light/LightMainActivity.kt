@@ -29,12 +29,16 @@ class LightMainActivity : AppCompatActivity() {
             startActivity(Intent(this, ScatteredLightActivity::class.java))
         }
 
-        findViewById<View>(R.id.specular_reflection).setOnClickListener {
+        findViewById<View>(R.id.specular_light).setOnClickListener {
             startActivity(Intent(this, SpecularLightActivity::class.java))
         }
 
         findViewById<View>(R.id.full_light).setOnClickListener {
             startActivity(Intent(this, FullLightActivity::class.java))
+        }
+
+        findViewById<View>(R.id.light_source_type).setOnClickListener {
+            startActivity(Intent(this, LightSourceTypeActivity::class.java))
         }
     }
 }

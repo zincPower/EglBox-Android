@@ -14,9 +14,14 @@ import kotlin.math.sin
  * @author jiang peng yong
  * @date 2024/6/19 10:08
  * @email 56002982@qq.com
- * @des 绘制球 —— 环境光、散射光、镜面光
+ * @des 绘制球 —— 光源类型（定点光、定向光）
  */
-class FullLightBallProgram : GLProgram() {
+class LightSourceTypeBallProgram : GLProgram() {
+    enum class LightSourceType(val value: Int) {
+        PointLight(1),
+        DirectionalLight(2),
+    }
+
     private var mAngleSpan = 10
     private lateinit var mVertexBuffer: FloatBuffer
     private lateinit var mNormalBuffer: FloatBuffer
@@ -33,6 +38,7 @@ class FullLightBallProgram : GLProgram() {
     private var mIsAddAmbientLightHandle = 0
     private var mIsAddScatteredLightHandle = 0
     private var mIsAddSpecularHandle = 0
+    private var mLightSourceTypeHandle = 0
 
     private var mVertexCount = 0
     private var mMVPMatrix: GLMatrix = GLMatrix()
@@ -45,6 +51,8 @@ class FullLightBallProgram : GLProgram() {
     private var mIsAddAmbientLight = true
     private var mIsAddScatteredLight = true
     private var mIsAddSpecularLight = true
+
+    private var mLightSourceType = LightSourceType.PointLight
 
     init {
         calculateVertex()
@@ -82,6 +90,10 @@ class FullLightBallProgram : GLProgram() {
         mIsAddSpecularLight = value
     }
 
+    fun setLightSourceType(type: LightSourceType) {
+        mLightSourceType = type
+    }
+
     fun setAngleSpan(angleSpan: Int) {
         mAngleSpan = angleSpan
         calculateVertex()
@@ -98,6 +110,7 @@ class FullLightBallProgram : GLProgram() {
         mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
         mIsAddScatteredLightHandle = getUniformLocation("uIsAddScatteredLight")
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
+        mLightSourceTypeHandle = getUniformLocation("uLightSourceType")
     }
 
     override fun onDraw() {
@@ -112,6 +125,8 @@ class FullLightBallProgram : GLProgram() {
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
         GLES20.glUniform1i(mIsAddScatteredLightHandle, if (mIsAddScatteredLight) 1 else 0)
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
+        // 光源类型
+        GLES20.glUniform1i(mLightSourceTypeHandle, mLightSourceType.value)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         // 法向量
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)
@@ -133,11 +148,12 @@ class FullLightBallProgram : GLProgram() {
         mIsAddAmbientLightHandle = 0
         mIsAddScatteredLightHandle = 0
         mIsAddSpecularHandle = 0
+        mLightSourceTypeHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/full_light/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light_source_type/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/full_light/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light_source_type/fragment.glsl")
 
     private fun calculateVertex() {
         val vertexList = ArrayList<Float>()

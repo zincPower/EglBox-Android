@@ -19,13 +19,18 @@
         android:text="3、散射光" />
 
     <TextView
-        android:id="@+id/specular_reflection"
+        android:id="@+id/specular_light"
         style="@style/common_button"
         android:text="4、镜面光" />
 
     <TextView
         android:id="@+id/full_light"
         style="@style/common_button"
-        android:text="5、全光效" />
+        android:text="5、环境光+散射光+镜面光" />
+
+    <TextView
+        android:id="@+id/light_source_type"
+        style="@style/common_button"
+        android:text="6、光源类型（定点光与定向光）" />
 
 </com.jiangpengyong.sample.widget.FlowLayout>

@@ -39,41 +39,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="绘制方式"
+            android:text="光照"
             android:textColor="@color/primary_black"
             android:textSize="12sp" />
 
-        <RadioGroup
-            android:id="@+id/drawing_mode"
+        <CheckBox
+            android:id="@+id/ambient_light"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="环境光"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
 
-            <RadioButton
-                android:id="@+id/gl_points"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="点（GL_POINTS）"
-                android:textColor="@color/primary_black"
-                android:textSize="12sp" />
+        <CheckBox
+            android:id="@+id/scattered_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="散射光"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
 
-            <RadioButton
-                android:id="@+id/gl_lines"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="线（GL_LINES）"
-                android:textColor="@color/primary_black"
-                android:textSize="12sp" />
-
-            <RadioButton
-                android:id="@+id/gl_triangles"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="面（GL_TRIANGLES）"
-                android:textColor="@color/primary_black"
-                android:textSize="12sp" />
-        </RadioGroup>
+        <CheckBox
+            android:id="@+id/specular_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="镜面光"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/shininess_title"
@@ -91,11 +86,46 @@
             android:max="99"
             android:progress="49" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="光源类型"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/light_source_type"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/point_light"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="定点光"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/directional_light"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="定向光"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+        </RadioGroup>
+
     </LinearLayout>
 
     <view
         android:id="@+id/surface_view"
-        class="com.jiangpengyong.sample.d_light.SpecularLightActivity$RenderView"
+        class="com.jiangpengyong.sample.d_light.LightSourceTypeActivity$RenderView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/light_x_position"
@@ -172,7 +202,7 @@
         android:padding="5dp"
         android:text="(-2.00, 0.00, 5.00)"
         android:textColor="@android:color/white"
-        android:textSize="15dp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@id/surface_view"
         app:layout_constraintStart_toStartOf="@id/surface_view" />
 

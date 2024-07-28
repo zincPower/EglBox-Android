@@ -102,14 +102,12 @@
         android:id="@+id/light_x"
         android:layout_width="0dp"
         android:layout_height="30dp"
-        android:gravity="right|center_vertical"
-        android:paddingEnd="10dp"
-        android:text="光源 X 轴位置："
+        android:gravity="center_vertical"
+        android:text="光源 X ："
         android:textColor="@color/primary_black"
-        android:textSize="15dp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@id/light_y"
-        app:layout_constraintEnd_toEndOf="@id/control_panel"
-        app:layout_constraintStart_toStartOf="@id/control_panel" />
+        app:layout_constraintStart_toStartOf="@id/surface_view" />
 
     <SeekBar
         android:id="@+id/light_x_position"
@@ -124,14 +122,12 @@
         android:id="@+id/light_y"
         android:layout_width="0dp"
         android:layout_height="30dp"
-        android:gravity="right|center_vertical"
-        android:paddingEnd="10dp"
-        android:text="光源 Y 轴位置："
+        android:gravity="center_vertical"
+        android:text="光源 Y ："
         android:textColor="@color/primary_black"
-        android:textSize="15dp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@id/light_z"
-        app:layout_constraintEnd_toEndOf="@id/control_panel"
-        app:layout_constraintStart_toStartOf="@id/control_panel" />
+        app:layout_constraintStart_toStartOf="@id/surface_view" />
 
     <SeekBar
         android:id="@+id/light_y_position"
@@ -146,14 +142,12 @@
         android:id="@+id/light_z"
         android:layout_width="0dp"
         android:layout_height="30dp"
-        android:gravity="right|center_vertical"
-        android:paddingEnd="10dp"
-        android:text="光源 Z 轴位置："
+        android:gravity="center_vertical"
+        android:text="光源 Z ："
         android:textColor="@color/primary_black"
-        android:textSize="15dp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/control_panel"
-        app:layout_constraintStart_toStartOf="@id/control_panel" />
+        app:layout_constraintStart_toStartOf="@id/surface_view" />
 
     <SeekBar
         android:id="@+id/light_z_position"
@@ -173,7 +167,7 @@
         android:padding="5dp"
         android:text="(-2.00, 0.00, 5.00)"
         android:textColor="@android:color/white"
-        android:textSize="15dp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@id/surface_view"
         app:layout_constraintStart_toStartOf="@id/surface_view" />
 
