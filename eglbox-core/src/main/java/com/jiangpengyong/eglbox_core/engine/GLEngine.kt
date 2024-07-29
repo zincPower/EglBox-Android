@@ -3,9 +3,12 @@ package com.jiangpengyong.eglbox_core.engine
 import android.os.Handler
 import android.os.Looper
 import android.view.Surface
+import androidx.annotation.MainThread
 import com.jiangpengyong.eglbox_core.egl.EglSurfaceType
 import com.jiangpengyong.eglbox_core.egl.WindowSurface
 import com.jiangpengyong.eglbox_core.logger.Logger
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * @author: jiang peng yong
@@ -73,16 +76,43 @@ class GLEngine private constructor(config: GLEngineConfig) {
         mGLThread = null
     }
 
+    @MainThread
     fun requestRender() {
         mGLThread?.requestRender()
     }
 
+    @MainThread
     fun setDrawFrameListener(listener: DrawFrameListener?) {
         mConfig.drawFrameListener = listener
     }
 
-    fun enqueueEvent(block: () -> Unit) {
-        mGLThread?.enqueueEvent(block)
+    @MainThread
+    fun enqueueEvent(block: () -> Unit): Boolean {
+        return mGLThread?.enqueueEvent(block) ?: false
+    }
+
+    @MainThread
+    fun <T> invokeInGLEngine(block: () -> T, timeout: Long): T? {
+        var result: T? = null
+        try {
+            val latch = CountDownLatch(1)
+            val res = enqueueEvent {
+                try {
+                    result = block()
+                } catch (e: Exception) {
+                    Logger.e(TAG, "Call invokeInGLEngine failure【Inner】. $e")
+                }
+            }
+            if (res) {
+                latch.await(timeout, TimeUnit.MILLISECONDS)
+            } else {
+                Logger.i(TAG, "Call invokeInGLEngine failure【enqueueEvent】.")
+            }
+        } catch (e: Exception) {
+            Logger.e(TAG, "Call invokeInGLEngine failure【Outer】. $e")
+            result = null
+        }
+        return result
     }
 
     fun getLooper(): Looper? = mGLThread?.getLooper()

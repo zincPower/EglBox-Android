@@ -27,7 +27,7 @@ class GLHandler(looper: Looper, thread: GLThread) : Handler(looper) {
         sendMessage(message)
     }
 
-    fun sendRelease(){
+    fun sendRelease() {
         val message = obtainMessage()
         message.what = MSG_RELEASE
         sendMessage(message)

@@ -125,6 +125,11 @@ class FilterChain(renderType: RenderType) {
         mFilterSlot.updateData(filterId, data)
     }
 
+    @GLThread
+    fun sendMessageToFilter(filterId: String, message: Message) {
+        mFilterSlot.receiveMessage(filterId, message)
+    }
+
     @MainThread
     fun addListener(listener: MessageListener) {
         this.mListener.addListener(listener)
@@ -151,26 +156,24 @@ class FilterChainListenerImpl : FilterChainListener {
     private val mMainHandler = Handler(Looper.getMainLooper())
 
     @MainThread
-    fun addListener(listener: MessageListener) {
+    fun addListener(listener: MessageListener) = synchronized(this) {
         mListeners.add(listener)
     }
 
     @MainThread
-    fun removeListener(listener: MessageListener) {
+    fun removeListener(listener: MessageListener) = synchronized(this) {
         mListeners.remove(listener)
     }
 
     @MainThread
-    fun removeAllListeners() {
+    fun removeAllListeners() = synchronized(this) {
         mListeners.clear()
     }
 
     @GLThread
-    override fun onReceiveMessage(filterId: String, message: Message) {
-        mMainHandler.post {
-            for (listener in mListeners) {
-                listener.onReceiveMessage(filterId, message)
-            }
+    override fun onReceiveMessage(filterId: String, message: Message) = synchronized(this) {
+        for (listener in mListeners) {
+            listener.onReceiveMessage(filterId, message)
         }
     }
 }
