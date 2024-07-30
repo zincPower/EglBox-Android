@@ -190,7 +190,7 @@ class AmbientLightActivity : AppCompatActivity() {
         override fun onInit() {
             mProgram.init()
             mViewMatrix.setLookAtM(
-                0F, 0F, 3F,
+                0F, 0F, 10F,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -218,13 +218,13 @@ class AmbientLightActivity : AppCompatActivity() {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
-                        2F, 10F
+                        5F, 20F
                     )
                 } else {
                     mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
-                        2F, 10F
+                        5F, 20F
                     )
                 }
                 mDisplaySize = displaySize

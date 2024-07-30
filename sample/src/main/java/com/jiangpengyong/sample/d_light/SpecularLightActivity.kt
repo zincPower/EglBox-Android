@@ -44,20 +44,20 @@ class SpecularLightActivity : AppCompatActivity() {
     private lateinit var mLightPositionTip: TextView
     private lateinit var mShininessTitle: TextView
 
-    private val mLightPosition = floatArrayOf(0F, 0F, 0F)
+    private val mLightPosition = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_light_specular)
         mRenderView = findViewById(R.id.surface_view)
-        mSpanAngleTitle = findViewById(R.id.span_angle_title)
-        mLightPositionTip = findViewById(R.id.light_position_tip)
-        mShininessTitle = findViewById(R.id.shininess_title)
+
         findViewById<View>(R.id.reset).setOnClickListener {
             mRenderView.sendMessageToFilter(Message.obtain().apply { what = RESET })
             mRenderView.requestRender()
         }
+
+        mSpanAngleTitle = findViewById(R.id.span_angle_title)
         mSpanAngleTitle.text = "圆切割度数（10度）"
         findViewById<SeekBar>(R.id.span_angle).apply {
             setProgress(2)
@@ -75,6 +75,7 @@ class SpecularLightActivity : AppCompatActivity() {
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
         }
+
         findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
             mRenderView.updateFilterData(Bundle().apply {
                 when (checkedId) {
@@ -86,6 +87,8 @@ class SpecularLightActivity : AppCompatActivity() {
             mRenderView.requestRender()
         }
 
+        mLightPositionTip = findViewById(R.id.light_position_tip)
+        updateLightPositionTip()
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -137,6 +140,8 @@ class SpecularLightActivity : AppCompatActivity() {
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
         }
+
+        mShininessTitle = findViewById(R.id.shininess_title)
         findViewById<SeekBar>(R.id.shininess).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -253,6 +258,7 @@ class SpecularLightActivity : AppCompatActivity() {
 
     class BallFilter : GLFilter() {
         private val mProgram = SpecularLightBallProgram()
+        private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
@@ -263,11 +269,12 @@ class SpecularLightActivity : AppCompatActivity() {
 
         private var mDisplaySize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(-2F, 0F, 5F)
-        private var mCameraPosition = floatArrayOf(0F, 0F, 3F)
+        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
+        private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
         override fun onInit() {
             mProgram.init()
+            mLightPointProgram.init()
             mViewMatrix.setLookAtM(
                 mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
                 0F, 0F, 0F,
@@ -285,11 +292,16 @@ class SpecularLightActivity : AppCompatActivity() {
                 mProgram.setLightPosition(mLightPosition)
                 mProgram.setCameraPosition(mCameraPosition)
                 mProgram.draw()
+
+                mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
+                mLightPointProgram.setLightPosition(mLightPosition)
+                mLightPointProgram.draw()
             }
         }
 
         override fun onRelease() {
             mProgram.release()
+            mLightPointProgram.release()
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
@@ -300,13 +312,13 @@ class SpecularLightActivity : AppCompatActivity() {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
-                        2F, 10F
+                        5F, 20F
                     )
                 } else {
                     mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
-                        2F, 10F
+                        5F, 20F
                     )
                 }
                 mDisplaySize = displaySize

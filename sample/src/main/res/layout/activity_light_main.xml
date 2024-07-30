@@ -33,4 +33,9 @@
         style="@style/common_button"
         android:text="6、光源类型（定点光与定向光）" />
 
+    <TextView
+        android:id="@+id/normal_type"
+        style="@style/common_button"
+        android:text="7、法向量类型" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>

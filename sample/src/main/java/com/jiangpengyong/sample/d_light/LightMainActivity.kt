@@ -40,5 +40,9 @@ class LightMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.light_source_type).setOnClickListener {
             startActivity(Intent(this, LightSourceTypeActivity::class.java))
         }
+
+        findViewById<View>(R.id.normal_type).setOnClickListener {
+            startActivity(Intent(this, NormalTypeActivity::class.java))
+        }
     }
 }

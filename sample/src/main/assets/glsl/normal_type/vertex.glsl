@@ -4,6 +4,8 @@
 uniform mat4 uMVPMatrix;
 // 物体变换矩阵，只包括物体的旋转、平移、缩放
 uniform mat4 uMMatrix;
+// 偏移法向量的矩阵
+uniform mat4 uNormalMatrix;
 // 光源位置
 uniform vec3 uLightPosition;
 // 相机位置
@@ -44,7 +46,7 @@ vec4 calScatteredLight(
     realNormal = normalize(realNormal);
 
     // 计算顶点到光源的向量
-    vec3 lightVector = normalize(lightLocation - (uMMatrix * vec4(aPosition, 1.0)).xyz);
+    vec3 lightVector = normalize(lightLocation - (uMMatrix * vec4(aPosition, 1)).xyz);
     // 利用点积，计算 cos 的值，并限制在 [0, 1] 之间
     float dotResult = max(0.0, dot(realNormal, lightVector));
     return ligthIntensity * dotResult;

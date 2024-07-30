@@ -86,6 +86,9 @@
         <activity
             android:name="com.jiangpengyong.sample.d_light.LightSourceTypeActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.d_light.NormalTypeActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.e_texture.TextureMainActivity"

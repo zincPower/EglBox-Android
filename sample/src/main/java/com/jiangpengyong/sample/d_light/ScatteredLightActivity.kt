@@ -43,22 +43,23 @@ class ScatteredLightActivity : AppCompatActivity() {
     private lateinit var mSpanAngleTitle: TextView
     private lateinit var mLightPositionTip: TextView
 
-    private val mLightPosition = floatArrayOf(0F, 0F, 0F)
+    private val mLightPosition = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_light_scattered)
         mRenderView = findViewById(R.id.surface_view)
-        mSpanAngleTitle = findViewById(R.id.span_angle_title)
-        mLightPositionTip = findViewById(R.id.light_position_tip)
+
         findViewById<View>(R.id.reset).setOnClickListener {
             mRenderView.sendMessageToFilter(Message.obtain().apply { what = RESET })
             mRenderView.requestRender()
         }
+
+        mSpanAngleTitle = findViewById(R.id.span_angle_title)
         mSpanAngleTitle.text = "圆切割度数（10度）"
         findViewById<SeekBar>(R.id.span_angle).apply {
-            setProgress(2)
+            progress = 2
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     val spanAngle = (progress + 1) * 5
@@ -73,6 +74,7 @@ class ScatteredLightActivity : AppCompatActivity() {
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
         }
+
         findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
             mRenderView.updateFilterData(Bundle().apply {
                 when (checkedId) {
@@ -84,6 +86,8 @@ class ScatteredLightActivity : AppCompatActivity() {
             mRenderView.requestRender()
         }
 
+        mLightPositionTip = findViewById(R.id.light_position_tip)
+        updateLightPositionTip()
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -236,6 +240,7 @@ class ScatteredLightActivity : AppCompatActivity() {
 
     class BallFilter : GLFilter() {
         private val mProgram = ScatteredLightBallProgram()
+        private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectMatrix()
         private val mViewMatrix = ViewMatrix()
@@ -246,12 +251,13 @@ class ScatteredLightActivity : AppCompatActivity() {
 
         private var mDisplaySize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(-2F, 0F, 5F)
+        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
 
         override fun onInit() {
             mProgram.init()
+            mLightPointProgram.init()
             mViewMatrix.setLookAtM(
-                0F, 0F, 3F,
+                0F, 0F, 10F,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -266,11 +272,17 @@ class ScatteredLightActivity : AppCompatActivity() {
                 mProgram.setMMatrix(mModelMatrix)
                 mProgram.setLightPosition(mLightPosition)
                 mProgram.draw()
+
+                // 模型矩阵为单位矩阵，不用进行
+                mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
+                mLightPointProgram.setLightPosition(mLightPosition)
+                mLightPointProgram.draw()
             }
         }
 
         override fun onRelease() {
             mProgram.release()
+            mLightPointProgram.release()
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
@@ -281,13 +293,13 @@ class ScatteredLightActivity : AppCompatActivity() {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
-                        2F, 10F
+                        5F, 20F
                     )
                 } else {
                     mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
-                        2F, 10F
+                        5F, 20F
                     )
                 }
                 mDisplaySize = displaySize
