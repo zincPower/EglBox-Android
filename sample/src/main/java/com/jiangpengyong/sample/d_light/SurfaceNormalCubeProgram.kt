@@ -1,17 +1,12 @@
 package com.jiangpengyong.sample.d_light
 
-import android.graphics.Color
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram
-import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.d_light.LightSourceTypeBallProgram.LightSourceType
-import java.nio.FloatBuffer
-import javax.microedition.khronos.opengles.GL
 
 /**
  * @author jiang peng yong
@@ -19,7 +14,7 @@ import javax.microedition.khronos.opengles.GL
  * @email 56002982@qq.com
  * @des 绘制立方体
  */
-class NormalTypeCubeProgram : GLProgram() {
+class SurfaceNormalCubeProgram : GLProgram() {
     private val sideLength = 1F
     private val halfSideLength = sideLength / 2F
     private val mVertexBuffer = allocateFloatBuffer(

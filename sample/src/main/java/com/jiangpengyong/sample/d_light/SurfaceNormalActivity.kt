@@ -11,7 +11,6 @@ import android.util.Size
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
-import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -23,7 +22,6 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_model.CubeProgram
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -34,7 +32,7 @@ import javax.microedition.khronos.opengles.GL10
  * @email 56002982@qq.com
  * @des 向量类型
  */
-class NormalTypeActivity : AppCompatActivity() {
+class SurfaceNormalActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -43,14 +41,14 @@ class NormalTypeActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
     private lateinit var mLightPositionTip: TextView
 
-    private val mLightPosition = floatArrayOf(0F, 0F, 0F)
+    private val mLightPosition = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_normal_type)
+        setContentView(R.layout.activity_surface_normal)
         mRenderView = findViewById(R.id.surface_view)
-        mLightPositionTip = findViewById(R.id.light_position_tip)
+
         findViewById<View>(R.id.reset).setOnClickListener {
             mRenderView.sendMessageToFilter(Message.obtain().apply { what = RESET })
             mRenderView.requestRender()
@@ -75,6 +73,8 @@ class NormalTypeActivity : AppCompatActivity() {
             mRenderView.requestRender()
         }
 
+        mLightPositionTip = findViewById(R.id.light_position_tip)
+        updateLightPositionTip()
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -226,7 +226,7 @@ class NormalTypeActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = NormalTypeCubeProgram()
+        private val mProgram = SurfaceNormalCubeProgram()
         private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectMatrix()
@@ -234,7 +234,7 @@ class NormalTypeActivity : AppCompatActivity() {
         private val mRotateMatrix = ModelMatrix()
         private val mLeftModelMatrix = ModelMatrix()
             .apply {
-//                translate(-2F, 0F, 0F)
+                translate(-2F, 0F, 0F)
             }
         private val mRightModelMatrix = ModelMatrix()
             .apply {
@@ -246,7 +246,7 @@ class NormalTypeActivity : AppCompatActivity() {
 
         private var mDisplaySize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(-2F, 0F, 5F)
+        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
         private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
         override fun onInit() {
@@ -271,11 +271,11 @@ class NormalTypeActivity : AppCompatActivity() {
                 mProgram.setMMatrix(mRotateMatrix * mLeftModelMatrix)
                 mProgram.draw()
 
-//                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
-//                mProgram.setMMatrix(mRotateMatrix * mRightModelMatrix)
-//                mProgram.draw()
+                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
+                mProgram.setMMatrix(mRotateMatrix * mRightModelMatrix)
+                mProgram.draw()
 
-                mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix)
+                mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
                 mLightPointProgram.setLightPosition(mLightPosition)
                 mLightPointProgram.draw()
             }

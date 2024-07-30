@@ -42,7 +42,7 @@ class LightMainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.normal_type).setOnClickListener {
-            startActivity(Intent(this, NormalTypeActivity::class.java))
+            startActivity(Intent(this, SurfaceNormalActivity::class.java))
         }
     }
 }
