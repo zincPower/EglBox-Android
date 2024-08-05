@@ -22,22 +22,27 @@ out vec4 vSpecularLight;
 
 // 计算该顶点的镜面光最终强度
 vec4 calSpecularLight(
-    vec3 normal, // 法向量（相对于原点）
+    vec3 normal,
     vec3 lightLocation,
     vec4 ligthIntensity
 ) {
-    // 顶点进行最终模型转换
+    // 顶点进行模型转换
     vec3 finalPosition = (uMMatrix * vec4(aPosition, 1.0)).xyz;
 
     // 对法向量进行矩阵转换处理，最终归一化
-    vec3 normalTarget = aPosition + normal;
-    vec3 realNormal = (uMMatrix * vec4(normalTarget, 1)).xyz - finalPosition;
+    // realNormal 才是跟随模型矩阵处理后的向量
+    vec3 tempNormal = aPosition + normal;
+    vec3 realNormal = (uMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
     realNormal = normalize(realNormal);
 
     // 顶点到相机的向量
     vec3 eyeVector = normalize(uCameraPosition - finalPosition);
     // 顶点到光源的向量
-    vec3 lightVector = normalize(lightLocation - finalPosition);
+    // 需要多一次归一化，否则因为精度问题，会有导致计算有问题：
+    // 观察点 （0，0，10）
+    // 光源点 （0，0，-5）
+    // 顶点 （0，0，1）
+    vec3 lightVector = normalize(normalize(lightLocation - finalPosition));
     // 半向量
     vec3 halfVector = normalize(eyeVector + lightVector);
 
