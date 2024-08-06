@@ -25,7 +25,7 @@ out vec3 vPosition;
 // 环境光强度
 out vec4 vAmbientLight;
 // 该顶点散射光最终亮度
-out vec4 vScatteredLight;
+out vec4 vDiffuseLight;
 // 该顶点镜面光最终亮度
 out vec4 vSpecularLight;
 
@@ -41,7 +41,7 @@ vec4 calScatteredLight(
     // 对法向量进行矩阵转换处理，最终归一化
     // realNormal 才是跟随模型矩阵处理后的向量
     vec3 tempNormal = aPosition + normal;
-    vec3 realNormal = (uMMatrix * vec4(normalTarget, 1)).xyz - finalPosition;
+    vec3 realNormal = (uMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
     realNormal = normalize(realNormal);
 
     // 计算顶点到光源的向量
@@ -63,11 +63,11 @@ vec4 calSpecularLight(
     // 对法向量进行矩阵转换处理，最终归一化
     // realNormal 才是跟随模型矩阵处理后的向量
     vec3 tempNormal = aPosition + normal;
-    vec3 realNormal = (uMMatrix * vec4(normalTarget, 1)).xyz - finalPosition;
-    realNormal = normalize(realNormal);
+    vec3 realNormal = (uMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
+    realNormal = normalize(normalize(realNormal));
 
     // 顶点到相机的向量
-    vec3 eyeVector = normalize(uCameraPosition - finalPosition);
+    vec3 eyeVector = normalize(normalize(uCameraPosition - finalPosition));
     // 顶点到光源的向量
     vec3 lightVector = normalize(normalize(lightLocation - finalPosition));
     // 半向量
@@ -98,9 +98,9 @@ void main() {
     // 散射光
     if (uIsAddScatteredLight == 1) {
         vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-        vScatteredLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
+        vDiffuseLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
     } else {
-        vScatteredLight = vec4(0);
+        vDiffuseLight = vec4(0);
     }
 
     // 镜面光

@@ -11,6 +11,7 @@ import android.util.Size
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
+import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -32,7 +33,7 @@ import javax.microedition.khronos.opengles.GL10
  * @email 56002982@qq.com
  * @des 向量类型
  */
-class SurfaceNormalActivity : AppCompatActivity() {
+class NormalTypeActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -40,13 +41,14 @@ class SurfaceNormalActivity : AppCompatActivity() {
 
     private lateinit var mRenderView: RenderView
     private lateinit var mLightPositionTip: TextView
+    private lateinit var mShininessTitle: TextView
 
     private val mLightPosition = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_surface_normal)
+        setContentView(R.layout.activity_light_normal_type)
         mRenderView = findViewById(R.id.surface_view)
 
         findViewById<View>(R.id.reset).setOnClickListener {
@@ -69,6 +71,30 @@ class SurfaceNormalActivity : AppCompatActivity() {
         findViewById<CheckBox>(R.id.specular_light).setOnCheckedChangeListener { _, isChecked ->
             mRenderView.updateFilterData(Bundle().apply {
                 putInt("specularLight", if (isChecked) 1 else 0)
+            })
+            mRenderView.requestRender()
+        }
+
+        mShininessTitle = findViewById(R.id.shininess_title)
+        findViewById<SeekBar>(R.id.shininess).apply {
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val value = progress + 1
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putFloat("shininess", value.toFloat())
+                    })
+                    mShininessTitle.text = "光滑度（${value}）"
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+
+        findViewById<RadioGroup>(R.id.normal_type).setOnCheckedChangeListener { _, checkedId ->
+            mRenderView.updateFilterData(Bundle().apply {
+                putInt("normalType", if (checkedId == R.id.vertex_normal) NormalTypeCubeProgram.NormalType.VERTEX_NORMAL.value else NormalTypeCubeProgram.NormalType.FACE_NORMAL.value)
             })
             mRenderView.requestRender()
         }
@@ -226,7 +252,7 @@ class SurfaceNormalActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = SurfaceNormalCubeProgram()
+        private val mProgram = NormalTypeCubeProgram()
         private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectMatrix()
@@ -332,6 +358,23 @@ class SurfaceNormalActivity : AppCompatActivity() {
                     ?.let {
                         mLightPosition[2] = it
                         mProgram.setLightPosition(mLightPosition)
+                    }
+
+                updateData.getFloat("shininess", -10000F)
+                    .takeIf { it != -10000F }
+                    ?.let {
+                        mProgram.setShininess(it)
+                    }
+
+                updateData.getInt("normalType", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        when (it) {
+                            NormalTypeCubeProgram.NormalType.VERTEX_NORMAL.value -> mProgram.setNormalType(NormalTypeCubeProgram.NormalType.VERTEX_NORMAL)
+                            NormalTypeCubeProgram.NormalType.FACE_NORMAL.value -> mProgram.setNormalType(NormalTypeCubeProgram.NormalType.FACE_NORMAL)
+                            else -> {}
+                        }
+
                     }
 
                 updateData.getInt("ambientLight", -10000)

@@ -56,18 +56,61 @@
             android:textSize="12sp" />
 
         <TextView
+            android:id="@+id/shininess_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="光源类型"
+            android:text="光滑度（50）"
             android:textColor="@color/primary_black"
             android:textSize="12sp" />
+
+        <SeekBar
+            android:id="@+id/shininess"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:max="99"
+            android:progress="49" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="法向量类型"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/normal_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/vertex_normal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="点法向量"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/face_normal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="面法向量"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+        </RadioGroup>
 
     </LinearLayout>
 
     <view
         android:id="@+id/surface_view"
-        class="com.jiangpengyong.sample.d_light.SurfaceNormalActivity$RenderView"
+        class="com.jiangpengyong.sample.d_light.NormalTypeActivity$RenderView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/light_x_position"
@@ -78,7 +121,7 @@
     <TextView
         android:id="@+id/light_x"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:gravity="center_vertical"
         android:text="光源 X ："
         android:textColor="@color/primary_black"
@@ -89,7 +132,7 @@
     <SeekBar
         android:id="@+id/light_x_position"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:progress="50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/light_x"
@@ -98,7 +141,7 @@
     <TextView
         android:id="@+id/light_y"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:gravity="center_vertical"
         android:text="光源 Y ："
         android:textColor="@color/primary_black"
@@ -109,7 +152,7 @@
     <SeekBar
         android:id="@+id/light_y_position"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:progress="50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/light_y"
@@ -118,7 +161,7 @@
     <TextView
         android:id="@+id/light_z"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:gravity="center_vertical"
         android:text="光源 Z ："
         android:textColor="@color/primary_black"
@@ -129,7 +172,7 @@
     <SeekBar
         android:id="@+id/light_z_position"
         android:layout_width="0dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:progress="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/light_z"
@@ -142,7 +185,7 @@
         android:layout_margin="10dp"
         android:background="@drawable/blue_alpha_round_5dp"
         android:padding="5dp"
-        android:text="(-2.00, 0.00, 5.00)"
+        android:text="(-, -, -)"
         android:textColor="@android:color/white"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@id/surface_view"
