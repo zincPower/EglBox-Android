@@ -38,4 +38,9 @@
         style="@style/common_button"
         android:text="7、法向量类型" />
 
+    <TextView
+        android:id="@+id/light_calculate_type"
+        style="@style/common_button"
+        android:text="8、计算光照方式" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>

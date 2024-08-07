@@ -44,5 +44,9 @@ class LightMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.normal_type).setOnClickListener {
             startActivity(Intent(this, NormalTypeActivity::class.java))
         }
+
+        findViewById<View>(R.id.light_calculate_type).setOnClickListener {
+            startActivity(Intent(this, LightCalculateTypeActivity::class.java))
+        }
     }
 }
