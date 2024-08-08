@@ -78,6 +78,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
     fun setTexture(texture: GLTexture): Texture2DProgram {
         mTexture = texture
+        mCurrentTexture2DInfo.textureSize = Size(texture.width, texture.height)
         return this
     }
 
@@ -114,7 +115,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     override fun onDraw() {
         if (mTexture == null) return
         mTexture?.bind()
-        updateInfo(Size(mTexture?.width ?: 0, mTexture?.height ?: 0))
+        updateInfo()
         GLES20.glUniformMatrix4fv(mVertexMatrixHandle, 1, false, mVertexMatrix, 0)
         GLES20.glUniformMatrix4fv(mTextureMatrixHandle, 1, false, mTextureMatrix, 0)
         GLES20.glEnableVertexAttribArray(mVertexPosHandle)
@@ -182,7 +183,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
         """
     }
 
-    private fun updateInfo(textureSize: Size) {
+    private fun updateInfo() {
         // 如果是 Matrix 类型，则矩阵计算交由外部
         if (mCurrentTexture2DInfo.scaleType == ScaleType.MATRIX) {
             mBeforeTexture2DInfo.update(mCurrentTexture2DInfo)
@@ -199,6 +200,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
             Logger.e(TAG, "Target size is invalid. size=${targetSize}")
             return
         }
+        val textureSize = mCurrentTexture2DInfo.textureSize
         if (!textureSize.isValid()) {
             Logger.e(TAG, "Texture size is invalid. size=${textureSize}")
             return
@@ -244,12 +246,14 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
 private data class Texture2DInfo(
     var scaleType: ScaleType = ScaleType.MATRIX,
+    var textureSize: Size = Size(0, 0),
     var targetSize: Size = Size(0, 0),
     var isMirrorX: Boolean = false,
     var isMirrorY: Boolean = false,
 ) {
     fun update(info: Texture2DInfo) {
         scaleType = info.scaleType
+        textureSize = info.textureSize
         targetSize = info.targetSize
         isMirrorX = info.isMirrorX
         isMirrorY = info.isMirrorY
@@ -257,6 +261,7 @@ private data class Texture2DInfo(
 
     fun reset() {
         scaleType = ScaleType.MATRIX
+        textureSize = Size(0, 0)
         targetSize = Size(0, 0)
         isMirrorX = false
         isMirrorY = false
@@ -266,6 +271,8 @@ private data class Texture2DInfo(
         if (this === other) return true
         if (other !is Texture2DInfo) return false
         return scaleType == other.scaleType &&
+                textureSize.width == other.textureSize.width &&
+                textureSize.height == other.textureSize.height &&
                 targetSize.width == other.targetSize.width &&
                 targetSize.height == other.targetSize.height &&
                 isMirrorX == other.isMirrorX &&
@@ -274,6 +281,7 @@ private data class Texture2DInfo(
 
     override fun hashCode(): Int {
         var result = scaleType.hashCode()
+        result = 31 * result + textureSize.hashCode()
         result = 31 * result + targetSize.hashCode()
         result = 31 * result + isMirrorX.hashCode()
         result = 31 * result + isMirrorY.hashCode()

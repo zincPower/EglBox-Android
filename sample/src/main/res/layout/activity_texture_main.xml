@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.jiangpengyong.sample.widget.FlowLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -7,7 +7,25 @@
     <TextView
         android:id="@+id/texture2d"
         style="@style/common_button"
-        android:text="渲染图片"
+        android:text="1、渲染图片（Texture2DProgram）"
         tools:ignore="MissingConstraints" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/wrap_mode"
+        style="@style/common_button"
+        android:text="2、拉伸方式"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/sample_mode"
+        style="@style/common_button"
+        android:text="3、采样方式"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/multi_texture"
+        style="@style/common_button"
+        android:text="4、多重纹理"
+        tools:ignore="MissingConstraints" />
+
+</com.jiangpengyong.sample.widget.FlowLayout>
