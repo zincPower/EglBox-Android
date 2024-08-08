@@ -70,7 +70,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
     private var mIsThreadReady = false
     private val mReadyLock = Object()
 
-    private var mWindowLock = Object()
+    private val mWindowLock = Object()
     private var mWindowControlFinish = true
 
     fun isRunning() = mIsRunning.get()
@@ -131,10 +131,10 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
             }
             mEglSurface?.release()
             mEglSurface = null
-            mEglSurface = egl.createWindow(window)
+            mEglSurface = egl.createWindow(window, 0, 0)
             mEglSurface?.let { egl.makeCurrent(it) }
             if (!mIsCalledOnEglCreated) {
-                renderer.onEGLCreated(egl)
+                renderer.onEGLCreated(egl, mEglSurface!!)
                 mIsCalledOnEglCreated = true
             }
 
@@ -343,7 +343,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
         mEglSurface = egl.createPBuffer(width, height)
         mEglSurface?.let { egl.makeCurrent(it) }
         if (!mIsCalledOnEglCreated) {
-            renderer.onEGLCreated(egl)
+            renderer.onEGLCreated(egl, mEglSurface!!)
             mIsCalledOnEglCreated = true
         }
         mEglSurface?.let { renderer.onSurfaceSizeChanged(it) }

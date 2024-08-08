@@ -14,8 +14,6 @@ import com.jiangpengyong.eglbox_core.filter.MessageListener
 import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.processor.MessageType.REQUEST_RENDER
-import kotlinx.coroutines.NonCancellable.start
-
 
 /**
  * @author: jiang peng yong
@@ -124,16 +122,27 @@ abstract class GLProcessor : MessageListener {
         }
     }
 
+    @MainThread
     abstract fun onLaunch()
+
+    @MainThread
     abstract fun onDestroy()
+
+    @MainThread
     abstract fun createGLEngine(): GLEngine
+
+    @MainThread
     abstract fun getRenderType(): RenderType
+
+    @MainThread
     abstract fun configFilterChain(filterChain: FilterChain)
+
+    @GLThread
     abstract fun onReceiveMessageFromFilter(filterId: String, message: Message)
 
     companion object {
         private const val TAG = "GLProcessor"
-        private const val SOURCE_FILTER_ID = "source"
-        private const val SINK_FILTER_ID = "sink"
+        const val SOURCE_FILTER_ID = "source"
+        const val SINK_FILTER_ID = "sink"
     }
 }

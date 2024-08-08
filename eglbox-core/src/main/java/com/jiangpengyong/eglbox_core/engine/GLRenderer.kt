@@ -13,7 +13,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterChain
  */
 interface GLRenderer {
     @GLThread
-    fun onEGLCreated(egl: EGL)
+    fun onEGLCreated(egl: EGL, surface: EglSurface)
 
     @GLThread
     fun onSurfaceSizeChanged(surface: EglSurface)
@@ -44,8 +44,8 @@ enum class RenderType { OnScreen, OffScreen }
 class FilterChainRenderer(renderType: RenderType) : GLRenderer {
     val filterChain = FilterChain(renderType)
 
-    override fun onEGLCreated(egl: EGL) {
-        filterChain.init(egl)
+    override fun onEGLCreated(egl: EGL, surface: EglSurface) {
+        filterChain.init(egl, surface)
     }
 
     override fun onSurfaceSizeChanged(surface: EglSurface) {

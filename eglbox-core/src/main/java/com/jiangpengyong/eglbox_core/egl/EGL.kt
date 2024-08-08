@@ -119,13 +119,13 @@ class EGL {
         return mState?.isValid() ?: false
     }
 
-    fun createWindow(window: Surface): WindowSurface? {
+    fun createWindow(window: Surface, width: Int, height: Int): WindowSurface? {
         val state = mState
         return if (state == null) {
             Logger.i(TAG, "State is null. Please call init method first.【createWindow】")
             null
         } else {
-            return WindowSurface(state, window, 0, 0)
+            return WindowSurface(state, window, width, height)
         }
     }
 

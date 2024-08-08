@@ -4,11 +4,14 @@ import android.os.Message
 import android.util.Size
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.egl.EGL
+import com.jiangpengyong.eglbox_core.egl.EglSurface
 import com.jiangpengyong.eglbox_core.egl.PBufferSurface
 import com.jiangpengyong.eglbox_core.egl.WindowSurface
 import com.jiangpengyong.eglbox_core.gles.GLCachePool
 import com.jiangpengyong.eglbox_core.gles.GLFrameBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.gles.Target
+import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 
 /**
  * @author jiang peng yong
@@ -33,6 +36,8 @@ class FilterContext(val renderType: RenderType) {
     // 滤镜链上下文数据，生命周期和滤镜链一样
     val contextData = HashMap<String, Any>()
 
+    val texture2DProgram = Texture2DProgram(Target.TEXTURE_2D)
+
     /**
      * EGL 环境
      * 可以创建通过 [EGL.createWindow] 创建上屏的 [WindowSurface]
@@ -41,9 +46,14 @@ class FilterContext(val renderType: RenderType) {
     var egl: EGL? = null
         private set
 
-    fun init(egl: EGL, listener: MessageListener) {
+    var surface: EglSurface? = null
+        private set
+
+    fun init(egl: EGL, surface: EglSurface, listener: MessageListener) {
         this.egl = egl
+        this.surface = surface
         mListener = listener
+        texture2DProgram.init()
     }
 
     fun release() {
@@ -52,6 +62,7 @@ class FilterContext(val renderType: RenderType) {
         displaySize = Size(0, 0)
         renderData.clear()
         contextData.clear()
+        texture2DProgram.release()
         this.egl = null
     }
 

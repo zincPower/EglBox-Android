@@ -30,11 +30,11 @@ class FilterChain(renderType: RenderType) {
     private val mListener = FilterChainListenerImpl()
 
     @GLThread
-    fun init(egl: EGL) {
+    fun init(egl: EGL, surface: EglSurface) {
         if (mIsInit) return
         Logger.i(TAG, "FilterChain init.")
         mIsInit = true;
-        mContext.init(egl, mListener)
+        mContext.init(egl, surface, mListener)
         mFilterSlot.addFilter(mSourceFilter)
         mFilterSlot.addFilter(mProcessFilter)
         mFilterSlot.addFilter(mSinkFilter)
