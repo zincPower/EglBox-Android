@@ -5,9 +5,9 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/texture2d"
+        android:id="@+id/triangle_texture"
         style="@style/common_button"
-        android:text="1、渲染图片（Texture2DProgram）"
+        android:text="1、三角形渲染图片"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -23,9 +23,17 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
+        android:id="@+id/texture2d"
+        style="@style/common_button"
+        android:text="1、渲染图片（Texture2DProgram）"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
         android:id="@+id/multi_texture"
         style="@style/common_button"
         android:text="4、多重纹理"
         tools:ignore="MissingConstraints" />
+
+
 
 </com.jiangpengyong.sample.widget.FlowLayout>

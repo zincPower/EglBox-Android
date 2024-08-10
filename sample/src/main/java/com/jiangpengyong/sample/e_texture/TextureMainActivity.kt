@@ -18,6 +18,10 @@ class TextureMainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_texture_main)
 
+        findViewById<TextView>(R.id.triangle_texture).setOnClickListener {
+            startActivity(Intent(this, TriangleTextureActivity::class.java))
+        }
+
         findViewById<TextView>(R.id.texture2d).setOnClickListener {
             startActivity(Intent(this, Texture2DActivity::class.java))
         }

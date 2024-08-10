@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox_model
+package com.jiangpengyong.sample.a_glsl
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram
@@ -63,8 +63,6 @@ class TriangleProgram : GLProgram() {
     }
 
     override fun onRelease() {
-        mVertexBuffer.clear()
-        mColorBuffer.clear()
         mMVPMatrixHandle = 0
         mPositionHandle = 0
         mColorHandle = 0

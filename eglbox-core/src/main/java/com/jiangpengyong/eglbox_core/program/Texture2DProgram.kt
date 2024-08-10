@@ -40,8 +40,8 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
  * 可以调用 [ModelMatrix.matrix] 获取 16 个 Float 类型的 [FloatArray] 数组。
  */
 class Texture2DProgram(val target: Target) : GLProgram() {
-    private var mVertexCoordinates = defaultVertexCoordinates
-    private var mTextureCoordinates = defaultTextureCoordinates
+    private val mVertexCoordinates = defaultVertexCoordinates
+    private val mTextureCoordinates = defaultTextureCoordinates
     private var mVertexMatrix = IDENTITY_MATRIX_4x4
     private var mTextureMatrix = IDENTITY_MATRIX_4x4
     private var mTexture: GLTexture? = null
@@ -93,8 +93,6 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     }
 
     fun reset(): Texture2DProgram {
-//        mVertexCoordinates = defaultVertexCoordinates
-//        mTextureCoordinates = defaultTextureCoordinates
         mVertexMatrix = IDENTITY_MATRIX_4x4
         mTextureMatrix = IDENTITY_MATRIX_4x4
         mTexture = null

@@ -133,7 +133,7 @@ class Texture2DActivity : AppCompatActivity() {
         override fun onInit() {
             mTexture2DProgram.init()
             mMatrix.reset()
-            mMatrix.scale(-1F, 1F, 1F)
+            mMatrix.scale(-1F, -1F, 1F)
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
