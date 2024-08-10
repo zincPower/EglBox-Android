@@ -22,6 +22,10 @@ class TextureMainActivity : AppCompatActivity() {
             startActivity(Intent(this, TriangleTextureActivity::class.java))
         }
 
+        findViewById<TextView>(R.id.texture_swizzle).setOnClickListener {
+            startActivity(Intent(this, TextureSwizzleActivity::class.java))
+        }
+
         findViewById<TextView>(R.id.texture2d).setOnClickListener {
             startActivity(Intent(this, Texture2DActivity::class.java))
         }

@@ -21,7 +21,7 @@ class GLTexture(
     private val magFilter: MagFilter = MagFilter.LINEAR,
     private val wrapS: WrapMode = WrapMode.EDGE,
     private val wrapT: WrapMode = WrapMode.EDGE,
-) : GLObject {
+) {
     private val TAG: String = "GLTexture"
 
     var id = 0
@@ -34,7 +34,7 @@ class GLTexture(
     /**
      * 初始化纹理
      */
-    override fun init() {
+    fun init(block: (() -> Unit)? = null) {
         if (isInit()) {
             Logger.i(TAG, "Texture has been initialized. id=$id")
             return
@@ -49,6 +49,7 @@ class GLTexture(
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MAG_FILTER, magFilter.value)
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_S, wrapS.value)
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_T, wrapT.value)
+        block?.invoke()
         unbind()
         Logger.i(TAG, "Init GLTexture success. id=$id")
     }
@@ -121,7 +122,7 @@ class GLTexture(
         Logger.i(TAG, "Create texture by bitmap. id=$id, size=${this.width} x ${this.height}")
     }
 
-    override fun isInit(): Boolean = (id != 0)
+    fun isInit(): Boolean = (id != 0)
 
     fun bind(textureUnit: Int = GLES20.GL_TEXTURE0) {
         if (id <= 0) {
@@ -146,7 +147,7 @@ class GLTexture(
         }
     }
 
-    override fun release() {
+    fun release() {
         if (!isInit()) return
         Logger.i(TAG, "Release GLTexture. id=$id, size=$width x $height")
         unbind()

@@ -11,6 +11,12 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
+        android:id="@+id/texture_swizzle"
+        style="@style/common_button"
+        android:text="2、渲染通道"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
         android:id="@+id/wrap_mode"
         style="@style/common_button"
         android:text="2、拉伸方式"
