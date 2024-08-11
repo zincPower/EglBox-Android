@@ -26,6 +26,10 @@ class TextureMainActivity : AppCompatActivity() {
             startActivity(Intent(this, TextureSwizzleActivity::class.java))
         }
 
+        findViewById<TextView>(R.id.wrap_mode).setOnClickListener {
+            startActivity(Intent(this, TextureWrapActivity::class.java))
+        }
+
         findViewById<TextView>(R.id.texture2d).setOnClickListener {
             startActivity(Intent(this, Texture2DActivity::class.java))
         }

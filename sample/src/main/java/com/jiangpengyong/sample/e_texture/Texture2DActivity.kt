@@ -99,9 +99,15 @@ class Texture2DActivity : AppCompatActivity() {
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 mFilter.init(mContext)
                 mTexture1.init()
-                mTexture1.setData(BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath))
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath).let { bitmap ->
+                    mTexture1.setData(bitmap)
+                    bitmap.recycle()
+                }
                 mTexture2.init()
-                mTexture2.setData(BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_2.jpeg").absolutePath))
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_2.jpeg").absolutePath).let { bitmap ->
+                    mTexture2.setData(bitmap)
+                    bitmap.recycle()
+                }
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {

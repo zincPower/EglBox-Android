@@ -1,6 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/control_panel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/surface_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="拉伸方式"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/wrap_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/repeat_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="重复拉伸"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/mirror_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="镜像拉伸"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/edge_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="截取拉伸"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/texture_position_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="纹理顶点坐标（-）"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <SeekBar
+            android:id="@+id/texture_position"
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
+
+    </LinearLayout>
+
+    <view
+        android:id="@+id/surface_view"
+        class="com.jiangpengyong.sample.e_texture.TextureWrapActivity$RenderView"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

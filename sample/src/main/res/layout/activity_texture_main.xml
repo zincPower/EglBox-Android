@@ -19,19 +19,19 @@
     <TextView
         android:id="@+id/wrap_mode"
         style="@style/common_button"
-        android:text="2、拉伸方式"
+        android:text="3、拉伸方式"
         tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/sample_mode"
         style="@style/common_button"
-        android:text="3、采样方式"
+        android:text="4、采样方式"
         tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/texture2d"
         style="@style/common_button"
-        android:text="1、渲染图片（Texture2DProgram）"
+        android:text="5、渲染图片（Texture2DProgram）"
         tools:ignore="MissingConstraints" />
 
     <TextView

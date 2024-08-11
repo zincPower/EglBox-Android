@@ -10,6 +10,8 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Size
 import android.widget.RadioGroup
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
@@ -17,6 +19,7 @@ import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.gles.Target
+import com.jiangpengyong.eglbox_core.gles.WrapMode
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -24,33 +27,47 @@ import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
 import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL
 import javax.microedition.khronos.opengles.GL10
 
-class TextureSwizzleActivity : AppCompatActivity() {
+/**
+ * @author jiang peng yong
+ * @date 2024/8/11 16:21
+ * @email 56002982@qq.com
+ * @des 纹理拉伸方式
+ */
+class TextureWrapActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
+    private lateinit var mTexturePositionTitle: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_texture_swizzle)
+        setContentView(R.layout.activity_texture_wrap)
         mRenderView = findViewById(R.id.surface_view)
 
-        findViewById<RadioGroup>(R.id.texture_type).setOnCheckedChangeListener { _, checkedId ->
+        findViewById<RadioGroup>(R.id.wrap_mode).setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.horizontal_image -> mRenderView.updateFilterData(Bundle().apply { putInt("textureType", 1) })
-                R.id.vertical_image -> mRenderView.updateFilterData(Bundle().apply { putInt("textureType", 2) })
+                R.id.repeat_mode -> mRenderView.updateFilterData(Bundle().apply { putInt("wrapMode", 1) })
+                R.id.mirror_mode -> mRenderView.updateFilterData(Bundle().apply { putInt("wrapMode", 2) })
+                R.id.edge_mode -> mRenderView.updateFilterData(Bundle().apply { putInt("wrapMode", 3) })
             }
             mRenderView.requestRender()
         }
 
-        findViewById<RadioGroup>(R.id.scale_mode).setOnCheckedChangeListener { _, checkedId ->
-            when (checkedId) {
-                R.id.center_inside -> mRenderView.updateFilterData(Bundle().apply { putInt("scaleMode", 1) })
-                R.id.center_crop -> mRenderView.updateFilterData(Bundle().apply { putInt("scaleMode", 2) })
-                R.id.fix_xy -> mRenderView.updateFilterData(Bundle().apply { putInt("scaleMode", 3) })
-                R.id.matrix -> mRenderView.updateFilterData(Bundle().apply { putInt("scaleMode", 4) })
-            }
-            mRenderView.requestRender()
+        mTexturePositionTitle = findViewById(R.id.texture_position_title)
+        findViewById<SeekBar>(R.id.texture_position).apply {
+            min = 10
+            max = 50
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val texturePositionMax = progress / 10F
+                    mTexturePositionTitle.text = "纹理顶点坐标（${texturePositionMax}）"
+                    mRenderView.updateFilterData(Bundle().apply { putFloat("texturePositionMax", texturePositionMax) })
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
         }
     }
 
@@ -85,37 +102,30 @@ class TextureSwizzleActivity : AppCompatActivity() {
             private val mFilterId = "Texture2DFilter"
             private val mFilter = Texture2DFilter().apply { id = mFilterId }
             private val mContext = FilterContext(RenderType.OnScreen)
-            private val mTexture1 = GLTexture()
-            private val mTexture2 = GLTexture()
+
             private val mImage = ImageInOut()
 
-            private var mTextureType = 1
+            private val mRepeatTexture = GLTexture(wrapS = WrapMode.REPEAT, wrapT = WrapMode.REPEAT)
+            private val mMirrorTexture = GLTexture(wrapS = WrapMode.MIRROR, wrapT = WrapMode.MIRROR)
+            private val mEdgeTexture = GLTexture(wrapS = WrapMode.EDGE, wrapT = WrapMode.EDGE)
+            private var mWrapMode = 1
 
             fun updateFilterData(bundle: Bundle) {
-                bundle.getInt("textureType", 0)
-                    .takeIf { it == 1 || it == 2 }
-                    ?.let { mTextureType = it }
                 mFilter.updateData(mFilterId, bundle)
+                bundle.getInt("wrapMode", 0)
+                    .takeIf { it != 0 }
+                    ?.let { mWrapMode = it }
             }
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 mFilter.init(mContext)
-                mTexture1.init {
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_R, GLES30.GL_RED)
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_B, GLES30.GL_RED)
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_G, GLES30.GL_RED)
-                }
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath).let { bitmap ->
-                    mTexture1.setData(bitmap)
-                    bitmap.recycle()
-                }
-                mTexture2.init {
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_R, GLES30.GL_RED)
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_B, GLES30.GL_RED)
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_G, GLES30.GL_RED)
-                }
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_2.jpeg").absolutePath).let { bitmap ->
-                    mTexture2.setData(bitmap)
+                mRepeatTexture.init()
+                mMirrorTexture.init()
+                mEdgeTexture.init()
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_3.jpeg").absolutePath).let { bitmap ->
+                    mRepeatTexture.setData(bitmap)
+                    mMirrorTexture.setData(bitmap)
+                    mEdgeTexture.setData(bitmap)
                     bitmap.recycle()
                 }
             }
@@ -127,15 +137,12 @@ class TextureSwizzleActivity : AppCompatActivity() {
 
             override fun onDrawFrame(gl: GL10?) {
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-
-                if (mTextureType == 1) {
-                    mImage.reset(mTexture1)
-                } else {
-                    mImage.reset(mTexture2)
+                when (mWrapMode) {
+                    1 -> mImage.reset(mRepeatTexture)
+                    2 -> mImage.reset(mMirrorTexture)
+                    3 -> mImage.reset(mEdgeTexture)
                 }
-
                 mFilter.draw(mImage)
-
                 mImage.clear()
             }
         }
@@ -144,7 +151,8 @@ class TextureSwizzleActivity : AppCompatActivity() {
     class Texture2DFilter : GLFilter() {
         private val mTexture2DProgram = Texture2DProgram(Target.TEXTURE_2D)
         private val mMatrix = ModelMatrix()
-        private var mScaleType = ScaleType.CENTER_INSIDE
+
+        private var mTextureCoordinates: FloatArray? = null
 
         override fun onInit() {
             mTexture2DProgram.init()
@@ -155,13 +163,9 @@ class TextureSwizzleActivity : AppCompatActivity() {
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
             imageInOut.texture?.let { mTexture2DProgram.setTexture(it) }
             mTexture2DProgram.isMirrorY(true)
-            if (mScaleType == ScaleType.MATRIX) {
-                mTexture2DProgram.setVertexMatrix(mMatrix.matrix)
-                    .setScaleType(ScaleType.MATRIX)
-            } else {
-                mTexture2DProgram.setScaleType(mScaleType)
-            }
+            mTexture2DProgram.setScaleType(ScaleType.FIT_XY)
             mContext?.let { mTexture2DProgram.setTargetSize(it.displaySize) }
+            mTextureCoordinates?.let { mTexture2DProgram.setTextureCoordinates(it) }
             mTexture2DProgram.draw()
         }
 
@@ -170,16 +174,15 @@ class TextureSwizzleActivity : AppCompatActivity() {
         }
 
         override fun onUpdateData(updateData: Bundle) {
-            updateData.getInt("scaleMode", 0)
-                .takeIf { it in 1 until 5 }
+            updateData.getFloat("texturePositionMax", 0F)
+                .takeIf { it != 0F }
                 ?.let {
-                    mScaleType = when (it) {
-                        1 -> ScaleType.CENTER_INSIDE
-                        2 -> ScaleType.CENTER_CROP
-                        3 -> ScaleType.FIT_XY
-                        4 -> ScaleType.MATRIX
-                        else -> ScaleType.CENTER_CROP
-                    }
+                    mTextureCoordinates = floatArrayOf(
+                        0.0f, 0.0f,     // 左下
+                        0.0f, it,     // 左上
+                        it, 0.0f,     // 右下
+                        it, it      // 右上
+                    )
                 }
         }
 

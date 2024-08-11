@@ -27,7 +27,7 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL
 import javax.microedition.khronos.opengles.GL10
 
-class TextureSwizzleActivity : AppCompatActivity() {
+class TextureFilterActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,8 +85,7 @@ class TextureSwizzleActivity : AppCompatActivity() {
             private val mFilterId = "Texture2DFilter"
             private val mFilter = Texture2DFilter().apply { id = mFilterId }
             private val mContext = FilterContext(RenderType.OnScreen)
-            private val mTexture1 = GLTexture()
-            private val mTexture2 = GLTexture()
+            private val mTexture = GLTexture()
             private val mImage = ImageInOut()
 
             private var mTextureType = 1
@@ -100,22 +99,13 @@ class TextureSwizzleActivity : AppCompatActivity() {
 
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 mFilter.init(mContext)
-                mTexture1.init {
+                mTexture.init {
                     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_R, GLES30.GL_RED)
                     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_B, GLES30.GL_RED)
                     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_G, GLES30.GL_RED)
                 }
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath).let { bitmap ->
-                    mTexture1.setData(bitmap)
-                    bitmap.recycle()
-                }
-                mTexture2.init {
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_R, GLES30.GL_RED)
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_B, GLES30.GL_RED)
-                    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_G, GLES30.GL_RED)
-                }
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_2.jpeg").absolutePath).let { bitmap ->
-                    mTexture2.setData(bitmap)
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_3.jpeg").absolutePath).let { bitmap ->
+                    mTexture.setData(bitmap)
                     bitmap.recycle()
                 }
             }
@@ -128,14 +118,8 @@ class TextureSwizzleActivity : AppCompatActivity() {
             override fun onDrawFrame(gl: GL10?) {
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
 
-                if (mTextureType == 1) {
-                    mImage.reset(mTexture1)
-                } else {
-                    mImage.reset(mTexture2)
-                }
-
+                mImage.reset(mTexture)
                 mFilter.draw(mImage)
-
                 mImage.clear()
             }
         }
