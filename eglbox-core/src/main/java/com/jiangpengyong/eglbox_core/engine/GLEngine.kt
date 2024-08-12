@@ -46,7 +46,7 @@ class GLEngine private constructor(config: GLEngineConfig) {
             return GLEngine(config)
         }
 
-        fun createPBufferType(width: Int, height: Int): GLEngine {
+        fun createPBufferType(width: Int = 16, height: Int = 16): GLEngine {
             val config = GLEngineConfig(EglSurfaceType.PBuffer, width, height)
             return GLEngine(config)
         }
