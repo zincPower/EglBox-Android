@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.e_texture.heavenly_body.HeavenlyBodyActivity
 
 /**
  * @author: jiang peng yong
@@ -35,6 +36,10 @@ class TextureMainActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.texture2d).setOnClickListener {
             startActivity(Intent(this, Texture2DActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.heavenly_body).setOnClickListener {
+            startActivity(Intent(this, HeavenlyBodyActivity::class.java))
         }
     }
 }

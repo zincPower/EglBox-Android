@@ -35,9 +35,9 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/multi_texture"
+        android:id="@+id/heavenly_body"
         style="@style/common_button"
-        android:text="6、多重纹理"
+        android:text="6、天体"
         tools:ignore="MissingConstraints" />
 
 

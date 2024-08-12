@@ -31,6 +31,8 @@ class GLTexture(
     var height: Int = 0
         private set
 
+    private var mTextureUnit = GLES20.GL_TEXTURE0
+
     /**
      * 初始化纹理
      */
@@ -42,8 +44,7 @@ class GLTexture(
         val ids = IntArray(1)
         GLES20.glGenTextures(1, ids, 0)
         id = ids[0]
-        // TODO 是否需要进行区分 TextureUnit
-        bind()
+        GLES20.glBindTexture(target.value, id)
         // 可用参数 https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MIN_FILTER, minFilter.value)
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MAG_FILTER, magFilter.value)
@@ -70,8 +71,7 @@ class GLTexture(
         }
         this.width = width
         this.height = height
-        // TODO 是否需要进行区分 TextureUnit
-        bind()
+        GLES20.glBindTexture(target.value, id)
         // 设置颜色附件纹理格式
         GLES20.glTexImage2D(
             target.value,
@@ -107,8 +107,7 @@ class GLTexture(
         }
         this.width = bitmap.width
         this.height = bitmap.height
-        // TODO 是否需要进行区分 TextureUnit
-        bind()
+        GLES20.glBindTexture(target.value, id)
         // https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glTexImage2D.xml
         GLUtils.texImage2D(
             target.value,               // 纹理类型
@@ -129,7 +128,7 @@ class GLTexture(
             Logger.i(TAG, "GLTexture isn't initialized.【bind】")
             return
         }
-        // TODO 是否需要记录 Texture Unit
+        mTextureUnit = textureUnit
         GLES20.glActiveTexture(textureUnit)
         GLES20.glBindTexture(target.value, id)
     }
@@ -141,8 +140,7 @@ class GLTexture(
         }
         val currentTexture = EGLBox.getCurrentTexture()
         if (currentTexture == id) {
-            // TODO 是否需要进行动态激活
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+            GLES20.glActiveTexture(mTextureUnit)
             GLES20.glBindTexture(target.value, 0)
         }
     }
@@ -186,4 +184,8 @@ enum class MinFilter(val value: Int) {
 enum class MagFilter(val value: Int) {
     NEAREST(GLES20.GL_NEAREST),
     LINEAR(GLES20.GL_LINEAR),
+    NEAREST_MIPMAP_NEAREST(GLES20.GL_NEAREST_MIPMAP_NEAREST),
+    LINEAR_MIPMAP_NEAREST(GLES20.GL_LINEAR_MIPMAP_NEAREST),
+    NEAREST_MIPMAP_LINEAR(GLES20.GL_NEAREST_MIPMAP_LINEAR),
+    LINEAR_MIPMAP_LINEAR(GLES20.GL_LINEAR_MIPMAP_LINEAR),
 }
