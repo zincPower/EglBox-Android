@@ -25,6 +25,12 @@ import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
+/**
+ * @author jiang peng yong
+ * @date 2024/8/11 16:46
+ * @email 56002982@qq.com
+ * @des 2d 纹理渲染器
+ */
 class Texture2DActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 

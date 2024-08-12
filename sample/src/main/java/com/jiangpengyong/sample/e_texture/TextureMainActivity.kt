@@ -13,7 +13,6 @@ import com.jiangpengyong.eglbox_sample.R
  * @desc: 纹理页面
  */
 class TextureMainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_texture_main)
@@ -30,9 +29,12 @@ class TextureMainActivity : AppCompatActivity() {
             startActivity(Intent(this, TextureWrapActivity::class.java))
         }
 
+        findViewById<TextView>(R.id.sample_mode).setOnClickListener {
+            startActivity(Intent(this, TextureSampleActivity::class.java))
+        }
+
         findViewById<TextView>(R.id.texture2d).setOnClickListener {
             startActivity(Intent(this, Texture2DActivity::class.java))
         }
     }
-
 }

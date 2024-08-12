@@ -27,6 +27,12 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL
 import javax.microedition.khronos.opengles.GL10
 
+/**
+ * @author jiang peng yong
+ * @date 2024/8/11 16:49
+ * @email 56002982@qq.com
+ * @des 颜色通道
+ */
 class TextureSwizzleActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
 

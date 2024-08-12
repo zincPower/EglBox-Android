@@ -81,7 +81,6 @@ class TextureWrapActivity : AppCompatActivity() {
         mRenderView.onPause()
     }
 
-
     class RenderView : GLSurfaceView {
         private val mRenderer = Renderer()
 
@@ -150,14 +149,11 @@ class TextureWrapActivity : AppCompatActivity() {
 
     class Texture2DFilter : GLFilter() {
         private val mTexture2DProgram = Texture2DProgram(Target.TEXTURE_2D)
-        private val mMatrix = ModelMatrix()
 
         private var mTextureCoordinates: FloatArray? = null
 
         override fun onInit() {
             mTexture2DProgram.init()
-            mMatrix.reset()
-            mMatrix.scale(-1F, -1F, 1F)
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
