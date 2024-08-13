@@ -69,6 +69,9 @@ class DisplaySourceFilter : SourceFilter() {
                     return
                 }
                 mTexture.setData(bitmap)
+                if (message.arg1 == 1) {
+                    bitmap.recycle()
+                }
                 updateTexture(mTexture)
             }
 

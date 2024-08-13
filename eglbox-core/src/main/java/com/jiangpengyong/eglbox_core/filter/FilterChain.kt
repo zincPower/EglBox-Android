@@ -81,7 +81,7 @@ class FilterChain(renderType: RenderType) {
     }
 
     @GLThread
-    fun setSourceFilter(filter: GLFilter, filterId: String) {
+    fun setSourceFilter(filterId: String, filter: GLFilter) {
         mSourceFilter.removeAllFilters()
         filter.id = filterId
         filter.name = filterId
@@ -89,7 +89,7 @@ class FilterChain(renderType: RenderType) {
         mSourceFilter.addFilter(filter)
     }
 
-    fun addFilter(filter: GLFilter, id: String, name: String, order: Int = 0) {
+    fun addFilter(id: String, name: String, order: Int, filter: GLFilter) {
         filter.id = id
         filter.name = name
         filter.order = order
@@ -106,7 +106,7 @@ class FilterChain(renderType: RenderType) {
     fun removeAllFilters() = mFilterSlot.removeAllFilters()
 
     @GLThread
-    fun setSinkFilter(filter: GLFilter, filterId: String) {
+    fun setSinkFilter(filterId: String, filter: GLFilter) {
         mSinkFilter.removeAllFilters()
         mSinkFilter.id = filterId
         mSinkFilter.name = filterId

@@ -88,8 +88,8 @@ abstract class GLProcessor : MessageListener {
     }
 
     @MainThread
-    fun addFilter(filter: GLFilter, filterId: String, name: String, order: Int = 0) = enqueueEvent {
-        mGLRenderer?.filterChain?.addFilter(filter, filterId, name, order)
+    fun addFilter(filterId: String, name: String, order: Int, filter: GLFilter) = enqueueEvent {
+        mGLRenderer?.filterChain?.addFilter(filterId, name, order, filter)
     }
 
     @MainThread
@@ -123,22 +123,22 @@ abstract class GLProcessor : MessageListener {
     }
 
     @MainThread
-    abstract fun onLaunch()
+    protected abstract fun onLaunch()
 
     @MainThread
-    abstract fun onDestroy()
+    protected abstract fun onDestroy()
 
     @MainThread
-    abstract fun createGLEngine(): GLEngine
+    protected abstract fun createGLEngine(): GLEngine
 
     @MainThread
-    abstract fun getRenderType(): RenderType
+    protected abstract fun getRenderType(): RenderType
 
     @MainThread
-    abstract fun configFilterChain(filterChain: FilterChain)
+    protected abstract fun configFilterChain(filterChain: FilterChain)
 
     @GLThread
-    abstract fun onReceiveMessageFromFilter(filterId: String, message: Message)
+    protected abstract fun onReceiveMessageFromFilter(filterId: String, message: Message)
 
     companion object {
         private const val TAG = "GLProcessor"

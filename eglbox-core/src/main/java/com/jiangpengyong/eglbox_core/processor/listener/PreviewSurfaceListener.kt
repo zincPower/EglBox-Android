@@ -8,12 +8,12 @@ import com.jiangpengyong.eglbox_core.processor.MessageType
 import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicBoolean
 
-class PreviewSurfaceListener(processor: GLProcessor) {
+class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listener {
     private val mProcessor = WeakReference(processor)
     private val mWindowLock = Object()
     private val mWindowControlFinish = AtomicBoolean(false)
 
-    fun onCreated(window: Surface, width: Int, height: Int) {
+    override fun onCreated(window: Surface, width: Int, height: Int) {
         Logger.i(TAG, "onCreated window=${window}, width=${width}, height=${height}")
         val processor = mProcessor.get()
         if (processor == null) {
@@ -43,7 +43,7 @@ class PreviewSurfaceListener(processor: GLProcessor) {
         }
     }
 
-    fun onChanged(window: Surface, width: Int, height: Int) {
+    override fun onChanged(window: Surface, width: Int, height: Int) {
         Logger.i(TAG, "onChanged window=${window}, width=${width}, height=${height}")
         val processor = mProcessor.get()
         if (processor == null) {
@@ -73,7 +73,7 @@ class PreviewSurfaceListener(processor: GLProcessor) {
         }
     }
 
-    fun onDestroy(window: Surface) {
+    override fun onDestroy(window: Surface) {
         Logger.i(TAG, "onDestroy window=${window}")
         val processor = mProcessor.get()
         if (processor == null) {
