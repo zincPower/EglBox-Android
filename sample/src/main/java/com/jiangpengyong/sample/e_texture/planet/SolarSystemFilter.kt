@@ -36,7 +36,7 @@ class SolarSystemFilter : GLFilter() {
 
     private val mMoonInfo = CelestialBodyInfo(CelestialBody.Moon, 2F, -0.5F, mEarthRatio * 0.5F, mEarthOrbitSpeed * 4F, mEarthOrbitSpeed * 4F)
     private val mSunInfo = CelestialBodyInfo(CelestialBody.Sun, 0F, 0F, 1.5F, 0F, 0F)
-    private val mSaturnRingInfo = CelestialBodyInfo(CelestialBody.SaturnRing, 0F, -27F, 1.2F, 0F, 0F)
+    private val mSaturnRingInfo = CelestialBodyInfo(CelestialBody.SaturnRing, 0F, -27F, 1.2F, 0F, mEarthRotationSpeed * 2F)
     private val mPlanetInfo = listOf(
         CelestialBodyInfo(CelestialBody.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F, mEarthRotationSpeed * 2F),
         CelestialBodyInfo(CelestialBody.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F, mEarthRotationSpeed * 1.2F),
@@ -162,6 +162,7 @@ class SolarSystemFilter : GLFilter() {
                     planetInfo.orbitAndRotation()
                 }
                 mMoonInfo.orbitAndRotation()
+                mSaturnRingInfo.orbitAndRotation()
             }
         }
     }
