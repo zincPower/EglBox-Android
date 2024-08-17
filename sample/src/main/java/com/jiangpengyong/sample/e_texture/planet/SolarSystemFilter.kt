@@ -28,21 +28,22 @@ class SolarSystemFilter : GLFilter() {
 
     private var mEarthRatio = 1 / 3F
     private var mEarthOrbitSpeed = 1 / 2F
+    private var mEarthRotationSpeed = 1F
 
     private var mSunPosition = floatArrayOf(0F, 0F, 0F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 30F)
 
-    private val mMoonInfo = CelestialBodyInfo(CelestialBody.Moon, 2F, -0.5F, mEarthRatio * 0.5F, mEarthOrbitSpeed * 4F)
-    private val mSunInfo = CelestialBodyInfo(CelestialBody.Sun, 0F, 0F, 1.5F, 0F)
+    private val mMoonInfo = CelestialBodyInfo(CelestialBody.Moon, 2F, -0.5F, mEarthRatio * 0.5F, mEarthOrbitSpeed * 4F, mEarthOrbitSpeed * 4F)
+    private val mSunInfo = CelestialBodyInfo(CelestialBody.Sun, 0F, 0F, 1.5F, 0F, 0F)
     private val mPlanetInfo = listOf(
-        CelestialBodyInfo(CelestialBody.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F),
-        CelestialBodyInfo(CelestialBody.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F),
-        CelestialBodyInfo(CelestialBody.Earth, 4.5F, -23.44F, mEarthRatio, mEarthOrbitSpeed),
-        CelestialBodyInfo(CelestialBody.Mars, 5.5F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F),
-        CelestialBodyInfo(CelestialBody.Jupiter, 7F, -3.13F, mEarthRatio * 2F, mEarthOrbitSpeed / 11.86F * 5F),
-        CelestialBodyInfo(CelestialBody.Saturn, 9F, -26.73F, mEarthRatio * 1.9F, mEarthOrbitSpeed / 29.46F * 5F),
-        CelestialBodyInfo(CelestialBody.Uranus, 11F, -97.86F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 84.01F * 5F),
-        CelestialBodyInfo(CelestialBody.Neptune, 12.5F, -28.32F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 164.79F * 5F),
+        CelestialBodyInfo(CelestialBody.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F, mEarthRotationSpeed * 2F),
+        CelestialBodyInfo(CelestialBody.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F, mEarthRotationSpeed * 1.2F),
+        CelestialBodyInfo(CelestialBody.Earth, 4.5F, -23.44F, mEarthRatio, mEarthOrbitSpeed, mEarthRotationSpeed),
+        CelestialBodyInfo(CelestialBody.Mars, 5.5F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F, mEarthRotationSpeed),
+        CelestialBodyInfo(CelestialBody.Jupiter, 7F, -3.13F, mEarthRatio * 2F, mEarthOrbitSpeed / 11.86F * 5F, mEarthRotationSpeed * 0.41F),
+        CelestialBodyInfo(CelestialBody.Saturn, 9F, -26.73F, mEarthRatio * 1.9F, mEarthOrbitSpeed / 29.46F * 5F, mEarthRotationSpeed * 0.45F),
+        CelestialBodyInfo(CelestialBody.Uranus, 11F, -97.86F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 84.01F * 5F, mEarthRotationSpeed * 0.72F),
+        CelestialBodyInfo(CelestialBody.Neptune, 12.5F, -28.32F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 164.79F * 5F, mEarthRotationSpeed * 0.67F),
     )
 
     override fun onInit() {

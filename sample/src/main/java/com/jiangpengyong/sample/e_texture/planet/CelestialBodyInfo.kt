@@ -37,11 +37,17 @@ data class CelestialBodyInfo(
     val tranX: Float,
     val angle: Float,
     val scale: Float,
-    var orbitSpeed: Float
+    var orbitSpeed: Float,
+    var rotationSpeed: Float
 ) {
     val matrix = ModelMatrix()
     val texture = GLTexture()
+
+    // 公转
     private var mOrbit = 0F
+
+    // 自转
+    private var mRotation = 0F
 
     fun init() {
         texture.init()
@@ -58,6 +64,7 @@ data class CelestialBodyInfo(
 
     fun orbitAndRotation() {
         mOrbit = (mOrbit + orbitSpeed) % 360
+        mRotation = (mRotation + rotationSpeed) % 360
         updateMatrix()
     }
 
@@ -67,6 +74,7 @@ data class CelestialBodyInfo(
             rotate(mOrbit, 0F, 1F, 0F)
             translate(tranX, 0F, 0F)
             rotate(angle, 0F, 0F, 1F)
+            rotate(mRotation, 0F, 1F, 0F)
             scale(scale, scale, scale)
         }
     }
