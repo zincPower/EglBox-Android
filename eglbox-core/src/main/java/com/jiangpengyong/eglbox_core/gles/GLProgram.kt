@@ -32,7 +32,7 @@ abstract class GLProgram : GLObject {
             onDraw()
             GLES20.glUseProgram(0)
         } else {
-            Logger.i(TAG, "Program hasn't initialized. 【draw】")
+            Logger.e(TAG, "Program hasn't initialized. 【draw】")
         }
     }
 

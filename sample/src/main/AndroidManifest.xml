@@ -112,7 +112,7 @@
             android:name="com.jiangpengyong.sample.e_texture.TextureSampleActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.e_texture.heavenly_body.HeavenlyBodyActivity"
+            android:name="com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity"
             android:screenOrientation="landscape" />
 
         <activity

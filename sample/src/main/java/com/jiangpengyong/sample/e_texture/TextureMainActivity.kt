@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
-import com.jiangpengyong.sample.e_texture.heavenly_body.HeavenlyBodyActivity
+import com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity
 
 /**
  * @author: jiang peng yong
@@ -38,8 +38,8 @@ class TextureMainActivity : AppCompatActivity() {
             startActivity(Intent(this, Texture2DActivity::class.java))
         }
 
-        findViewById<TextView>(R.id.heavenly_body).setOnClickListener {
-            startActivity(Intent(this, HeavenlyBodyActivity::class.java))
+        findViewById<TextView>(R.id.solar_system).setOnClickListener {
+            startActivity(Intent(this, SolarSystemActivity::class.java))
         }
     }
 }

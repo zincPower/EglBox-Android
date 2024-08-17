@@ -9,17 +9,15 @@ uniform vec3 uLightPosition;
 // 相机位置
 uniform vec3 uCameraPosition;
 // 顶点位置
-in vec3 aVertexCoordinate;
+in vec3 aPosition;
 // 纹理位置
-in vec2 aTextureCoordinate;
+in vec2 aTextureCoord;
 // 法向量
 in vec3 aNormal;
 // 光滑度
 in float aShininess;
 
-// 将未转换的顶点位置传递给片元着色器
-out vec3 vVertexCoordinate;
-out vec2 vTextureCoordinate;
+out vec2 vTextureCoord;
 // 环境光强度
 out vec4 vAmbientLight;
 // 该顶点散射光最终亮度
@@ -34,16 +32,16 @@ vec4 calScatteredLight(
     vec4 ligthIntensity
 ) {
     // 顶点进行模型转换
-    vec3 finalPosition = (uMMatrix * vec4(aVertexCoordinate, 1.0)).xyz;
+    vec3 finalPosition = (uMMatrix * vec4(aPosition, 1.0)).xyz;
 
     // 对法向量进行矩阵转换处理，最终归一化
     // realNormal 才是跟随模型矩阵处理后的向量
-    vec3 tempNormal = aVertexCoordinate + normal;
+    vec3 tempNormal = aPosition + normal;
     vec3 realNormal = (uMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
     realNormal = normalize(realNormal);
 
     // 计算顶点到光源的向量
-    vec3 lightVector = normalize(lightLocation - (uMMatrix * vec4(aVertexCoordinate, 1.0)).xyz);
+    vec3 lightVector = normalize(lightLocation - (uMMatrix * vec4(aPosition, 1.0)).xyz);
     // 利用点积，计算 cos 的值，并限制在 [0, 1] 之间
     float dotResult = max(0.0, dot(realNormal, lightVector));
     return ligthIntensity * dotResult;
@@ -56,10 +54,10 @@ vec4 calSpecularLight(
     vec4 ligthIntensity
 ) {
     // 顶点进行最终模型转换
-    vec3 finalPosition = (uMMatrix * vec4(aVertexCoordinate, 1.0)).xyz;
+    vec3 finalPosition = (uMMatrix * vec4(aPosition, 1.0)).xyz;
 
     // 对法向量进行矩阵转换处理，最终归一化
-    vec3 normalTarget = aVertexCoordinate + normal;
+    vec3 normalTarget = aPosition + normal;
     vec3 realNormal = (uMMatrix * vec4(normalTarget, 1)).xyz - finalPosition;
     realNormal = normalize(realNormal);
 
@@ -81,13 +79,11 @@ vec4 calSpecularLight(
 
 void main() {
     // 使用变换矩阵计算绘制顶点的最终位置
-    gl_Position = uMVPMatrix * vec4(aVertexCoordinate, 1);
-    // 将未转换的顶点位置传给片元着色器
-    vVertexCoordinate = aVertexCoordinate;
-    vTextureCoordinate = aTextureCoordinate;
+    gl_Position = uMVPMatrix * vec4(aPosition, 1);
+    vTextureCoord = aTextureCoord;
 
     // 环境光
-    vAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
+    vAmbientLight = vec4(0.3, 0.3, 0.3, 1.0);
 
     // 散射光
     vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
