@@ -5,6 +5,8 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.util.AttributeSet
 import android.util.Size
@@ -26,15 +28,29 @@ import javax.microedition.khronos.opengles.GL10
 class SolarSystemActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
+        const val MESSAGE_RUN = 100001
     }
 
     private lateinit var mRenderView: RenderView
+
+    private val mHandler = Handler(Looper.getMainLooper())
+    private val mRunnable = object : Runnable {
+        override fun run() {
+            mRenderView.sendMessageToFilter(Message().apply {
+                what = MESSAGE_RUN
+            })
+            mRenderView.requestRender()
+            mHandler.postDelayed(this, 10)
+        }
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_solar_system)
         mRenderView = findViewById(R.id.surface_view)
+
+        mHandler.postDelayed(mRunnable, 10)
     }
 
     override fun onResume() {

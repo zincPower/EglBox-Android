@@ -86,10 +86,10 @@ void main() {
     vAmbientLight = vec4(0.3, 0.3, 0.3, 1.0);
 
     // 散射光
-    vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
+    vec4 scatteredLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
     vScatteredLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
 
     // 镜面光
-    vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
+    vec4 specularLightIntensity = vec4(0.6, 0.6, 0.6, 1.0);
     vSpecularLight = calSpecularLight(aNormal, uLightPosition, specularLightIntensity);
 }

@@ -3,7 +3,6 @@ package com.jiangpengyong.sample.e_texture.planet
 import android.graphics.BitmapFactory
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.sample.App
 import java.io.File
 
@@ -35,9 +34,11 @@ data class PlanetInfo(
     val tranX: Float,
     val angle: Float,
     val scale: Float,
+    var orbitSpeed: Float
 ) {
     val matrix = ModelMatrix()
     val texture = GLTexture()
+    private var mOrbit = 0F
 
     fun init() {
         texture.init()
@@ -45,16 +46,25 @@ data class PlanetInfo(
             texture.setData(this)
             recycle()
         }
-
-        matrix.apply {
-            reset()
-            translate(tranX, 0F, 0F)
-            rotate(angle, 0F, 0F, 1F)
-            scale(scale, scale, scale)
-        }
+        updateMatrix()
     }
 
     fun release() {
         texture.release()
+    }
+
+    fun orbitAndRotation() {
+        mOrbit = (mOrbit + orbitSpeed) % 360
+        updateMatrix()
+    }
+
+    private fun updateMatrix() {
+        matrix.apply {
+            reset()
+            rotate(mOrbit, 0F, 1F, 0F)
+            translate(tranX, 0F, 0F)
+            rotate(angle, 0F, 0F, 1F)
+            scale(scale, scale, scale)
+        }
     }
 }
