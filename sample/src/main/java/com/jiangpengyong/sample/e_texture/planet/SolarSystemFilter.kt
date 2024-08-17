@@ -25,6 +25,7 @@ class SolarSystemFilter : GLFilter() {
 
     private val mSunProgram = SunProgram()
     private val mPlanetProgram = PlanetProgram()
+    private val mRingProgram = RingProgram(smallRadius = 1.3F)
 
     private var mEarthRatio = 1 / 3F
     private var mEarthOrbitSpeed = 1 / 2F
@@ -35,6 +36,7 @@ class SolarSystemFilter : GLFilter() {
 
     private val mMoonInfo = CelestialBodyInfo(CelestialBody.Moon, 2F, -0.5F, mEarthRatio * 0.5F, mEarthOrbitSpeed * 4F, mEarthOrbitSpeed * 4F)
     private val mSunInfo = CelestialBodyInfo(CelestialBody.Sun, 0F, 0F, 1.5F, 0F, 0F)
+    private val mSaturnRingInfo = CelestialBodyInfo(CelestialBody.SaturnRing, 0F, -27F, 1.2F, 0F, 0F)
     private val mPlanetInfo = listOf(
         CelestialBodyInfo(CelestialBody.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F, mEarthRotationSpeed * 2F),
         CelestialBodyInfo(CelestialBody.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F, mEarthRotationSpeed * 1.2F),
@@ -53,9 +55,12 @@ class SolarSystemFilter : GLFilter() {
 
         mSunProgram.init()
         mPlanetProgram.init()
+        mRingProgram.init()
 
         mSunInfo.init()
         mMoonInfo.init()
+        mSaturnRingInfo.init()
+        mSaturnRingInfo.matrix.scale(1F, 0.8F, 1F)
         for (planetInfo in mPlanetInfo) {
             planetInfo.init()
         }
@@ -73,6 +78,7 @@ class SolarSystemFilter : GLFilter() {
         mSunProgram.draw()
 
         for (planetInfo in mPlanetInfo) {
+            GLES20.glFrontFace(GLES20.GL_CW)
             mPlanetProgram.setTexture(planetInfo.texture)
             mPlanetProgram.setLightPosition(mSunPosition)
             synchronized(this) {
@@ -91,12 +97,31 @@ class SolarSystemFilter : GLFilter() {
                 }
                 mPlanetProgram.setShininess(3F)
                 mPlanetProgram.draw()
+            } else if (planetInfo.celestialBody == CelestialBody.Saturn) {
+                GLES20.glFrontFace(GLES20.GL_CCW)
+                mRingProgram.setTexture(mSaturnRingInfo.texture)
+                mRingProgram.setLightPosition(mSunPosition)
+                synchronized(this) {
+                    mRingProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix * mSaturnRingInfo.matrix)
+                    mRingProgram.setMMatrix(mGestureMatrix * planetInfo.matrix * mSaturnRingInfo.matrix)
+                }
+                mRingProgram.setShininess(1F)
+                mRingProgram.draw()
             }
         }
     }
 
     override fun onRelease() {
         mSunProgram.release()
+        mPlanetProgram.release()
+        mRingProgram.release()
+
+        mSunInfo.release()
+        mMoonInfo.release()
+        mSaturnRingInfo.release()
+        for (planetInfo in mPlanetInfo) {
+            planetInfo.release()
+        }
     }
 
     private fun updateProjectionMatrix(context: FilterContext) {

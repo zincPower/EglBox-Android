@@ -15,7 +15,7 @@ import kotlin.math.sin
  * @author jiang peng yong
  * @date 2024/8/12 22:04
  * @email 56002982@qq.com
- * @des 天体
+ * @des 行星
  */
 class PlanetProgram : GLProgram() {
     private var mAngleSpan = 10
