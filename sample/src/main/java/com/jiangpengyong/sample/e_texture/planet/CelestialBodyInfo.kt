@@ -12,15 +12,18 @@ import java.io.File
  * @email 56002982@qq.com
  * @des 八大行星
  */
-enum class PlanetType(val textureFile: String) {
-    Mercury("images/heavenly_body/2k_mercury.jpg"),    // 水星
-    Venus("images/heavenly_body/2k_venus_surface.jpg"),      // 金星
-    Earth("images/heavenly_body/2k_earth_daymap.jpg"),      // 地球
-    Mars("images/heavenly_body/2k_mars.jpg"),       // 火星
-    Jupiter("images/heavenly_body/2k_jupiter.jpg"),    // 木星
-    Saturn("images/heavenly_body/2k_saturn.jpg"),     // 土星
-    Uranus("images/heavenly_body/2k_uranus.jpg"),     // 天王星
-    Neptune("images/heavenly_body/2k_neptune.jpg"),    // 海王星
+enum class CelestialBody(val textureFile: String) {
+    Mercury("images/heavenly_body/2k_mercury.jpg"),                 // 水星
+    Venus("images/heavenly_body/2k_venus_surface.jpg"),             // 金星
+    Earth("images/heavenly_body/2k_earth_daymap.jpg"),              // 地球
+    Mars("images/heavenly_body/2k_mars.jpg"),                       // 火星
+    Jupiter("images/heavenly_body/2k_jupiter.jpg"),                 // 木星
+    Saturn("images/heavenly_body/2k_saturn.jpg"),                   // 土星
+    Uranus("images/heavenly_body/2k_uranus.jpg"),                   // 天王星
+    Neptune("images/heavenly_body/2k_neptune.jpg"),                 // 海王星
+    Moon("images/heavenly_body/2k_moon.jpg"),                       // 月亮
+    Sun("images/heavenly_body/2k_sun.jpg"),                         // 太阳
+    SaturnRing("images/heavenly_body/2k_saturn_ring_alpha.png"),    // 土星环
 }
 
 /**
@@ -29,8 +32,8 @@ enum class PlanetType(val textureFile: String) {
  * @email 56002982@qq.com
  * @des 行星数据
  */
-data class PlanetInfo(
-    val type: PlanetType,
+data class CelestialBodyInfo(
+    val celestialBody: CelestialBody,
     val tranX: Float,
     val angle: Float,
     val scale: Float,
@@ -42,7 +45,7 @@ data class PlanetInfo(
 
     fun init() {
         texture.init()
-        BitmapFactory.decodeFile(File(App.context.filesDir, type.textureFile).absolutePath).apply {
+        BitmapFactory.decodeFile(File(App.context.filesDir, celestialBody.textureFile).absolutePath).apply {
             texture.setData(this)
             recycle()
         }

@@ -1,6 +1,5 @@
 package com.jiangpengyong.sample.e_texture.planet
 
-import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
@@ -8,14 +7,11 @@ import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
-import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity.Companion.MESSAGE_RUN
-import java.io.File
 
 class SolarSystemFilter : GLFilter() {
     private val mProjectMatrix = ProjectMatrix()
@@ -24,33 +20,29 @@ class SolarSystemFilter : GLFilter() {
 
     private var mXAngle = 0F
     private var mYAngle = 0F
-
     private var mRotation = 0F
-
     private var mDisplaySize = Size(0, 0)
 
-    private var mCameraPosition = floatArrayOf(0F, 0F, 30F)
-
+    private val mSunProgram = SunProgram()
     private val mPlanetProgram = PlanetProgram()
+
     private var mEarthRatio = 1 / 3F
     private var mEarthOrbitSpeed = 1 / 2F
 
-    private val mSunProgram = SunProgram()
-    private val mSunTexture = GLTexture()
-    private val mSunMatrix = ModelMatrix()
     private var mSunPosition = floatArrayOf(0F, 0F, 0F)
+    private var mCameraPosition = floatArrayOf(0F, 0F, 30F)
 
-    private var
-
+    private val mMoonInfo = CelestialBodyInfo(CelestialBody.Moon, 2F, -0.5F, mEarthRatio * 0.5F, mEarthOrbitSpeed * 4F)
+    private val mSunInfo = CelestialBodyInfo(CelestialBody.Sun, 0F, 0F, 1.5F, 0F)
     private val mPlanetInfo = listOf(
-        PlanetInfo(PlanetType.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F),
-        PlanetInfo(PlanetType.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F),
-        PlanetInfo(PlanetType.Earth, 4.5F, -23.44F, mEarthRatio, mEarthOrbitSpeed),
-        PlanetInfo(PlanetType.Mars, 5.5F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F),
-        PlanetInfo(PlanetType.Jupiter, 7F, -3.13F, mEarthRatio * 2F, mEarthOrbitSpeed / 11.86F * 5F),
-        PlanetInfo(PlanetType.Saturn, 9F, -26.73F, mEarthRatio * 1.9F, mEarthOrbitSpeed / 29.46F * 5F),
-        PlanetInfo(PlanetType.Uranus, 11F, -97.86F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 84.01F * 5F),
-        PlanetInfo(PlanetType.Neptune, 12.5F, -28.32F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 164.79F * 5F),
+        CelestialBodyInfo(CelestialBody.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F),
+        CelestialBodyInfo(CelestialBody.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F),
+        CelestialBodyInfo(CelestialBody.Earth, 4.5F, -23.44F, mEarthRatio, mEarthOrbitSpeed),
+        CelestialBodyInfo(CelestialBody.Mars, 5.5F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F),
+        CelestialBodyInfo(CelestialBody.Jupiter, 7F, -3.13F, mEarthRatio * 2F, mEarthOrbitSpeed / 11.86F * 5F),
+        CelestialBodyInfo(CelestialBody.Saturn, 9F, -26.73F, mEarthRatio * 1.9F, mEarthOrbitSpeed / 29.46F * 5F),
+        CelestialBodyInfo(CelestialBody.Uranus, 11F, -97.86F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 84.01F * 5F),
+        CelestialBodyInfo(CelestialBody.Neptune, 12.5F, -28.32F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 164.79F * 5F),
     )
 
     override fun onInit() {
@@ -58,16 +50,11 @@ class SolarSystemFilter : GLFilter() {
             mCameraPosition[0], mCameraPosition[1], mCameraPosition[2], 0F, 0F, 0F, 0F, 1F, 0F
         )
 
+        mSunProgram.init()
         mPlanetProgram.init()
 
-        mSunProgram.init()
-        mSunTexture.init()
-        BitmapFactory.decodeFile(File(App.context.filesDir, "images/heavenly_body/2k_sun.jpg").absolutePath).let { bitmap ->
-            mSunTexture.setData(bitmap)
-            bitmap.recycle()
-        }
-        mSunMatrix.scale(1.5F, 1.5F, 1.5F)
-
+        mSunInfo.init()
+        mMoonInfo.init()
         for (planetInfo in mPlanetInfo) {
             planetInfo.init()
         }
@@ -78,23 +65,32 @@ class SolarSystemFilter : GLFilter() {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         updateProjectionMatrix(context)
 
-        val mvpMatrix = synchronized(this) {
-            mProjectMatrix * mViewMatrix * mGestureMatrix
+        synchronized(this) {
+            mSunProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * mSunInfo.matrix)
         }
-
-        mSunProgram.setMVPMatrix(mvpMatrix * mSunMatrix)
-        mSunProgram.setTexture(mSunTexture)
+        mSunProgram.setTexture(mSunInfo.texture)
         mSunProgram.draw()
 
         for (planetInfo in mPlanetInfo) {
             mPlanetProgram.setTexture(planetInfo.texture)
             mPlanetProgram.setLightPosition(mSunPosition)
             synchronized(this) {
-                mPlanetProgram.setMVPMatrix(mvpMatrix * planetInfo.matrix)
+                mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
                 mPlanetProgram.setMMatrix(mGestureMatrix * planetInfo.matrix)
             }
             mPlanetProgram.setShininess(3F)
             mPlanetProgram.draw()
+
+            if (planetInfo.celestialBody == CelestialBody.Earth) {
+                mPlanetProgram.setTexture(mMoonInfo.texture)
+                mPlanetProgram.setLightPosition(mSunPosition)
+                synchronized(this) {
+                    mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix * mMoonInfo.matrix)
+                    mPlanetProgram.setMMatrix(mGestureMatrix * planetInfo.matrix * mMoonInfo.matrix)
+                }
+                mPlanetProgram.setShininess(3F)
+                mPlanetProgram.draw()
+            }
         }
     }
 
@@ -139,6 +135,7 @@ class SolarSystemFilter : GLFilter() {
                 for (planetInfo in mPlanetInfo) {
                     planetInfo.orbitAndRotation()
                 }
+                mMoonInfo.orbitAndRotation()
             }
         }
     }
