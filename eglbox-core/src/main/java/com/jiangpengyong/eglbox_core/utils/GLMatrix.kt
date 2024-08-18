@@ -1,6 +1,7 @@
 package com.jiangpengyong.eglbox_core.utils
 
 import android.opengl.Matrix
+import android.util.Log
 import java.nio.FloatBuffer
 
 private const val MATRIX_LENGTH = 16
@@ -362,5 +363,21 @@ open class GLMatrix {
             other.matrix, 0
         )
         return result
+    }
+
+    operator fun times(other: FloatArray): FloatArray {
+        if (other.size != 3) {
+            Log.e(TAG, "The parameter requires an array of length three.")
+            return floatArrayOf(0F, 0F, 0F)
+        }
+
+        val vector = floatArrayOf(other[0], other[1], other[2], 1F)
+        val resultVector = FloatArray(4) // 存储结果的数组
+        Matrix.multiplyMV(resultVector, 0, matrix, 0, vector, 0)
+        return resultVector
+    }
+
+    companion object {
+        const val TAG = "GLMatrix"
     }
 }

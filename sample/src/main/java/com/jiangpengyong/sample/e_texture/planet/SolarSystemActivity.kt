@@ -1,5 +1,6 @@
 package com.jiangpengyong.sample.e_texture.planet
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.GLES20
@@ -11,6 +12,8 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Size
 import android.view.MotionEvent
+import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
@@ -29,9 +32,24 @@ class SolarSystemActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         const val MESSAGE_RUN = 100001
+        const val MESSAGE_TARGET = 100002
     }
 
     private lateinit var mRenderView: RenderView
+
+    private var mEyeTarget = SolarSystemFilter.Target.SolarSystem
+    private val mFloatAnimation = ValueAnimator.ofFloat(0F, 1F).apply {
+        setDuration(500)
+        interpolator = LinearInterpolator()
+        addUpdateListener { animator ->
+            val value = animator.animatedValue as? Float ?: return@addUpdateListener
+            mRenderView.sendMessageToFilter(Message.obtain().apply {
+                what = MESSAGE_TARGET
+                arg1 = mEyeTarget.value
+                obj = value
+            })
+        }
+    }
 
     private val mHandler = Handler(Looper.getMainLooper())
     private val mRunnable = object : Runnable {
@@ -51,6 +69,23 @@ class SolarSystemActivity : AppCompatActivity() {
         mRenderView = findViewById(R.id.surface_view)
 
         mHandler.postDelayed(mRunnable, 10)
+
+        findViewById<View>(R.id.solar_system).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.SolarSystem)
+        }
+        findViewById<View>(R.id.earth).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Earth)
+        }
+        findViewById<View>(R.id.saturn).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Saturn)
+        }
+    }
+
+    private fun updateTarget(target: SolarSystemFilter.Target) {
+        if (mEyeTarget == target) return
+        if (mFloatAnimation.isRunning) mFloatAnimation.cancel()
+        mEyeTarget = target
+        mFloatAnimation.start()
     }
 
     override fun onResume() {
