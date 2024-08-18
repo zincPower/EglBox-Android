@@ -13,6 +13,7 @@ import android.util.AttributeSet
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_core.engine.RenderType
@@ -31,7 +32,6 @@ import javax.microedition.khronos.opengles.GL10
 class SolarSystemActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
-        const val MESSAGE_RUN = 100001
         const val MESSAGE_TARGET = 100002
     }
 
@@ -39,8 +39,8 @@ class SolarSystemActivity : AppCompatActivity() {
 
     private var mEyeTarget = SolarSystemFilter.Target.SolarSystem
     private val mFloatAnimation = ValueAnimator.ofFloat(0F, 1F).apply {
-        setDuration(500)
-        interpolator = LinearInterpolator()
+        setDuration(2000)
+        interpolator = DecelerateInterpolator()
         addUpdateListener { animator ->
             val value = animator.animatedValue as? Float ?: return@addUpdateListener
             mRenderView.sendMessageToFilter(Message.obtain().apply {
@@ -54,9 +54,6 @@ class SolarSystemActivity : AppCompatActivity() {
     private val mHandler = Handler(Looper.getMainLooper())
     private val mRunnable = object : Runnable {
         override fun run() {
-            mRenderView.sendMessageToFilter(Message().apply {
-                what = MESSAGE_RUN
-            })
             mRenderView.requestRender()
             mHandler.postDelayed(this, 10)
         }
