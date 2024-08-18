@@ -130,9 +130,9 @@ class RingProgram(
         mTextureCoordHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/heavenly_body/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/heavenly_body/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/fragment.glsl")
 
     private fun calculateVertex() {
         mVertexCount = 3 * bigSpan * smallSpan * 2

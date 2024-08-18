@@ -15,17 +15,17 @@ import java.io.File
  * @des 八大行星
  */
 enum class CelestialBody(val textureFile: String) {
-    Mercury("images/heavenly_body/2k_mercury.jpg"),                 // 水星
-    Venus("images/heavenly_body/2k_venus_surface.jpg"),             // 金星
-    Earth("images/heavenly_body/2k_earth_daymap.jpg"),              // 地球
-    Mars("images/heavenly_body/2k_mars.jpg"),                       // 火星
-    Jupiter("images/heavenly_body/2k_jupiter.jpg"),                 // 木星
-    Saturn("images/heavenly_body/2k_saturn.jpg"),                   // 土星
-    Uranus("images/heavenly_body/2k_uranus.jpg"),                   // 天王星
-    Neptune("images/heavenly_body/2k_neptune.jpg"),                 // 海王星
-    Moon("images/heavenly_body/2k_moon.jpg"),                       // 月亮
-    Sun("images/heavenly_body/2k_sun.jpg"),                         // 太阳
-    SaturnRing("images/heavenly_body/2k_saturn_ring_alpha.png"),    // 土星环
+    Mercury("images/celestial_body/2k_mercury.jpg"),                 // 水星
+    Venus("images/celestial_body/2k_venus_surface.jpg"),             // 金星
+    Earth("images/celestial_body/2k_earth_daymap.jpg"),              // 地球
+    Mars("images/celestial_body/2k_mars.jpg"),                       // 火星
+    Jupiter("images/celestial_body/2k_jupiter.jpg"),                 // 木星
+    Saturn("images/celestial_body/2k_saturn.jpg"),                   // 土星
+    Uranus("images/celestial_body/2k_uranus.jpg"),                   // 天王星
+    Neptune("images/celestial_body/2k_neptune.jpg"),                 // 海王星
+    Moon("images/celestial_body/2k_moon.jpg"),                       // 月亮
+    Sun("images/celestial_body/2k_sun.jpg"),                         // 太阳
+    SaturnRing("images/celestial_body/2k_saturn_ring_alpha.png"),    // 土星环
 }
 
 /**
@@ -75,7 +75,6 @@ data class CelestialBodyInfo(
 
     fun updatePosition(matrix: GLMatrix) {
         position = matrix * originalPosition
-        Log.i("jiang", "position ${position[0]} ${position[1]} ${position[2]}")
     }
 
     private fun updateMatrix() {

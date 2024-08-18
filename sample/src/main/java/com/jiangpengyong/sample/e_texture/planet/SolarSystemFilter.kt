@@ -35,6 +35,7 @@ class SolarSystemFilter : GLFilter() {
     // 绘制程序
     private val mSunProgram = SunProgram()
     private val mPlanetProgram = PlanetProgram()
+    private val mEarthProgram = EarthProgram()
     private val mRingProgram = RingProgram(bigRadius = 0.9F, smallRadius = 1.5F)
 
     // 地球信息，作为其他天体基准
@@ -72,6 +73,7 @@ class SolarSystemFilter : GLFilter() {
     override fun onInit() {
         mSunProgram.init()
         mPlanetProgram.init()
+        mEarthProgram.init()
         mRingProgram.init()
 
         mSunInfo.init()
@@ -197,21 +199,23 @@ class SolarSystemFilter : GLFilter() {
     private fun drawPlanet() {
         for (item in mPlanetInfo) {
             val planetInfo = item.value
-            GLES20.glFrontFace(GLES20.GL_CW)
-            mPlanetProgram.setTexture(planetInfo.texture)
-            mPlanetProgram.setLightPosition(mSunPosition)
-            mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
-            (mGestureMatrix * planetInfo.matrix).let { modelMatrix ->
-                mPlanetProgram.setMMatrix(modelMatrix)
-                planetInfo.updatePosition(modelMatrix)
-            }
-            mPlanetProgram.setShininess(3F)
-            mPlanetProgram.draw()
-
             if (planetInfo.celestialBody == CelestialBody.Earth) {
+                drawEarth(planetInfo)
                 drawMoon(planetInfo.matrix)
-            } else if (planetInfo.celestialBody == CelestialBody.Saturn) {
-                drawSaturnRing(planetInfo.matrix)
+            } else {
+                GLES20.glFrontFace(GLES20.GL_CW)
+                mPlanetProgram.setTexture(planetInfo.texture)
+                mPlanetProgram.setLightPosition(mSunPosition)
+                mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
+                (mGestureMatrix * planetInfo.matrix).let { modelMatrix ->
+                    mPlanetProgram.setMMatrix(modelMatrix)
+                    planetInfo.updatePosition(modelMatrix)
+                }
+                mPlanetProgram.setShininess(3F)
+                mPlanetProgram.draw()
+                if (planetInfo.celestialBody == CelestialBody.Saturn) {
+                    drawSaturnRing(planetInfo.matrix)
+                }
             }
         }
     }
@@ -245,6 +249,21 @@ class SolarSystemFilter : GLFilter() {
         }
         mRingProgram.setShininess(1F)
         mRingProgram.draw()
+    }
+
+    /**
+     * 绘制地球
+     */
+    private fun drawEarth(planetInfo: CelestialBodyInfo) {
+        mEarthProgram.setDayTexture(planetInfo.texture)
+        mEarthProgram.setLightPosition(mSunPosition)
+        mEarthProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
+        (mGestureMatrix * planetInfo.matrix).let { modelMatrix ->
+            mEarthProgram.setMMatrix(modelMatrix)
+            planetInfo.updatePosition(modelMatrix)
+        }
+        mEarthProgram.setShininess(3F)
+        mEarthProgram.draw()
     }
 
     override fun onUpdateData(updateData: Bundle) = synchronized(this) {

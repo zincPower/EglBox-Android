@@ -1,5 +1,6 @@
 package com.jiangpengyong.sample.e_texture.planet
 
+import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
@@ -7,6 +8,7 @@ import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
+import java.io.File
 import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
@@ -15,9 +17,9 @@ import kotlin.math.sin
  * @author jiang peng yong
  * @date 2024/8/12 22:04
  * @email 56002982@qq.com
- * @des 行星
+ * @des 地球
  */
-class PlanetProgram : GLProgram() {
+class EarthProgram : GLProgram() {
     private var mAngleSpan = 10
     private var mRadius = 1F
 
@@ -29,7 +31,8 @@ class PlanetProgram : GLProgram() {
     private var mNormalHandle = 0
     private var mShininessHandle = 0
     private var mLightSourceTypeHandle = 0
-    private var mTextureHandle = 0
+    private var mDayTextureHandle = 0
+    private var mNightTextureHandle = 0
     private var mTextureCoordHandle = 0
 
     private var mVertexCount = 0
@@ -44,7 +47,8 @@ class PlanetProgram : GLProgram() {
     private var mCameraPosition = FloatArray(3)
     private var mShininess = 50F
 
-    private var mTexture: GLTexture? = null
+    private var mDayTexture: GLTexture? = null
+    private var mNightTexture: GLTexture = GLTexture()
 
     init {
         calculateVertex()
@@ -75,8 +79,8 @@ class PlanetProgram : GLProgram() {
         calculateVertex()
     }
 
-    fun setTexture(texture: GLTexture) {
-        mTexture = texture
+    fun setDayTexture(texture: GLTexture) {
+        mDayTexture = texture
     }
 
     override fun onInit() {
@@ -89,11 +93,21 @@ class PlanetProgram : GLProgram() {
         mNormalHandle = getAttribLocation("aNormal")
         mShininessHandle = getAttribLocation("aShininess")
         mLightSourceTypeHandle = getUniformLocation("uLightSourceType")
-        mTextureHandle = getUniformLocation("sTexture")
+        mDayTextureHandle = getUniformLocation("sTextureDay")
+        mNightTextureHandle = getUniformLocation("sTextureNight")
+
+        mNightTexture.init()
+        BitmapFactory.decodeFile(File(App.context.filesDir, "images/celestial_body/2k_earth_nightmap.jpg").absolutePath).let { bitmap ->
+            mNightTexture.setData(bitmap)
+            bitmap.recycle()
+        }
     }
 
     override fun onDraw() {
-        mTexture?.bind()
+        mDayTexture?.bind(textureUnit = GLES20.GL_TEXTURE0)
+        GLES20.glUniform1i(mDayTextureHandle, 0)
+        mNightTexture.bind(textureUnit = GLES20.GL_TEXTURE1)
+        GLES20.glUniform1i(mNightTextureHandle, 1)
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
         GLES20.glUniform3f(mLightPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
@@ -109,7 +123,8 @@ class PlanetProgram : GLProgram() {
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mNormalHandle)
         GLES20.glDisableVertexAttribArray(mTextureCoordHandle)
-        mTexture?.unbind()
+        mDayTexture?.unbind()
+        mNightTexture.unbind()
     }
 
     override fun onRelease() {
@@ -121,13 +136,14 @@ class PlanetProgram : GLProgram() {
         mNormalHandle = 0
         mShininessHandle = 0
         mLightSourceTypeHandle = 0
-        mTextureHandle = 0
+        mDayTextureHandle = 0
+        mNightTextureHandle = 0
         mTextureCoordHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/earth/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/earth/fragment.glsl")
 
     private fun calculateVertex() {
         val vertexList = ArrayList<Float>()
