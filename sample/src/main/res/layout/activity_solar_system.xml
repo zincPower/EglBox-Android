@@ -10,31 +10,98 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/solar_system"
-        style="@style/common_button"
-        android:layout_width="100dp"
-        android:background="@drawable/selector_gray_round_5dp"
-        android:text="太阳系"
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/earth"
-        style="@style/common_button"
-        android:layout_width="100dp"
-        android:background="@drawable/selector_gray_round_5dp"
-        android:text="地球"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/solar_system" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/saturn"
-        style="@style/common_button"
-        android:layout_width="100dp"
-        android:background="@drawable/selector_gray_round_5dp"
-        android:text="土星"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/earth" />
+            <TextView
+                android:id="@+id/solar_system"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="太阳系"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/mercury"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="水星"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/solar_system" />
+
+            <TextView
+                android:id="@+id/venus"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="金星"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/solar_system" />
+
+            <TextView
+                android:id="@+id/earth"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="地球"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/solar_system" />
+
+            <TextView
+                android:id="@+id/mars"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="火星"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/solar_system" />
+
+            <TextView
+                android:id="@+id/jupiter"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="木星"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/solar_system" />
+
+            <TextView
+                android:id="@+id/saturn"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="土星"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/earth" />
+
+            <TextView
+                android:id="@+id/uranus"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="天王星"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/earth" />
+
+            <TextView
+                android:id="@+id/neptune"
+                style="@style/common_button"
+                android:layout_width="100dp"
+                android:background="@drawable/selector_gray_round_5dp"
+                android:text="海王星"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/earth" />
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

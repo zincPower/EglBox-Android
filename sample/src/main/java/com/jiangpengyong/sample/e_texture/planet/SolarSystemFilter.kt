@@ -16,8 +16,14 @@ import com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity.Companion.M
 class SolarSystemFilter : GLFilter() {
     enum class Target(val value: Int) {
         SolarSystem(0),
-        Earth(1),
-        Saturn(2),
+        Mercury(1),
+        Venus(2),
+        Earth(3),
+        Mars(4),
+        Jupiter(5),
+        Saturn(6),
+        Uranus(7),
+        Neptune(8)
     }
 
     // 矩阵
@@ -63,7 +69,7 @@ class SolarSystemFilter : GLFilter() {
         CelestialBody.Mercury to CelestialBodyInfo(CelestialBody.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F, mEarthRotationSpeed * 2F),
         CelestialBody.Venus to CelestialBodyInfo(CelestialBody.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F, mEarthRotationSpeed * 1.2F),
         CelestialBody.Earth to CelestialBodyInfo(CelestialBody.Earth, 4.5F, -23.44F, mEarthRatio, mEarthOrbitSpeed, mEarthRotationSpeed),
-        CelestialBody.Mars to CelestialBodyInfo(CelestialBody.Mars, 5.5F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F, mEarthRotationSpeed),
+        CelestialBody.Mars to CelestialBodyInfo(CelestialBody.Mars, 5.8F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F, mEarthRotationSpeed),
         CelestialBody.Jupiter to CelestialBodyInfo(CelestialBody.Jupiter, 7F, -3.13F, mEarthRatio * 2F, mEarthOrbitSpeed / 11.86F * 5F, mEarthRotationSpeed * 0.41F),
         CelestialBody.Saturn to CelestialBodyInfo(CelestialBody.Saturn, 9F, -26.73F, mEarthRatio * 1.9F, mEarthOrbitSpeed / 29.46F * 5F, mEarthRotationSpeed * 0.45F),
         CelestialBody.Uranus to CelestialBodyInfo(CelestialBody.Uranus, 11F, -97.86F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 84.01F * 5F, mEarthRotationSpeed * 0.72F),
@@ -140,8 +146,14 @@ class SolarSystemFilter : GLFilter() {
     private fun updateViewMatrix() {
         when (mEyeTarget) {
             Target.SolarSystem -> defaultEyePosition
+            Target.Mercury -> (mPlanetInfo[CelestialBody.Mercury]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
+            Target.Venus -> (mPlanetInfo[CelestialBody.Venus]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
             Target.Earth -> (mPlanetInfo[CelestialBody.Earth]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
+            Target.Mars -> (mPlanetInfo[CelestialBody.Mars]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
+            Target.Jupiter -> (mPlanetInfo[CelestialBody.Jupiter]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
             Target.Saturn -> (mPlanetInfo[CelestialBody.Saturn]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
+            Target.Uranus -> (mPlanetInfo[CelestialBody.Uranus]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
+            Target.Neptune -> (mPlanetInfo[CelestialBody.Neptune]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
         }.let { eyeTargetPosition ->
             mEyeTargetPosition = eyeTargetPosition
             if (mProgress < 0F || mProgress >= 1F) {
@@ -280,8 +292,15 @@ class SolarSystemFilter : GLFilter() {
                 mEyeSourcePosition = mEyePosition
                 mEyeTarget = when (message.arg1) {
                     Target.SolarSystem.value -> Target.SolarSystem
+                    Target.Mercury.value -> Target.Mercury
+                    Target.SolarSystem.value -> Target.SolarSystem
+                    Target.Venus.value -> Target.Venus
                     Target.Earth.value -> Target.Earth
+                    Target.Mars.value -> Target.Mars
+                    Target.Jupiter.value -> Target.Jupiter
                     Target.Saturn.value -> Target.Saturn
+                    Target.Uranus.value -> Target.Uranus
+                    Target.Neptune.value -> Target.Neptune
                     else -> Target.SolarSystem
                 }
             }

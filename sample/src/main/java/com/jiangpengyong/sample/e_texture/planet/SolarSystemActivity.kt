@@ -70,11 +70,29 @@ class SolarSystemActivity : AppCompatActivity() {
         findViewById<View>(R.id.solar_system).setOnClickListener {
             updateTarget(SolarSystemFilter.Target.SolarSystem)
         }
+        findViewById<View>(R.id.mercury).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Mercury)
+        }
+        findViewById<View>(R.id.venus).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Venus)
+        }
         findViewById<View>(R.id.earth).setOnClickListener {
             updateTarget(SolarSystemFilter.Target.Earth)
         }
+        findViewById<View>(R.id.mars).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Mars)
+        }
+        findViewById<View>(R.id.jupiter).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Jupiter)
+        }
         findViewById<View>(R.id.saturn).setOnClickListener {
             updateTarget(SolarSystemFilter.Target.Saturn)
+        }
+        findViewById<View>(R.id.uranus).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Uranus)
+        }
+        findViewById<View>(R.id.neptune).setOnClickListener {
+            updateTarget(SolarSystemFilter.Target.Neptune)
         }
     }
 

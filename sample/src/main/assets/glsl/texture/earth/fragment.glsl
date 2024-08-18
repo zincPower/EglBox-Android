@@ -15,8 +15,7 @@ void main() {
     vec4 textureDayColor = texture(sTextureDay, vTextureCoord);
     vec4 finalDayColor = textureDayColor * vAmbientLight + textureDayColor * vDiffuseLight + textureDayColor * vSpecularLight;
 
-    vec4 textureNightColor = texture(sTextureNight, vTextureCoord);
-    vec4 finalNightColor = textureNightColor;
+    vec4 finalNightColor =  texture(sTextureNight, vTextureCoord);
 
     if (vDiffuseLight.x > 0.25) {
         fragColor = finalDayColor;
