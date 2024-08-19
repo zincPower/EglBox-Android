@@ -26,7 +26,7 @@ class GLPreviewViewActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.image1).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.jpg").absolutePath).let { bitmap ->
                     previewView.setImage(bitmap, true)
                 }
                 previewView.requestRender()

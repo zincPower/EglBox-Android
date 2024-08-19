@@ -111,7 +111,7 @@ class TextureSwizzleActivity : AppCompatActivity() {
                     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_B, GLES30.GL_RED)
                     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_G, GLES30.GL_RED)
                 }
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.jpg").absolutePath).let { bitmap ->
                     mTexture1.setData(bitmap)
                     bitmap.recycle()
                 }
@@ -120,7 +120,7 @@ class TextureSwizzleActivity : AppCompatActivity() {
                     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_B, GLES30.GL_RED)
                     GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES30.GL_TEXTURE_SWIZZLE_G, GLES30.GL_RED)
                 }
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_2.jpeg").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_vertical.jpg").absolutePath).let { bitmap ->
                     mTexture2.setData(bitmap)
                     bitmap.recycle()
                 }

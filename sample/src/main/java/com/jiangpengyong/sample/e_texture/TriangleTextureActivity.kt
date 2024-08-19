@@ -61,7 +61,7 @@ class TriangleTextureActivity : AppCompatActivity() {
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 mTriangleFilter.init(mContext)
                 mTexture.init()
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.jpg").absolutePath).let { bitmap ->
                     mTexture.setData(bitmap)
                     bitmap.recycle()
                 }

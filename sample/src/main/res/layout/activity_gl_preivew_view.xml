@@ -6,7 +6,7 @@
 
     <com.jiangpengyong.sample.widget.FlowLayout
         android:id="@+id/control_panel"
-        android:layout_width="300dp"
+        android:layout_width="400dp"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
