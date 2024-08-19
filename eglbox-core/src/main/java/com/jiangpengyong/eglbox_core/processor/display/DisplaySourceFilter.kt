@@ -1,6 +1,7 @@
 package com.jiangpengyong.eglbox_core.processor.display
 
 import android.graphics.Bitmap
+import android.icu.number.Scale
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
@@ -9,8 +10,11 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.SourceFilter
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.gles.Target
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.processor.MessageType
+import com.jiangpengyong.eglbox_core.program.ScaleType
+import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.program.isValid
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 
@@ -27,7 +31,7 @@ class DisplaySourceFilter : SourceFilter() {
     private var mPreviewSize = Size(0, 0)
     private val mTexture = GLTexture()
 
-    private var mIsNeedBlank = true
+    private var mIsNeedBlank = false
 
     override fun onInit() {
         mTexture.init()
@@ -40,6 +44,7 @@ class DisplaySourceFilter : SourceFilter() {
         texture2DProgram.reset()
         texture2DProgram.setTexture(texture)
         texture2DProgram.setVertexMatrix(mVertexMatrix.matrix)
+        texture2DProgram.setScaleType(ScaleType.MATRIX)
 
         val fbo = context.getTexFBO(texture.width, texture.height)
         fbo.use {

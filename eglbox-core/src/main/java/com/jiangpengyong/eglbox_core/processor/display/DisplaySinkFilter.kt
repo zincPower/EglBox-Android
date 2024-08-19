@@ -61,13 +61,16 @@ class DisplaySinkFilter : SinkFilter() {
         }
 
         if (mIsNeedCalculate) {
-            mMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, mBeforeImageSize, mPreviewSize)
+            mMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, mPreviewSize, mBeforeImageSize)
             mIsNeedCalculate = false
         }
 
-        context.texture2DProgram.setVertexMatrix(mMatrix.matrix)
-        context.texture2DProgram.setTexture(texture)
-        context.texture2DProgram.draw()
+        context.texture2DProgram.apply {
+            setTexture(texture)
+            setScaleType(ScaleType.MATRIX)
+            setVertexMatrix(mMatrix.matrix)
+            draw()
+        }
 
         surface.swapBuffer()
         context.surface?.let { context.egl?.makeCurrent(it) }
