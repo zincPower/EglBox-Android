@@ -24,8 +24,6 @@ class RingProgram(
     private val bigSpan: Int = 36,          // 圆环的份数
     private val smallSpan: Int = 36,        // 圆环条的份数
 ) : GLProgram() {
-
-
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
     private var mLightPositionHandle = 0
@@ -74,11 +72,6 @@ class RingProgram(
     fun setShininess(shininess: Float) {
         mShininess = shininess
     }
-
-//    fun setAngleSpan(angleSpan: Int) {
-//        mAngleSpan = angleSpan
-//        calculateVertex()
-//    }
 
     fun setTexture(texture: GLTexture) {
         mTexture = texture
