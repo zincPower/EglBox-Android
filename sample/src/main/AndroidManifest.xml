@@ -118,5 +118,9 @@
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
             android:screenOrientation="landscape" />
+
+        <activity
+            android:name="com.jiangpengyong.sample.view.GLPreviewViewActivity"
+            android:screenOrientation="landscape" />
     </application>
 </manifest>

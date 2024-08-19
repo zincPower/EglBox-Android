@@ -117,15 +117,15 @@ class GLEngine private constructor(config: GLEngineConfig) {
 
     fun getLooper(): Looper? = mGLThread?.getLooper()
 
-    fun notifyWindowCreated(window: Surface?) {
-        mGLThread?.handleWindowCreated(window)
+    fun notifyWindowCreated(window: Any?, width: Int, height: Int) {
+        mGLThread?.handleWindowCreated(window, width, height)
     }
 
-    fun notifyWindowSizeChanged(window: Surface?, width: Int, height: Int) {
+    fun notifyWindowSizeChanged(window: Any?, width: Int, height: Int) {
         mGLThread?.handleWindowSizeChanged(window, width, height)
     }
 
-    fun notifyWindowDestroy(window: Surface?) {
+    fun notifyWindowDestroy(window: Any?) {
         mGLThread?.handleWindowDestroy(window)
     }
 }

@@ -8,14 +8,14 @@ class SurfaceView : SurfaceViewManager.Listener {
 
     var state = State.Idle
         private set
-    private var mWindow: Surface? = null
+    private var mWindow: Any? = null
     private var mWidth = 0
     private var mHeight = 0
     private var mListeners = HashSet<SurfaceViewManager.Listener>()
 
     fun getListenerSize() = mListeners.size
 
-    override fun onCreated(window: Surface, width: Int, height: Int) {
+    override fun onCreated(window: Any, width: Int, height: Int) {
         Logger.i(TAG, "onCreated window=${window}, size=${width}x${height}")
         state = State.Created
         mWindow = window
@@ -24,7 +24,7 @@ class SurfaceView : SurfaceViewManager.Listener {
         notifyListener()
     }
 
-    override fun onChanged(window: Surface, width: Int, height: Int) {
+    override fun onChanged(window: Any, width: Int, height: Int) {
         Logger.i(TAG, "onChanged window=${window}, size=${width}x${height}")
         state = State.SizeChanged
         mWindow = window
@@ -33,7 +33,7 @@ class SurfaceView : SurfaceViewManager.Listener {
         notifyListener()
     }
 
-    override fun onDestroy(window: Surface) {
+    override fun onDestroy(window: Any) {
         Logger.i(TAG, "onDestroy window=${window}")
         state = State.Destroy
         mWindow = window

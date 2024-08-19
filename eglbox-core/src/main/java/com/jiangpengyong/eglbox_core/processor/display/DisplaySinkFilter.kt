@@ -28,7 +28,7 @@ class DisplaySinkFilter : SinkFilter() {
     private var mPreviewSize = Size(0, 0)
     private var mBeforeImageSize = Size(0, 0)
     private var mIsNeedCalculate = true
-    private var mSurface: Surface? = null
+    private var mSurface: Any? = null
     private var mWindowSurface: WindowSurface? = null
 
     override fun onInit() {}
@@ -88,18 +88,18 @@ class DisplaySinkFilter : SinkFilter() {
                 val width = message.arg1
                 val height = message.arg2
                 Logger.i(TAG, "Create preview window. size=${width}x${height}")
-                createPreviewWindow(message.obj as? Surface, width, height)
+                createPreviewWindow(message.obj, width, height)
             }
 
             MessageType.SURFACE_CHANGED -> {
                 val width = message.arg1
                 val height = message.arg2
                 Logger.i(TAG, "Update preview window. size=${width}x${height}")
-                updatePreviewWindow(message.obj as? Surface, width, height)
+                updatePreviewWindow(message.obj, width, height)
             }
 
             MessageType.SURFACE_DESTROY -> {
-                val curSurface = message.obj as? Surface
+                val curSurface = message.obj
                 val isEqual = if (mSurface == curSurface) "true" else "false"
                 Logger.i(TAG, "Destroy preview window. mWindow==window is $isEqual")
                 destroyPreviewWindow(curSurface)
@@ -107,7 +107,7 @@ class DisplaySinkFilter : SinkFilter() {
         }
     }
 
-    private fun createPreviewWindow(surface: Surface?, width: Int, height: Int) {
+    private fun createPreviewWindow(surface: Any?, width: Int, height: Int) {
         if (surface == null) {
             Logger.e(TAG, "Surface is null.")
             return
@@ -133,11 +133,11 @@ class DisplaySinkFilter : SinkFilter() {
         mPreviewSize = Size(width, height)
     }
 
-    private fun updatePreviewWindow(surface: Surface?, width: Int, height: Int) {
+    private fun updatePreviewWindow(surface: Any, width: Int, height: Int) {
         createPreviewWindow(surface, width, height)
     }
 
-    private fun destroyPreviewWindow(surface: Surface?) {
+    private fun destroyPreviewWindow(surface: Any) {
         if (surface != mSurface) return
         mWindowSurface?.release()
         mWindowSurface = null

@@ -1,0 +1,27 @@
+package com.jiangpengyong.sample.view
+
+import android.graphics.BitmapFactory
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox_core.view.GLPreviewView
+import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.App
+import java.io.File
+
+class GLPreviewViewActivity : AppCompatActivity() {
+    private lateinit var previewView: GLPreviewView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_gl_preivew_view)
+        previewView = findViewById(R.id.preview_view)
+
+        findViewById<View>(R.id.image1).setOnClickListener {
+            BitmapFactory.decodeFile(File(App.context.filesDir, "images/original_image_1.jpeg").absolutePath).let { bitmap ->
+                previewView.setImage(bitmap, true)
+            }
+            previewView.requestRender()
+        }
+    }
+}

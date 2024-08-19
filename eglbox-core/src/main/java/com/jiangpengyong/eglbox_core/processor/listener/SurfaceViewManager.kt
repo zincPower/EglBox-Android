@@ -5,44 +5,44 @@ import com.jiangpengyong.eglbox_core.logger.Logger
 
 object SurfaceViewManager {
     interface Listener {
-        fun onCreated(window: Surface, width: Int, height: Int)
-        fun onChanged(window: Surface, width: Int, height: Int)
-        fun onDestroy(window: Surface)
+        fun onCreated(window: Any, width: Int, height: Int)
+        fun onChanged(window: Any, width: Int, height: Int)
+        fun onDestroy(window: Any)
     }
 
     const val TAG = "SurfaceViewManager"
     private val mMap = HashMap<String, SurfaceView>()
     private val mLock = Object()
 
-    fun surfaceCreated(id: String, window: Surface, width: Int, height: Int) = synchronized(mLock) {
-        Logger.i(TAG, "surfaceCreated id=${id}, window=${window}, size=${width}x${height}, map=${mMap.size}")
+    fun surfaceCreated(id: String, nativeWindow: Any, width: Int, height: Int) = synchronized(mLock) {
+        Logger.i(TAG, "surfaceCreated id=${id}, nativeWindow=${nativeWindow}, size=${width}x${height}, map=${mMap.size}")
         var surfaceView = mMap[id]
         if (surfaceView == null) {
             surfaceView = SurfaceView()
             mMap[id] = surfaceView
         }
-        surfaceView.onCreated(window, width, height)
+        surfaceView.onCreated(nativeWindow, width, height)
     }
 
-    fun surfaceChanged(id: String, window: Surface, width: Int, height: Int) = synchronized(mLock) {
-        Logger.i(TAG, "surfaceChanged id=${id}, window=${window}, size=${width}x${height}, map=${mMap.size}")
+    fun surfaceSizeChanged(id: String, nativeWindow: Any, width: Int, height: Int) = synchronized(mLock) {
+        Logger.i(TAG, "surfaceChanged id=${id}, nativeWindow=${nativeWindow}, size=${width}x${height}, map=${mMap.size}")
         var surfaceView = mMap[id]
         if (surfaceView == null) {
-            Logger.e(TAG, "SurfaceChanged invalid data. id=${id}, window=${window}, size=${width}x${height}")
+            Logger.e(TAG, "SurfaceChanged invalid data. id=${id}, nativeWindow=${nativeWindow}, size=${width}x${height}")
             surfaceView = SurfaceView()
             mMap[id] = surfaceView
         }
-        surfaceView.onChanged(window, width, height)
+        surfaceView.onChanged(nativeWindow, width, height)
     }
 
-    fun surfaceDestroy(id: String, window: Surface) = synchronized(mLock) {
-        Logger.i(TAG, "surfaceDestroy id=${id}, window=${window}, map=${mMap.size}")
+    fun surfaceDestroy(id: String, nativeWindow: Any) = synchronized(mLock) {
+        Logger.i(TAG, "surfaceDestroy id=${id}, nativeWindow=${nativeWindow}, map=${mMap.size}")
         val surfaceView = mMap[id]
         if (surfaceView == null) {
-            Logger.e(TAG, "SurfaceDestroy invalid data. id=${id}, window=${window}")
+            Logger.e(TAG, "SurfaceDestroy invalid data. id=${id}, nativeWindow=${nativeWindow}")
             return
         }
-        surfaceView.onDestroy(window)
+        surfaceView.onDestroy(nativeWindow)
         maybeRemoveSurfaceView(id)
     }
 

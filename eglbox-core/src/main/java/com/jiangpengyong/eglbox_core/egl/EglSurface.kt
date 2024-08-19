@@ -31,7 +31,7 @@ open class EglSurface(
 
     fun release() {
         Logger.i(TAG, "Release EglSurface.");
-        if (!(mState.isValid())) return
+        if (!mState.isValid()) return
         if (surface != null) EGL14.eglDestroySurface(mState.display, surface)
         surface = null
     }
@@ -43,7 +43,7 @@ open class EglSurface(
 
 class WindowSurface(
     state: EGLState,
-    window: Surface,
+    window: Any,
     width: Int,
     height: Int
 ) : EglSurface(state, EglSurfaceType.Window, width, height) {
@@ -62,7 +62,7 @@ class WindowSurface(
     }
 
     fun swapBuffer() {
-        if (mState.isValid()) {
+        if (!mState.isValid()) {
             Logger.e(TAG, "EGLState is invalid.")
             return;
         }

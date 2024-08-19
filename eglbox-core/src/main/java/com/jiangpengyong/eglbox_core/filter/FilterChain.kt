@@ -108,9 +108,9 @@ class FilterChain(renderType: RenderType) {
     @GLThread
     fun setSinkFilter(filterId: String, filter: GLFilter) {
         mSinkFilter.removeAllFilters()
-        mSinkFilter.id = filterId
-        mSinkFilter.name = filterId
-        mSinkFilter.order = 0
+        filter.id = filterId
+        filter.name = filterId
+        filter.order = 0
         mSinkFilter.addFilter(filter)
     }
 

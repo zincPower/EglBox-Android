@@ -237,6 +237,25 @@
             android:paddingBottom="5dp">
 
             <LinearLayout
+                android:id="@+id/preview_view"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1、PreviewView"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_crop" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/ocrop"
                 style="@style/common_button"
                 android:orientation="horizontal">
@@ -244,7 +263,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1、OCrop"
+                    android:text="2、OCrop"
                     android:textColor="@android:color/white" />
 
                 <ImageView
@@ -264,7 +283,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2、相机"
+                    android:text="3、相机"
                     android:textColor="@android:color/white" />
 
                 <ImageView
@@ -283,7 +302,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3、播放器"
+                    android:text="4、播放器"
                     android:textColor="@android:color/white" />
 
                 <ImageView
@@ -303,7 +322,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4、编辑器"
+                    android:text="5、编辑器"
                     android:textColor="@android:color/white" />
 
                 <ImageView

@@ -27,7 +27,7 @@ class DisplaySourceFilter : SourceFilter() {
     private var mPreviewSize = Size(0, 0)
     private val mTexture = GLTexture()
 
-    private var mIsNeedBlank = false
+    private var mIsNeedBlank = true
 
     override fun onInit() {
         mTexture.init()

@@ -109,7 +109,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
         this.mHandler?.sendRequestRenderMessage()
     }
 
-    fun handleWindowCreated(window: Surface?) = synchronized(mWindowLock) {
+    fun handleWindowCreated(window: Any?, width: Int, height: Int) = synchronized(mWindowLock) {
         mWindowControlFinish = false
         val result = mHandler?.post {
             val egl = mEGL
@@ -131,7 +131,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
             }
             mEglSurface?.release()
             mEglSurface = null
-            mEglSurface = egl.createWindow(window, 0, 0)
+            mEglSurface = egl.createWindow(window, width, height)
             mEglSurface?.let { egl.makeCurrent(it) }
             if (!mIsCalledOnEglCreated) {
                 renderer.onEGLCreated(egl, mEglSurface!!)
@@ -143,7 +143,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
         waitWindowControlFinish(result)
     }
 
-    fun handleWindowSizeChanged(window: Surface?, width: Int, height: Int) = synchronized(mWindowLock) {
+    fun handleWindowSizeChanged(window: Any?, width: Int, height: Int) = synchronized(mWindowLock) {
         mWindowControlFinish = false
         val result = mHandler?.post {
             val renderer = mRenderer
@@ -171,7 +171,7 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
         waitWindowControlFinish(result)
     }
 
-    fun handleWindowDestroy(window: Surface?) = synchronized(mWindowLock) {
+    fun handleWindowDestroy(window: Any?) = synchronized(mWindowLock) {
         mWindowControlFinish = false
         val result = mHandler?.post {
             val egl = mEGL

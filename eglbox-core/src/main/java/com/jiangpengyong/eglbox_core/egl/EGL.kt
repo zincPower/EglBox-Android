@@ -119,7 +119,7 @@ class EGL {
         return mState?.isValid() ?: false
     }
 
-    fun createWindow(window: Surface, width: Int, height: Int): WindowSurface? {
+    fun createWindow(window: Any, width: Int, height: Int): WindowSurface? {
         val state = mState
         return if (state == null) {
             Logger.i(TAG, "State is null. Please call init method first.【createWindow】")
@@ -217,7 +217,7 @@ class EGL {
         )
         val configs = arrayOfNulls<EGLConfig>(1)
         val numConfigs = IntArray(1)
-        val result = EGL14.eglChooseConfig(display, attribList, 0, configs, 0, 1, numConfigs, 1)
+        val result = EGL14.eglChooseConfig(display, attribList, 0, configs, 0, 1, numConfigs, 0)
         return if (result) {
             Logger.i(TAG, "EglChooseConfig success. renderType=${renderType}, rgba format=8888")
             configs[0]

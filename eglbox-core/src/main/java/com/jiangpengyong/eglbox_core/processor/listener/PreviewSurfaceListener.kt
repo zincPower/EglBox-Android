@@ -13,7 +13,7 @@ class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listen
     private val mWindowLock = Object()
     private val mWindowControlFinish = AtomicBoolean(false)
 
-    override fun onCreated(window: Surface, width: Int, height: Int) {
+    override fun onCreated(window: Any, width: Int, height: Int) {
         Logger.i(TAG, "onCreated window=${window}, width=${width}, height=${height}")
         val processor = mProcessor.get()
         if (processor == null) {
@@ -29,8 +29,10 @@ class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listen
                     message.obj = window
                     message.arg1 = width
                     message.arg2 = height
-                    processor.sendMessageToFilter(GLProcessor.SOURCE_FILTER_ID, message)
-                    processor.sendMessageToFilter(GLProcessor.SINK_FILTER_ID, message)
+                    processor.getFilterChain()?.apply {
+                        sendMessageToFilter(GLProcessor.SOURCE_FILTER_ID, message)
+                        sendMessageToFilter(GLProcessor.SINK_FILTER_ID, message)
+                    }
                     mWindowControlFinish.set(true)
                     Logger.i(TAG, "onCreated 结束 inner")
                     mWindowLock.notifyAll()
@@ -43,7 +45,7 @@ class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listen
         }
     }
 
-    override fun onChanged(window: Surface, width: Int, height: Int) {
+    override fun onChanged(window: Any, width: Int, height: Int) {
         Logger.i(TAG, "onChanged window=${window}, width=${width}, height=${height}")
         val processor = mProcessor.get()
         if (processor == null) {
@@ -73,7 +75,7 @@ class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listen
         }
     }
 
-    override fun onDestroy(window: Surface) {
+    override fun onDestroy(window: Any) {
         Logger.i(TAG, "onDestroy window=${window}")
         val processor = mProcessor.get()
         if (processor == null) {
