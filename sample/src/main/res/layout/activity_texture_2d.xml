@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:id="@+id/control_panel"
-        android:layout_width="200dp"
+        android:layout_width="280dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
