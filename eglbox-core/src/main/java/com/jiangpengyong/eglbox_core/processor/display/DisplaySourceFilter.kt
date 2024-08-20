@@ -40,6 +40,8 @@ class DisplaySourceFilter : SourceFilter() {
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val texture = imageInOut.texture ?: return
 
+        context.displaySize = mPreviewSize
+
         val texture2DProgram = context.texture2DProgram
         texture2DProgram.reset()
         texture2DProgram.setTexture(texture)

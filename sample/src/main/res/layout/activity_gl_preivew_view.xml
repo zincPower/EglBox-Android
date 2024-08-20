@@ -13,16 +13,16 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/image1"
+            android:id="@+id/image_horizontal"
             style="@style/common_button"
-            android:text="图片1"
+            android:text="横图"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/image2"
+            android:id="@+id/image_vertical"
             style="@style/common_button"
-            android:text="图片2"
+            android:text="竖图"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,22 +34,36 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/filter1"
+            android:id="@+id/add_filter_triangle"
             style="@style/common_button"
-            android:text="三角滤镜"
+            android:text="添加三角滤镜"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/ball_filter"
+            android:id="@+id/add_filter_ball"
             style="@style/common_button"
-            android:text="球体"
+            android:text="添加球体滤镜"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/remove_filter_triangle"
+            style="@style/common_button"
+            android:text="移除三角滤镜"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/remove_filter_ball"
+            style="@style/common_button"
+            android:text="移除球体滤镜"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </com.jiangpengyong.sample.widget.FlowLayout>
 
-    <com.jiangpengyong.eglbox_core.view.GLPreviewView
+    <com.jiangpengyong.eglbox_core.view.GLDisplayView
         android:id="@+id/preview_view"
         android:layout_width="0dp"
         android:layout_height="match_parent"

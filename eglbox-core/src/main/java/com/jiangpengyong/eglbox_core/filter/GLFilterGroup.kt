@@ -96,7 +96,7 @@ class GLFilterGroup : GLFilter() {
     }
 
     fun removeFilter(filterId: String) {
-        Logger.i(TAG, "FilterGroup id=${id} , start removeFilter id=${filterId}")
+        Logger.i(TAG, "FilterGroup id=${id}, start removeFilter id=${filterId}")
         val iterator = mFilters.iterator()
         while (iterator.hasNext()) {
             val item = iterator.next()
@@ -106,7 +106,7 @@ class GLFilterGroup : GLFilter() {
                 item.release()
             } else {
                 if (item is GLFilterGroup) {
-                    item.removeFilter(id)
+                    item.removeFilter(filterId)
                 }
             }
         }

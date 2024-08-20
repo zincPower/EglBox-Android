@@ -2,14 +2,12 @@ package com.jiangpengyong.eglbox_core.view
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
-import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.processor.display.DisplayProcessor
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
 import java.util.concurrent.atomic.AtomicInteger
@@ -20,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * @email: 56002982@qq.com
  * @desc: GL 显示控件
  */
-class GLPreviewView : FrameLayout {
+class GLDisplayView : FrameLayout {
     private val mSurfaceId = "GLPreviewView-${System.currentTimeMillis()}"
     private val mDisplayProcessor = DisplayProcessor()
     private var mFilterIdCreator = AtomicInteger()
@@ -57,10 +55,12 @@ class GLPreviewView : FrameLayout {
 
     fun setImage(bitmap: Bitmap, isAutoRelease: Boolean) {
         mDisplayProcessor.setImage(bitmap, isAutoRelease)
+        requestRender()
     }
 
     fun setBlank() {
         mDisplayProcessor.setBlank()
+        requestRender()
     }
 
     fun addFilter(filterType: DisplayProcessor.FilterType, name: String, order: Int): String? {
@@ -71,7 +71,13 @@ class GLPreviewView : FrameLayout {
         }
         val filterId = mFilterIdCreator.incrementAndGet().toString()
         mDisplayProcessor.addFilter(filterType, filterId, name, order, filter)
+        requestRender()
         return filterId
+    }
+
+    fun removeFilter(filterId: String) {
+        mDisplayProcessor.removeFilter(filterId)
+        requestRender()
     }
 
     private class SurfaceTextureListenerImpl(private val surfaceId: String) : SurfaceTextureListener {
