@@ -121,7 +121,7 @@ class TextureWrapActivity : AppCompatActivity() {
                 mRepeatTexture.init()
                 mMirrorTexture.init()
                 mEdgeTexture.init()
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.jpg").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.png").absolutePath).let { bitmap ->
                     mRepeatTexture.setData(bitmap)
                     mMirrorTexture.setData(bitmap)
                     mEdgeTexture.setData(bitmap)
