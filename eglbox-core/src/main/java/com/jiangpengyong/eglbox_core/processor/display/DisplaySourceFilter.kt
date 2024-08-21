@@ -109,7 +109,7 @@ class DisplaySourceFilter : SourceFilter() {
         mTexture.setData(width, height)
         val fbo = mContext?.getFBO()
         fbo?.bindTexture(mTexture, GLES20.GL_COLOR_ATTACHMENT0) {
-            GLES20.glClearColor(0F, 0F, 0F, 0F)
+            GLES20.glClearColor(0F, 0F, 0F, 1F)
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         }
         fbo?.unbindTexture(GLES20.GL_COLOR_ATTACHMENT0)

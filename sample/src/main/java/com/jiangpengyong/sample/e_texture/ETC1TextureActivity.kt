@@ -108,6 +108,7 @@ class ETC1TextureActivity : AppCompatActivity() {
                 mTexture1.init()
                 // 使用 ETC1 工具加载
                 // 图片使用 etc1tool '图片路径' --encode 进行编译
+                // 透明通道会丢失
                 File(App.context.filesDir, "images/test_image/test_image_horizontal.pkm").inputStream().use { inputStream ->
                     val etc1Texture = ETC1Util.createTexture(inputStream)
                     mTexture1.setData(etc1Texture)
@@ -126,6 +127,7 @@ class ETC1TextureActivity : AppCompatActivity() {
             }
 
             override fun onDrawFrame(gl: GL10?) {
+                GLES20.glClearColor(0F, 0F, 0F, 1F)
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
 
                 if (mTextureType == 1) {
