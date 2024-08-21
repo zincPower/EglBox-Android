@@ -81,5 +81,11 @@ class GLDisplayViewActivity : AppCompatActivity() {
             displayView.removeFilter(starFilter ?: return@setOnClickListener)
             starFilter = null
         }
+
+        findViewById<View>(R.id.export).setOnClickListener {
+            displayView.exportImage {
+
+            }
+        }
     }
 }

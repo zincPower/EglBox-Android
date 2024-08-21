@@ -76,6 +76,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/export"
+            style="@style/common_button"
+            android:text="导出"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </com.jiangpengyong.sample.widget.FlowLayout>
 
     <com.jiangpengyong.eglbox_core.view.GLDisplayView

@@ -10,6 +10,7 @@ import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
 import com.jiangpengyong.eglbox_core.processor.display.DisplayProcessor
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
+import com.jiangpengyong.eglbox_core.processor.offscreen.OffscreenProcessor
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -20,8 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class GLDisplayView : FrameLayout {
     private val mSurfaceId = "GLPreviewView-${System.currentTimeMillis()}"
+    private val mFilterIdCreator = AtomicInteger()
     private val mDisplayProcessor = DisplayProcessor()
-    private var mFilterIdCreator = AtomicInteger()
+    private val mOffscreenProcessor = OffscreenProcessor()
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -35,18 +37,25 @@ class GLDisplayView : FrameLayout {
         init(context)
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        release()
+    }
+
     private fun init(context: Context) {
         mDisplayProcessor.apply {
             launch()
             setPreviewSurfaceId(mSurfaceId)
         }
+        mOffscreenProcessor.launch()
         val textureView = TextureView(context)
         textureView.surfaceTextureListener = SurfaceTextureListenerImpl(mSurfaceId)
         addView(textureView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
     }
 
-    fun release() {
+    private fun release() {
         mDisplayProcessor.destroy()
+        mOffscreenProcessor.destroy()
     }
 
     fun requestRender() {
@@ -80,6 +89,13 @@ class GLDisplayView : FrameLayout {
         requestRender()
     }
 
+    fun exportImage(callback: (result: Bitmap) -> Unit) {
+        mDisplayProcessor.getFilterData(DisplayProcessor.FilterType.Process) { filterData ->
+            // TODO 离屏处理
+            Log.i(TAG, "FilterData=${filterData}")
+        }
+    }
+
     private class SurfaceTextureListenerImpl(private val surfaceId: String) : SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
             SurfaceViewManager.surfaceCreated(surfaceId, surface, width, height)
@@ -103,4 +119,9 @@ class GLDisplayView : FrameLayout {
     companion object {
         const val TAG = "GLPreviewView"
     }
+}
+
+interface ExportCallback {
+    fun onSuccess(bitmap: Bitmap)
+    fun onFailure()
 }
