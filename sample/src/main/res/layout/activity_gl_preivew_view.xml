@@ -6,9 +6,10 @@
 
     <com.jiangpengyong.sample.widget.FlowLayout
         android:id="@+id/control_panel"
-        android:layout_width="400dp"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/preview_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -41,16 +42,16 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/add_filter_ball"
+            android:id="@+id/remove_filter_triangle"
             style="@style/common_button"
-            android:text="添加球体滤镜"
+            android:text="移除三角滤镜"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/remove_filter_triangle"
+            android:id="@+id/add_filter_ball"
             style="@style/common_button"
-            android:text="移除三角滤镜"
+            android:text="添加球体滤镜"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -61,16 +62,40 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/add_filter_star"
+            style="@style/common_button"
+            android:text="添加五角星"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/remove_filter_star"
+            style="@style/common_button"
+            android:text="移除五角星"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </com.jiangpengyong.sample.widget.FlowLayout>
 
     <com.jiangpengyong.eglbox_core.view.GLDisplayView
         android:id="@+id/preview_view"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_blue_dark"
+        android:background="@color/primary_blue"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/result_image"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/result_image"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@color/primary_orange"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/control_panel"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

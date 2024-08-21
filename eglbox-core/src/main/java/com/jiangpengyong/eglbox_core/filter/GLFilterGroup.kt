@@ -93,6 +93,7 @@ class GLFilterGroup : GLFilter() {
         Logger.i(TAG, "FilterGroup id=${id} addFilter filter=${filter}")
         if (isInit()) filter.init(mContext!!)
         mFilters.add(filter)
+        mFilters.sort()
     }
 
     fun removeFilter(filterId: String) {

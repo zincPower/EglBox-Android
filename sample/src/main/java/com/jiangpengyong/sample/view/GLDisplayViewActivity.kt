@@ -10,6 +10,7 @@ import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLDisplayView
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.sample.c_drawing_mode.LayoutGLSLActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -18,6 +19,7 @@ class GLDisplayViewActivity : AppCompatActivity() {
     private lateinit var displayView: GLDisplayView
     private var triangleFilter: String? = null
     private var ballFilter: String? = null
+    private var starFilter: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +28,7 @@ class GLDisplayViewActivity : AppCompatActivity() {
 
         FilterCenter.registerFilter("TriangleFilter", TriangleFilter::class.java)
         FilterCenter.registerFilter("BallFilter", BallFilter::class.java)
+        FilterCenter.registerFilter("StarFilter", StarFilter::class.java)
 
         findViewById<View>(R.id.image_horizontal).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -59,6 +62,11 @@ class GLDisplayViewActivity : AppCompatActivity() {
             ballFilter = displayView.addFilter(DisplayProcessor.FilterType.Process, "BallFilter", 0)
         }
 
+        findViewById<View>(R.id.add_filter_star).setOnClickListener {
+            if (starFilter != null) return@setOnClickListener
+            starFilter = displayView.addFilter(DisplayProcessor.FilterType.Process, "StarFilter", 1)
+        }
+
         findViewById<View>(R.id.remove_filter_triangle).setOnClickListener {
             displayView.removeFilter(triangleFilter ?: return@setOnClickListener)
             triangleFilter = null
@@ -67,6 +75,11 @@ class GLDisplayViewActivity : AppCompatActivity() {
         findViewById<View>(R.id.remove_filter_ball).setOnClickListener {
             displayView.removeFilter(ballFilter ?: return@setOnClickListener)
             ballFilter = null
+        }
+
+        findViewById<View>(R.id.remove_filter_star).setOnClickListener {
+            displayView.removeFilter(starFilter ?: return@setOnClickListener)
+            starFilter = null
         }
     }
 }

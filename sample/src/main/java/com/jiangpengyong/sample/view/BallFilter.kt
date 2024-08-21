@@ -41,7 +41,6 @@ class BallFilter : GLFilter() {
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-
         imageInOut.texture?.let { texture ->
             updateProjectionMatrix(Size(texture.width, texture.height))
             val fbo = context.getTexFBO(texture.width, texture.height)
