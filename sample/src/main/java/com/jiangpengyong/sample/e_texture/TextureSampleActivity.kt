@@ -165,12 +165,12 @@ class TextureSampleActivity : AppCompatActivity() {
             mMagNearestTexture.init()
             mMagLinearTexture.init()
 
-            BitmapFactory.decodeFile(File(App.context.filesDir, "images/fire_big.jpg").absolutePath).let { bitmap ->
+            BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/fire_big.jpg").absolutePath).let { bitmap ->
                 mMinNearestTexture.setData(bitmap)
                 mMinLinearTexture.setData(bitmap)
                 bitmap.recycle()
             }
-            BitmapFactory.decodeFile(File(App.context.filesDir, "images/fire_small.jpg").absolutePath).let { bitmap ->
+            BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/fire_small.jpg").absolutePath).let { bitmap ->
                 mMagNearestTexture.setData(bitmap)
                 mMagLinearTexture.setData(bitmap)
                 bitmap.recycle()

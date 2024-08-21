@@ -41,5 +41,9 @@ class TextureMainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.solar_system).setOnClickListener {
             startActivity(Intent(this, SolarSystemActivity::class.java))
         }
+
+        findViewById<TextView>(R.id.etc1_texture).setOnClickListener {
+            startActivity(Intent(this, ETC1TextureActivity::class.java))
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.jiangpengyong.eglbox_core.gles
 
 import android.graphics.Bitmap
+import android.opengl.ETC1Util
+import android.opengl.ETC1Util.ETC1Texture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.GLUtils
@@ -119,6 +121,33 @@ class GLTexture(
         )
         unbind()
         Logger.i(TAG, "Create texture by bitmap. id=$id, size=${this.width} x ${this.height}")
+    }
+
+    /**
+     * 设置 ETC1 格式纹理
+     */
+    fun setData(ect1Texture: ETC1Texture) {
+        if (!isInit()) {
+            Logger.e(TAG, "Texture isn't initialized. size=${ect1Texture.width} x ${ect1Texture.height}【setData(ect1Texture)】")
+            return
+        }
+        if (target == Target.EXTERNAL_OES) {
+            Logger.e(TAG, "Target type can't EXTERNAL OES.")
+            return
+        }
+        this.width = ect1Texture.width
+        this.height = ect1Texture.height
+        GLES20.glBindTexture(target.value, id)
+        ETC1Util.loadTexture(
+            GLES20.GL_TEXTURE_2D,
+            0,
+            0,
+            GLES20.GL_RGB,
+            GLES20.GL_UNSIGNED_BYTE,
+            ect1Texture
+        )
+        unbind()
+        Logger.i(TAG, "Create texture by ect1Texture. id=$id, size=${this.width} x ${this.height}")
     }
 
     fun isInit(): Boolean = (id != 0)
