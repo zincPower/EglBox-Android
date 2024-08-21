@@ -6,6 +6,7 @@ import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.sample.utils.toRadians
 import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
@@ -74,9 +75,9 @@ class AmbientLightBallProgram : GLProgram() {
         mPositionHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/ambient_light/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/ambient_light/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/ambient_light/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/ambient_light/fragment.glsl")
 
     private fun calculateVertex() {
         val vertexList = ArrayList<Float>()
@@ -161,9 +162,5 @@ class AmbientLightBallProgram : GLProgram() {
         }
         mVertexCount = vertexList.size / 3
         mVertexBuffer = allocateFloatBuffer(vertexList.toFloatArray())
-    }
-
-    private fun Double.toRadians(): Double {
-        return Math.toRadians(this)
     }
 }

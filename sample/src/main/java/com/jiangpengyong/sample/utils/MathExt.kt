@@ -9,5 +9,5 @@ fun Float.toRadians(): Double {
 }
 
 fun Double.toRadians(): Double {
-    return Math.toRadians(this.toDouble())
+    return Math.toRadians(this)
 }

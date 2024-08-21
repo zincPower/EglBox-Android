@@ -221,10 +221,6 @@ class RingProgram(
         mNormalBuffer = allocateFloatBuffer(vertices)
     }
 
-    private fun Double.toRadians(): Double {
-        return Math.toRadians(this)
-    }
-
     private fun cullVertex(
         alv: ArrayList<Float>,
         alFaceIndex: ArrayList<Int>,

@@ -6,6 +6,7 @@ import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.sample.utils.toRadians
 import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
@@ -135,9 +136,9 @@ class FullLightBallProgram : GLProgram() {
         mIsAddSpecularHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/full_light/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/full_light/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/full_light/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/full_light/fragment.glsl")
 
     private fun calculateVertex() {
         val vertexList = ArrayList<Float>()
@@ -224,9 +225,5 @@ class FullLightBallProgram : GLProgram() {
         mVertexBuffer = allocateFloatBuffer(vertexList.toFloatArray())
         // 因为球体的几何体征，球心在原点，所以各个点法向量和顶点位置刚好一致，不用再次计算
         mNormalBuffer = allocateFloatBuffer(vertexList.toFloatArray())
-    }
-
-    private fun Double.toRadians(): Double {
-        return Math.toRadians(this)
     }
 }

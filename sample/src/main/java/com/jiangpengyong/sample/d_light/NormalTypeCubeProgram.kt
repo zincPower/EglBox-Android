@@ -264,9 +264,9 @@ class NormalTypeCubeProgram : GLProgram() {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount)
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/normal_type/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/normal_type/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/normal_type/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/normal_type/fragment.glsl")
 
 
     override fun onInit() {

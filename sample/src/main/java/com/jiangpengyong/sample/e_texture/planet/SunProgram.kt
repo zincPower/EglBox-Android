@@ -7,6 +7,7 @@ import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.sample.utils.toRadians
 import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
@@ -218,9 +219,5 @@ class SunProgram : GLProgram() {
             }
         }
         mTextureBuffer = allocateFloatBuffer(textureList.toFloatArray())
-    }
-
-    private fun Double.toRadians(): Double {
-        return Math.toRadians(this)
     }
 }

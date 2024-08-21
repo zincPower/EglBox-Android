@@ -6,6 +6,7 @@ import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.sample.utils.toRadians
 import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
@@ -157,13 +158,13 @@ class LightCalculateTypeBallProgram(val lightCalculateType: LightCalculateType) 
     }
 
     override fun getVertexShaderSource(): String = when (lightCalculateType) {
-        LightCalculateType.Vertex -> loadFromAssetsFile(App.context.resources, "glsl/light_calculate_type/gouraud/vertex.glsl")
-        LightCalculateType.Fragment -> loadFromAssetsFile(App.context.resources, "glsl/light_calculate_type/phong/vertex.glsl")
+        LightCalculateType.Vertex -> loadFromAssetsFile(App.context.resources, "glsl/light/light_calculate_type/gouraud/vertex.glsl")
+        LightCalculateType.Fragment -> loadFromAssetsFile(App.context.resources, "glsl/light/light_calculate_type/phong/vertex.glsl")
     }
 
     override fun getFragmentShaderSource(): String = when (lightCalculateType) {
-        LightCalculateType.Vertex -> loadFromAssetsFile(App.context.resources, "glsl/light_calculate_type/gouraud/fragment.glsl")
-        LightCalculateType.Fragment -> loadFromAssetsFile(App.context.resources, "glsl/light_calculate_type/phong/fragment.glsl")
+        LightCalculateType.Vertex -> loadFromAssetsFile(App.context.resources, "glsl/light/light_calculate_type/gouraud/fragment.glsl")
+        LightCalculateType.Fragment -> loadFromAssetsFile(App.context.resources, "glsl/light/light_calculate_type/phong/fragment.glsl")
     }
 
     private fun calculateVertex() {
@@ -251,9 +252,5 @@ class LightCalculateTypeBallProgram(val lightCalculateType: LightCalculateType) 
         mVertexBuffer = allocateFloatBuffer(vertexList.toFloatArray())
         // 因为球体的几何体征，球心在原点，所以各个点法向量和顶点位置刚好一致，不用再次计算
         mNormalBuffer = allocateFloatBuffer(vertexList.toFloatArray())
-    }
-
-    private fun Double.toRadians(): Double {
-        return Math.toRadians(this)
     }
 }

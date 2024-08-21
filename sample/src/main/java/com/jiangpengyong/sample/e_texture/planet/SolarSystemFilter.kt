@@ -12,6 +12,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity.Companion.MESSAGE_TARGET
+import com.jiangpengyong.sample.utils.SizeUtils
 
 class SolarSystemFilter : GLFilter() {
     enum class Target(val value: Int) {
@@ -32,8 +33,8 @@ class SolarSystemFilter : GLFilter() {
     private val mGestureMatrix = ModelMatrix()
 
     // 手势旋转角度
-    private var mXAngle = 0F
-    private var mYAngle = 0F
+    private var mXAngle = 30F
+    private var mYAngle = 45F
 
     // 屏幕尺寸
     private var mDisplaySize = Size(0, 0)
@@ -43,6 +44,7 @@ class SolarSystemFilter : GLFilter() {
     private val mPlanetProgram = PlanetProgram()
     private val mEarthProgram = EarthProgram()
     private val mRingProgram = RingProgram(bigRadius = 0.9F, smallRadius = 1.5F)
+    private val mOrbitProgram = OrbitProgram()
 
     // 地球信息，作为其他天体基准
     private var mEarthRatio = 1 / 3F
@@ -61,19 +63,21 @@ class SolarSystemFilter : GLFilter() {
     // 观察目标
     private var mEyeTarget = Target.SolarSystem
 
+    private val mOrbitModelMatrix = ModelMatrix()
+
     // 天体信息
     private val mMoonInfo = CelestialBodyInfo(CelestialBody.Moon, 2F, -0.5F, 0.25F, mEarthOrbitSpeed * 4F, mEarthOrbitSpeed * 4F)
     private val mSunInfo = CelestialBodyInfo(CelestialBody.Sun, 0F, 0F, 1.5F, 0F, 0F)
     private val mSaturnRingInfo = CelestialBodyInfo(CelestialBody.SaturnRing, 0F, -27F, 1.2F, 0F, mEarthRotationSpeed * 2F)
     private val mPlanetInfo = mapOf(
-        CelestialBody.Mercury to CelestialBodyInfo(CelestialBody.Mercury, 2.2F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F, mEarthRotationSpeed * 2F),
-        CelestialBody.Venus to CelestialBodyInfo(CelestialBody.Venus, 3.3F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F, mEarthRotationSpeed * 1.2F),
-        CelestialBody.Earth to CelestialBodyInfo(CelestialBody.Earth, 4.5F, -23.44F, mEarthRatio, mEarthOrbitSpeed, mEarthRotationSpeed),
-        CelestialBody.Mars to CelestialBodyInfo(CelestialBody.Mars, 5.8F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F, mEarthRotationSpeed),
-        CelestialBody.Jupiter to CelestialBodyInfo(CelestialBody.Jupiter, 7F, -3.13F, mEarthRatio * 2F, mEarthOrbitSpeed / 11.86F * 5F, mEarthRotationSpeed * 0.41F),
-        CelestialBody.Saturn to CelestialBodyInfo(CelestialBody.Saturn, 9F, -26.73F, mEarthRatio * 1.9F, mEarthOrbitSpeed / 29.46F * 5F, mEarthRotationSpeed * 0.45F),
-        CelestialBody.Uranus to CelestialBodyInfo(CelestialBody.Uranus, 11F, -97.86F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 84.01F * 5F, mEarthRotationSpeed * 0.72F),
-        CelestialBody.Neptune to CelestialBodyInfo(CelestialBody.Neptune, 12.5F, -28.32F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 164.79F * 5F, mEarthRotationSpeed * 0.67F),
+        CelestialBody.Mercury to CelestialBodyInfo(CelestialBody.Mercury, 2.5F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F, mEarthRotationSpeed * 2F),
+        CelestialBody.Venus to CelestialBodyInfo(CelestialBody.Venus, 4.5F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F, mEarthRotationSpeed * 1.2F),
+        CelestialBody.Earth to CelestialBodyInfo(CelestialBody.Earth, 6.5F, -23.44F, mEarthRatio, mEarthOrbitSpeed, mEarthRotationSpeed),
+        CelestialBody.Mars to CelestialBodyInfo(CelestialBody.Mars, 9F, -25.19F, mEarthRatio * 0.8F, mEarthOrbitSpeed / 1.88F, mEarthRotationSpeed),
+        CelestialBody.Jupiter to CelestialBodyInfo(CelestialBody.Jupiter, 12F, -3.13F, mEarthRatio * 2F, mEarthOrbitSpeed / 11.86F * 5F, mEarthRotationSpeed * 0.41F),
+        CelestialBody.Saturn to CelestialBodyInfo(CelestialBody.Saturn, 16F, -26.73F, mEarthRatio * 1.9F, mEarthOrbitSpeed / 29.46F * 5F, mEarthRotationSpeed * 0.45F),
+        CelestialBody.Uranus to CelestialBodyInfo(CelestialBody.Uranus, 20F, -97.86F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 84.01F * 5F, mEarthRotationSpeed * 0.72F),
+        CelestialBody.Neptune to CelestialBodyInfo(CelestialBody.Neptune, 25F, -28.32F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 164.79F * 5F, mEarthRotationSpeed * 0.67F),
     )
 
     override fun onInit() {
@@ -81,6 +85,10 @@ class SolarSystemFilter : GLFilter() {
         mPlanetProgram.init()
         mEarthProgram.init()
         mRingProgram.init()
+        mOrbitProgram.apply {
+            setAngleSpan(1)
+            init()
+        }
 
         mSunInfo.init()
         mMoonInfo.init()
@@ -88,6 +96,8 @@ class SolarSystemFilter : GLFilter() {
         for (item in mPlanetInfo) {
             item.value.init()
         }
+
+        GLES20.glLineWidth(SizeUtils.dp2px(0.5F).toFloat())
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) = synchronized(this) {
@@ -211,6 +221,9 @@ class SolarSystemFilter : GLFilter() {
     private fun drawPlanet() {
         for (item in mPlanetInfo) {
             val planetInfo = item.value
+
+            drawOrbit(planetInfo)
+
             if (planetInfo.celestialBody == CelestialBody.Earth) {
                 drawEarth(planetInfo)
                 drawMoon(planetInfo.matrix)
@@ -230,6 +243,19 @@ class SolarSystemFilter : GLFilter() {
                 }
             }
         }
+    }
+
+    /**
+     * 绘制行星轨道
+     */
+    private fun drawOrbit(planetInfo: CelestialBodyInfo) {
+        mOrbitModelMatrix.reset()
+        mOrbitModelMatrix.apply {
+            rotate(90F, -1F, 0F, 0F)
+            scale(planetInfo.tranX, planetInfo.tranX, 1F)
+        }
+        mOrbitProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * mOrbitModelMatrix)
+        mOrbitProgram.draw()
     }
 
     /**
