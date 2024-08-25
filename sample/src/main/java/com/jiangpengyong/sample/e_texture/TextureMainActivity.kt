@@ -54,5 +54,9 @@ class TextureMainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.point_sprite_array).setOnClickListener {
             startActivity(Intent(this, PointSpriteArrayActivity::class.java))
         }
+
+        findViewById<TextView>(R.id.sampler).setOnClickListener {
+            startActivity(Intent(this, SamplerActivity::class.java))
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.opengl.ETC1Util
 import android.opengl.ETC1Util.ETC1Texture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
+import android.opengl.GLES30
 import android.opengl.GLUtils
 import com.jiangpengyong.eglbox_core.logger.Logger
 
@@ -52,6 +53,7 @@ class GLTexture(
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_MAG_FILTER, magFilter.value)
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_S, wrapS.value)
         GLES20.glTexParameteri(target.value, GLES20.GL_TEXTURE_WRAP_T, wrapT.value)
+
         block?.invoke()
         unbind()
         Logger.i(TAG, "Init GLTexture success. id=$id")

@@ -123,6 +123,9 @@
         <activity
             android:name="com.jiangpengyong.sample.e_texture.PointSpriteArrayActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.e_texture.SamplerActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
