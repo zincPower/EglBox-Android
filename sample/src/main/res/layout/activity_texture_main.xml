@@ -52,4 +52,10 @@
         android:text="8、点精灵"
         tools:ignore="MissingConstraints" />
 
+    <TextView
+        android:id="@+id/point_sprite_array"
+        style="@style/common_button"
+        android:text="9、点精灵（纹理数组）"
+        tools:ignore="MissingConstraints" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>

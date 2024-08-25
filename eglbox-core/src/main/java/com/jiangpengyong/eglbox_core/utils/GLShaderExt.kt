@@ -39,7 +39,8 @@ object GLShaderExt {
             GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0)
             // 若编译失败则显示错误日志并删除此 shader
             if (compiled[0] != GLES20.GL_TRUE) {
-                Logger.e(TAG, "Could not compile shader $shaderType:\n ${GLES20.glGetShaderInfoLog(shader)}")
+                val shaderTip = if (shaderType == GLES20.GL_VERTEX_SHADER) "vertex shader" else if (shaderType == GLES20.GL_FRAGMENT_SHADER) "fragment shader" else "unknown shader"
+                Logger.e(TAG, "Could not compile shader $shaderTip:\n ${GLES20.glGetShaderInfoLog(shader)}")
                 // 异常情况，删除着色器
                 GLES20.glDeleteShader(shader)
                 shader = 0
@@ -68,7 +69,7 @@ object GLShaderExt {
             result = String(byteArray, Charsets.UTF_8)
             result = result.replace("\\r\\n", "\n")
         } catch (e: Exception) {
-            Logger.e(TAG,"Load from assets file failure.", e)
+            Logger.e(TAG, "Load from assets file failure.", e)
         }
         return result ?: ""
     }

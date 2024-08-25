@@ -50,5 +50,9 @@ class TextureMainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.point_sprite).setOnClickListener {
             startActivity(Intent(this, PointSpriteActivity::class.java))
         }
+
+        findViewById<TextView>(R.id.point_sprite_array).setOnClickListener {
+            startActivity(Intent(this, PointSpriteArrayActivity::class.java))
+        }
     }
 }
