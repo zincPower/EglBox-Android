@@ -33,8 +33,8 @@ class SolarSystemFilter : GLFilter() {
     private val mGestureMatrix = ModelMatrix()
 
     // 手势旋转角度
-    private var mXAngle = 30F
-    private var mYAngle = 45F
+    private var mXAngle = 45F
+    private var mYAngle = 30F
 
     // 屏幕尺寸
     private var mDisplaySize = Size(0, 0)

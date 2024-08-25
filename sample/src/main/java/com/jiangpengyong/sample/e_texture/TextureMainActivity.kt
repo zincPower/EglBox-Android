@@ -1,6 +1,7 @@
 package com.jiangpengyong.sample.e_texture
 
 import android.content.Intent
+import android.graphics.Point
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -44,6 +45,10 @@ class TextureMainActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.etc1_texture).setOnClickListener {
             startActivity(Intent(this, ETC1TextureActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.point_sprite).setOnClickListener {
+            startActivity(Intent(this, PointSpriteActivity::class.java))
         }
     }
 }

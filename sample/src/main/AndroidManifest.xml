@@ -117,6 +117,9 @@
         <activity
             android:name="com.jiangpengyong.sample.e_texture.ETC1TextureActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.e_texture.PointSpriteActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"

@@ -286,5 +286,4 @@ class LayoutGLSLActivity : AppCompatActivity() {
             private const val TAG = "StarProgram"
         }
     }
-
 }

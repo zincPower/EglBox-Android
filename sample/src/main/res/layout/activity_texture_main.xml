@@ -46,4 +46,10 @@
         android:text="7、ETC1 纹理"
         tools:ignore="MissingConstraints" />
 
+    <TextView
+        android:id="@+id/point_sprite"
+        style="@style/common_button"
+        android:text="8、点精灵"
+        tools:ignore="MissingConstraints" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>
