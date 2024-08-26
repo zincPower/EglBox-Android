@@ -134,6 +134,25 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/geometry"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="6、3D 几何形状"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_geometry" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/model"
                 style="@style/common_button"
                 android:orientation="horizontal">
@@ -141,7 +160,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="6、模型"
+                    android:text="7、3D 模型"
                     android:textColor="@android:color/white" />
 
                 <ImageView

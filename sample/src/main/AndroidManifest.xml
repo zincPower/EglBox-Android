@@ -128,6 +128,13 @@
             android:screenOrientation="landscape" />
 
         <activity
+            android:name="com.jiangpengyong.sample.f_geometry.GeometryMainActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.f_geometry.CylinderActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
             android:screenOrientation="landscape" />
 
