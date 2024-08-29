@@ -1,6 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/control_panel"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/reset"
+            style="@style/common_button"
+            android:layout_width="match_parent"
+            android:text="方向复位"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="光照"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <CheckBox
+            android:id="@+id/ambient_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="环境光"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <CheckBox
+            android:id="@+id/scattered_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="散射光"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <CheckBox
+            android:id="@+id/specular_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="镜面光"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/shininess_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="光滑度（50）"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <SeekBar
+            android:id="@+id/shininess"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:max="99"
+            android:progress="49" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="法向量类型"
+            android:textColor="@color/primary_black"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/normal_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/vertex_normal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="点法向量"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/face_normal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="面法向量"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <view
+        android:id="@+id/surface_view"
+        class="com.jiangpengyong.sample.f_geometry.CylinderActivity$RenderView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/light_x_position"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/control_panel"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/light_x"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:gravity="center_vertical"
+        android:text="光源 X ："
+        android:textColor="@color/primary_black"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@id/light_y"
+        app:layout_constraintStart_toStartOf="@id/surface_view" />
+
+    <SeekBar
+        android:id="@+id/light_x_position"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:progress="50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/light_x"
+        app:layout_constraintTop_toTopOf="@id/light_x" />
+
+    <TextView
+        android:id="@+id/light_y"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:gravity="center_vertical"
+        android:text="光源 Y ："
+        android:textColor="@color/primary_black"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@id/light_z"
+        app:layout_constraintStart_toStartOf="@id/surface_view" />
+
+    <SeekBar
+        android:id="@+id/light_y_position"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:progress="50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/light_y"
+        app:layout_constraintTop_toTopOf="@id/light_y" />
+
+    <TextView
+        android:id="@+id/light_z"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:gravity="center_vertical"
+        android:text="光源 Z ："
+        android:textColor="@color/primary_black"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/surface_view" />
+
+    <SeekBar
+        android:id="@+id/light_z_position"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:progress="100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/light_z"
+        app:layout_constraintTop_toTopOf="@id/light_z" />
+
+    <TextView
+        android:id="@+id/light_position_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/blue_alpha_round_5dp"
+        android:padding="5dp"
+        android:text="(-, -, -)"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="@id/surface_view"
+        app:layout_constraintStart_toStartOf="@id/surface_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
