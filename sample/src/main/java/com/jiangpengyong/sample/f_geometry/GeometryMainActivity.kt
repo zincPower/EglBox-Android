@@ -15,6 +15,10 @@ class GeometryMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.cylinder).setOnClickListener {
             startActivity(Intent(this, CylinderActivity::class.java))
         }
+
+        findViewById<View>(R.id.cone).setOnClickListener {
+            startActivity(Intent(this, ConeActivity::class.java))
+        }
     }
 
 }

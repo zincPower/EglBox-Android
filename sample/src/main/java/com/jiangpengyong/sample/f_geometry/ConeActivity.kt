@@ -24,6 +24,7 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.NormalTypeCubeProgram
+import com.jiangpengyong.sample.f_geometry.geometry.filter.ConeFilter
 import com.jiangpengyong.sample.f_geometry.geometry.filter.CylinderFilter
 import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
@@ -33,9 +34,9 @@ import javax.microedition.khronos.opengles.GL10
  * @author jiang peng yong
  * @date 2024/8/26 08:29
  * @email 56002982@qq.com
- * @des 圆柱体
+ * @des 圆锥体
  */
-class CylinderActivity : AppCompatActivity() {
+class ConeActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -48,7 +49,7 @@ class CylinderActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_geometry_cylinder)
+        setContentView(R.layout.activity_geometry_cone)
 
         mRenderView = findViewById(R.id.surface_view)
 
@@ -186,7 +187,7 @@ class CylinderActivity : AppCompatActivity() {
 
         private class Renderer : GLSurfaceView.Renderer {
             private val mFilterId = "CylinderFilter"
-            private val mFilter = CylinderFilter().apply { id = mFilterId }
+            private val mFilter = ConeFilter().apply { id = mFilterId }
             private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
 

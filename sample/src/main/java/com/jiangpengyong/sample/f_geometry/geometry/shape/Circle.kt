@@ -1,6 +1,9 @@
-package com.jiangpengyong.sample.f_geometry.geometry
+package com.jiangpengyong.sample.f_geometry.geometry.shape
 
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
+import com.jiangpengyong.sample.f_geometry.geometry.DrawMode
+import com.jiangpengyong.sample.f_geometry.geometry.FrontFace
+import com.jiangpengyong.sample.f_geometry.geometry.GeometryInfo
 import com.jiangpengyong.sample.utils.toRadians
 import kotlin.math.cos
 import kotlin.math.sin

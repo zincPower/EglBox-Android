@@ -1,5 +1,6 @@
-package com.jiangpengyong.sample.f_geometry.geometry
+package com.jiangpengyong.sample.f_geometry.geometry.filter
 
+import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
 import android.util.Size
@@ -10,11 +11,15 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
+import com.jiangpengyong.sample.f_geometry.geometry.GeometryInfo
+import com.jiangpengyong.sample.f_geometry.geometry.GeometryProgram
+import com.jiangpengyong.sample.f_geometry.geometry.shape.Circle
+import com.jiangpengyong.sample.f_geometry.geometry.shape.ConeSide
 
-class CylinderFilter(
+class ConeFilter(
     val radius: Float = 0.5F,
     val height: Float = 1F,
-    val segment: Int = 30,
+    val segment: Int = 60,
 ) : GLFilter() {
     private val mProgram = GeometryProgram()
 
@@ -23,7 +28,7 @@ class CylinderFilter(
     private var mSideTexture: GLTexture? = null
 
     private val mCircleInfo: GeometryInfo
-    private val mCylinderSide: GeometryInfo
+    private val mConeSideInfo: GeometryInfo
 
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
@@ -36,20 +41,16 @@ class CylinderFilter(
     private var mLightPosition = floatArrayOf(0F, 0F, 5F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
-    private var mTopMatrix = ModelMatrix().apply {
-        translate(0F, 0F, height / 2F)
-    }
     private var mBottomMatrix = ModelMatrix().apply {
-        translate(0F, 0F, -height / 2F)
-        rotate(180F, 1F, 0F, 0F)
+        translate(0F, 0F, height / 2F)
     }
 
     init {
         val circle = Circle(radius, segment)
         mCircleInfo = circle.create()
 
-        val cylinderSide = CylinderSide(radius, height, segment)
-        mCylinderSide = cylinderSide.create()
+        val cylinderSide = ConeSide(radius, height, segment)
+        mConeSideInfo = cylinderSide.create()
     }
 
     fun setTexture(
@@ -69,7 +70,6 @@ class CylinderFilter(
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         updateProjectionMatrix(context)
-        drawCircle(mTopMatrix)
         drawSide()
         drawCircle(mBottomMatrix)
     }
@@ -90,7 +90,13 @@ class CylinderFilter(
 
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}
-    override fun onReceiveMessage(message: Message) {}
+    override fun onReceiveMessage(message: Message) = synchronized(this) {
+        if (message.what == RESET) {
+            mXAngle = 0F
+            mYAngle = 0F
+            mModelMatrix.reset()
+        }
+    }
 
     private fun drawCircle(matrix: ModelMatrix) {
         mTopTexture?.let { mProgram.setTexture(it) }
@@ -102,6 +108,7 @@ class CylinderFilter(
             normalBuffer = mCircleInfo.normalBuffer,
             vertexCount = mCircleInfo.vertexCount
         )
+        GLES20.glFrontFace(mCircleInfo.frontFace.value)
         mProgram.setDrawMode(mCircleInfo.drawMode)
         mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix * matrix)
         mProgram.setMMatrix(mModelMatrix * matrix)
@@ -113,12 +120,13 @@ class CylinderFilter(
         mProgram.setCameraPosition(mCameraPosition)
         mProgram.setLightPosition(mLightPosition)
         mProgram.setData(
-            vertexBuffer = mCylinderSide.vertexBuffer,
-            textureBuffer = mCylinderSide.textureBuffer,
-            normalBuffer = mCylinderSide.normalBuffer,
-            vertexCount = mCylinderSide.vertexCount
+            vertexBuffer = mConeSideInfo.vertexBuffer,
+            textureBuffer = mConeSideInfo.textureBuffer,
+            normalBuffer = mConeSideInfo.normalBuffer,
+            vertexCount = mConeSideInfo.vertexCount
         )
-        mProgram.setDrawMode(mCylinderSide.drawMode)
+        GLES20.glFrontFace(mConeSideInfo.frontFace.value)
+        mProgram.setDrawMode(mConeSideInfo.drawMode)
         mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
         mProgram.setMMatrix(mModelMatrix)
         mProgram.draw()
@@ -151,5 +159,9 @@ class CylinderFilter(
             0F, 0F, 0F,
             0F, 1F, 0F
         )
+    }
+
+    companion object {
+        const val RESET = 10000
     }
 }

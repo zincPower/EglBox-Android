@@ -8,4 +8,9 @@
         style="@style/common_button"
         android:text="1、圆柱体" />
 
+    <TextView
+        android:id="@+id/cone"
+        style="@style/common_button"
+        android:text="2、圆锥体" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>

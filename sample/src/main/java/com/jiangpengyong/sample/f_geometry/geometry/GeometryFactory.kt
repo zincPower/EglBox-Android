@@ -1,6 +1,7 @@
 package com.jiangpengyong.sample.f_geometry.geometry
 
 import android.opengl.GLES20
+import com.jiangpengyong.sample.f_geometry.geometry.shape.Circle
 import java.nio.FloatBuffer
 
 data class GeometryInfo(
@@ -18,9 +19,9 @@ enum class DrawMode(val value: Int) {
     TriangleStrip(GLES20.GL_TRIANGLE_STRIP),
 }
 
-enum class FrontFace {
-    CW,
-    CCW,
+enum class FrontFace(val value: Int) {
+    CW(GLES20.GL_CW),
+    CCW(GLES20.GL_CCW),
 }
 
 /**

@@ -9,6 +9,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.NormalTypeCubeProgram.NormalType
 import java.nio.FloatBuffer
+import javax.microedition.khronos.opengles.GL
 
 /**
  * @author jiang peng yong
