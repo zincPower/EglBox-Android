@@ -1,7 +1,5 @@
 package com.jiangpengyong.sample.f_geometry.geometry
 
-import android.graphics.BitmapFactory
-import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
 import android.util.Size
@@ -12,8 +10,6 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.sample.App
-import java.io.File
 
 class CylinderFilter(
     val radius: Float = 0.5F,
@@ -27,6 +23,7 @@ class CylinderFilter(
     private var mSideTexture: GLTexture? = null
 
     private val mCircleInfo: GeometryInfo
+    private val mCylinderSide: GeometryInfo
 
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
@@ -39,9 +36,20 @@ class CylinderFilter(
     private var mLightPosition = floatArrayOf(0F, 0F, 5F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
+    private var mTopMatrix = ModelMatrix().apply {
+        translate(0F, 0F, height / 2F)
+    }
+    private var mBottomMatrix = ModelMatrix().apply {
+        translate(0F, 0F, -height / 2F)
+        rotate(180F, 1F, 0F, 0F)
+    }
+
     init {
         val circle = Circle(radius, segment)
         mCircleInfo = circle.create()
+
+        val cylinderSide = CylinderSide(radius, height, segment)
+        mCylinderSide = cylinderSide.create()
     }
 
     fun setTexture(
@@ -61,7 +69,9 @@ class CylinderFilter(
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         updateProjectionMatrix(context)
-        drawTopCircle()
+        drawCircle(mTopMatrix)
+        drawSide()
+        drawCircle(mBottomMatrix)
     }
 
     override fun onRelease() {
@@ -82,7 +92,7 @@ class CylinderFilter(
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {}
 
-    private fun drawTopCircle() {
+    private fun drawCircle(matrix: ModelMatrix) {
         mTopTexture?.let { mProgram.setTexture(it) }
         mProgram.setCameraPosition(mCameraPosition)
         mProgram.setLightPosition(mLightPosition)
@@ -93,6 +103,22 @@ class CylinderFilter(
             vertexCount = mCircleInfo.vertexCount
         )
         mProgram.setDrawMode(mCircleInfo.drawMode)
+        mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix * matrix)
+        mProgram.setMMatrix(mModelMatrix * matrix)
+        mProgram.draw()
+    }
+
+    private fun drawSide() {
+        mTopTexture?.let { mProgram.setTexture(it) }
+        mProgram.setCameraPosition(mCameraPosition)
+        mProgram.setLightPosition(mLightPosition)
+        mProgram.setData(
+            vertexBuffer = mCylinderSide.vertexBuffer,
+            textureBuffer = mCylinderSide.textureBuffer,
+            normalBuffer = mCylinderSide.normalBuffer,
+            vertexCount = mCylinderSide.vertexCount
+        )
+        mProgram.setDrawMode(mCylinderSide.drawMode)
         mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
         mProgram.setMMatrix(mModelMatrix)
         mProgram.draw()
