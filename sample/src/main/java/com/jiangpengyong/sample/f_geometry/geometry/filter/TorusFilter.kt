@@ -24,8 +24,8 @@ import com.jiangpengyong.sample.f_geometry.geometry.shape.Torus
 class TorusFilter(
     majorRadius: Float = 1F,
     minorRadius: Float = 0.5F,
-    majorSegment: Int = 4,
-    minorSegment: Int = 3,
+    majorSegment: Int = 72,
+    minorSegment: Int = 30,
 ) : GLFilter() {
     private val mProgram = GeometryProgram()
 

@@ -24,6 +24,8 @@ class Torus(
     private var mGeometryInfo: GeometryInfo? = null
     private val mMajorSpanAngle = 360F / majorSegment
     private val mMinorSpanAngle = 360F / minorSegment
+    private val mVertexOrgList = ArrayList<Float>()
+    private val mTextureOrgList = ArrayList<Float>()
 
     fun create(): GeometryInfo {
         val geometryInfo = mGeometryInfo
@@ -31,127 +33,21 @@ class Torus(
             return geometryInfo
         }
 
-        // 计算顶点坐标
-        val vertexOrgList = ArrayList<Float>()
-        var curMajorAngle = 0F
-        while (curMajorAngle < 360F) {
-            val curMajorRadian = curMajorAngle.toRadians().toFloat()
-            calculateVertex(vertexOrgList, curMajorRadian)
-            curMajorAngle += mMajorSpanAngle
-        }
-        calculateVertex(vertexOrgList, 0F.toRadians().toFloat())
-
-        // 计算纹理坐标
-        val textureOrgList = ArrayList<Float>()
-        curMajorAngle = 0F
-        while (curMajorAngle < 360F) {
-            calculateTexture(textureOrgList, curMajorAngle)
-            curMajorAngle += mMajorSpanAngle
-        }
-        calculateTexture(textureOrgList, 0F)
+        initData()
 
         val vertexList = ArrayList<Float>()
         val textureList = ArrayList<Float>()
         val normalList = ArrayList<Float>()
         for (majorIndex in 0 until majorSegment) {
             // 组装顶点坐标
-            val curVertexIndex = majorIndex * minorSegment * 3
-            val nextVertexIndex = majorIndex * minorSegment * 3
+            // 当前点，minorSegment + 1 因为每一个圈都多一个计算
+            val curVertexIndex = majorIndex * (minorSegment + 1) * 3
+            // 下一圈点，majorIndex + 1 因为推进下一个圈
+            val nextVertexIndex = (majorIndex + 1) * (minorSegment + 1) * 3
             for (minorIndex in 0 until minorSegment) {
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 0])
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 1])
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 2])
-
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 0])
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 1])
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 2])
-
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 3])
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 4])
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 5])
-
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 3])
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 4])
-                vertexList.add(vertexOrgList[nextVertexIndex + minorIndex * 3 + 5])
-
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 3])
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 4])
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 5])
-
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 0])
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 1])
-                vertexList.add(vertexOrgList[curVertexIndex + minorIndex * 3 + 2])
-
-                // 组装法向量
-                val normalVector1 = VectorUtil.cross(
-                    floatArrayOf(
-                        vertexOrgList[nextVertexIndex + 0] - vertexOrgList[curVertexIndex + 0],
-                        vertexOrgList[nextVertexIndex + 1] - vertexOrgList[curVertexIndex + 1],
-                        vertexOrgList[nextVertexIndex + 2] - vertexOrgList[curVertexIndex + 2]
-                    ),
-                    floatArrayOf(
-                        vertexOrgList[nextVertexIndex + 3] - vertexOrgList[nextVertexIndex + 0],
-                        vertexOrgList[nextVertexIndex + 4] - vertexOrgList[nextVertexIndex + 1],
-                        vertexOrgList[nextVertexIndex + 5] - vertexOrgList[nextVertexIndex + 2]
-                    )
-                )
-                val normalVector2 = VectorUtil.cross(
-                    floatArrayOf(
-                        vertexOrgList[nextVertexIndex + 3] - vertexOrgList[curVertexIndex + 3],
-                        vertexOrgList[nextVertexIndex + 4] - vertexOrgList[curVertexIndex + 4],
-                        vertexOrgList[nextVertexIndex + 5] - vertexOrgList[curVertexIndex + 5]
-                    ),
-                    floatArrayOf(
-                        vertexOrgList[curVertexIndex + 3] - vertexOrgList[curVertexIndex + 0],
-                        vertexOrgList[curVertexIndex + 4] - vertexOrgList[curVertexIndex + 1],
-                        vertexOrgList[curVertexIndex + 5] - vertexOrgList[curVertexIndex + 2]
-                    )
-                )
-                normalList.add(normalVector1[0])
-                normalList.add(normalVector1[1])
-                normalList.add(normalVector1[2])
-
-                normalList.add(normalVector1[0])
-                normalList.add(normalVector1[1])
-                normalList.add(normalVector1[2])
-
-                normalList.add(normalVector1[0])
-                normalList.add(normalVector1[1])
-                normalList.add(normalVector1[2])
-
-                normalList.add(normalVector2[0])
-                normalList.add(normalVector2[1])
-                normalList.add(normalVector2[2])
-
-                normalList.add(normalVector2[0])
-                normalList.add(normalVector2[1])
-                normalList.add(normalVector2[2])
-
-                normalList.add(normalVector2[0])
-                normalList.add(normalVector2[1])
-                normalList.add(normalVector2[2])
-
-                // 组装纹理顶点
-                val curTextureIndex = majorIndex * minorSegment * 2
-                val nextTextureIndex = (majorIndex + 1) * minorSegment * 2
-
-                textureList.add(textureOrgList[curTextureIndex + 0])
-                textureList.add(textureOrgList[curTextureIndex + 1])
-
-                textureList.add(textureOrgList[nextTextureIndex + 0])
-                textureList.add(textureOrgList[nextTextureIndex + 1])
-
-                textureList.add(textureOrgList[nextTextureIndex + 2])
-                textureList.add(textureOrgList[nextTextureIndex + 3])
-
-                textureList.add(textureOrgList[nextTextureIndex + 2])
-                textureList.add(textureOrgList[nextTextureIndex + 3])
-
-                textureList.add(textureOrgList[curTextureIndex + 2])
-                textureList.add(textureOrgList[curTextureIndex + 3])
-
-                textureList.add(textureOrgList[curTextureIndex + 0])
-                textureList.add(textureOrgList[curTextureIndex + 1])
+                calculateVertex(vertexList, curVertexIndex, nextVertexIndex, minorIndex)
+                assembleNormal(normalList, curVertexIndex, nextVertexIndex)
+                assembleTexture(textureList, majorIndex, minorIndex)
             }
         }
 
@@ -163,6 +59,136 @@ class Torus(
             drawMode = DrawMode.Triangles,
             frontFace = FrontFace.CCW,
         ).apply { mGeometryInfo = this }
+    }
+
+    private fun assembleTexture(textureList: java.util.ArrayList<Float>, majorIndex: Int, minorIndex: Int) {
+        // 组装纹理顶点
+        val curTextureIndex = majorIndex * (minorSegment + 1) * 2
+        val nextTextureIndex = (majorIndex + 1) * (minorSegment + 1) * 2
+
+        textureList.add(mTextureOrgList[curTextureIndex + minorIndex * 2 + 0])
+        textureList.add(mTextureOrgList[curTextureIndex + minorIndex * 2 + 1])
+
+        textureList.add(mTextureOrgList[nextTextureIndex + minorIndex * 2 + 0])
+        textureList.add(mTextureOrgList[nextTextureIndex + minorIndex * 2 + 1])
+
+        textureList.add(mTextureOrgList[nextTextureIndex + minorIndex * 2 + 2])
+        textureList.add(mTextureOrgList[nextTextureIndex + minorIndex * 2 + 3])
+
+        textureList.add(mTextureOrgList[nextTextureIndex + minorIndex * 2 + 2])
+        textureList.add(mTextureOrgList[nextTextureIndex + minorIndex * 2 + 3])
+
+        textureList.add(mTextureOrgList[curTextureIndex + minorIndex * 2 + 2])
+        textureList.add(mTextureOrgList[curTextureIndex + minorIndex * 2 + 3])
+
+        textureList.add(mTextureOrgList[curTextureIndex + minorIndex * 2 + 0])
+        textureList.add(mTextureOrgList[curTextureIndex + minorIndex * 2 + 1])
+    }
+
+    private fun assembleNormal(
+        normalList: ArrayList<Float>,
+        curVertexIndex: Int,
+        nextVertexIndex: Int
+    ) {
+        // 组装法向量
+        val normalVector1 = VectorUtil.cross(
+            floatArrayOf(
+                mVertexOrgList[nextVertexIndex + 0] - mVertexOrgList[curVertexIndex + 0],
+                mVertexOrgList[nextVertexIndex + 1] - mVertexOrgList[curVertexIndex + 1],
+                mVertexOrgList[nextVertexIndex + 2] - mVertexOrgList[curVertexIndex + 2]
+            ),
+            floatArrayOf(
+                mVertexOrgList[nextVertexIndex + 3] - mVertexOrgList[nextVertexIndex + 0],
+                mVertexOrgList[nextVertexIndex + 4] - mVertexOrgList[nextVertexIndex + 1],
+                mVertexOrgList[nextVertexIndex + 5] - mVertexOrgList[nextVertexIndex + 2]
+            )
+        )
+        val normalVector2 = VectorUtil.cross(
+            floatArrayOf(
+                mVertexOrgList[nextVertexIndex + 3] - mVertexOrgList[curVertexIndex + 3],
+                mVertexOrgList[nextVertexIndex + 4] - mVertexOrgList[curVertexIndex + 4],
+                mVertexOrgList[nextVertexIndex + 5] - mVertexOrgList[curVertexIndex + 5]
+            ),
+            floatArrayOf(
+                mVertexOrgList[curVertexIndex + 3] - mVertexOrgList[curVertexIndex + 0],
+                mVertexOrgList[curVertexIndex + 4] - mVertexOrgList[curVertexIndex + 1],
+                mVertexOrgList[curVertexIndex + 5] - mVertexOrgList[curVertexIndex + 2]
+            )
+        )
+        normalList.add(normalVector1[0])
+        normalList.add(normalVector1[1])
+        normalList.add(normalVector1[2])
+
+        normalList.add(normalVector1[0])
+        normalList.add(normalVector1[1])
+        normalList.add(normalVector1[2])
+
+        normalList.add(normalVector1[0])
+        normalList.add(normalVector1[1])
+        normalList.add(normalVector1[2])
+
+        normalList.add(normalVector2[0])
+        normalList.add(normalVector2[1])
+        normalList.add(normalVector2[2])
+
+        normalList.add(normalVector2[0])
+        normalList.add(normalVector2[1])
+        normalList.add(normalVector2[2])
+
+        normalList.add(normalVector2[0])
+        normalList.add(normalVector2[1])
+        normalList.add(normalVector2[2])
+    }
+
+    private fun calculateVertex(
+        vertexList: ArrayList<Float>,
+        curVertexIndex: Int,
+        nextVertexIndex: Int,
+        minorIndex: Int
+    ) {
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 0])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 1])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 2])
+
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 0])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 1])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 2])
+
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 3])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 4])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 5])
+
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 3])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 4])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 5])
+
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 3])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 4])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 5])
+
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 0])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 1])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 2])
+    }
+
+    /**
+     * 初始化点数据
+     */
+    private fun initData() {
+        var curMajorAngle = 0F
+        while (curMajorAngle < 360F) {
+            val curMajorRadian = curMajorAngle.toRadians().toFloat()
+            calculateVertex(mVertexOrgList, curMajorRadian)
+            curMajorAngle += mMajorSpanAngle
+        }
+        calculateVertex(mVertexOrgList, 0F.toRadians().toFloat())
+
+        curMajorAngle = 0F
+        while (curMajorAngle < 360F) {
+            calculateTexture(mTextureOrgList, curMajorAngle)
+            curMajorAngle += mMajorSpanAngle
+        }
+        calculateTexture(mTextureOrgList, 0F)
     }
 
     private fun calculateVertex(vertexOrgList: ArrayList<Float>, curMajorRadian: Float) {
@@ -182,6 +208,15 @@ class Torus(
 
             curMinorAngle += mMinorSpanAngle
         }
+
+        val curMinorRadian = 0F.toRadians()
+        val temp = majorRadius + minorRadius * cos(curMinorRadian)
+        val x = temp * cos(curMajorRadian)
+        val y = minorRadius * sin(curMinorRadian)
+        val z = temp * sin(curMajorRadian)
+        vertexOrgList.add(x.toFloat())
+        vertexOrgList.add(y.toFloat())
+        vertexOrgList.add(z.toFloat())
     }
 
     private fun calculateTexture(textureOrgList: ArrayList<Float>, curMajorAngle: Float) {
@@ -193,5 +228,9 @@ class Torus(
             textureOrgList.add(t)
             curMinorAngle += mMinorSpanAngle
         }
+
+        val s = 360F / 360F
+        textureOrgList.add(s)
+        textureOrgList.add(t)
     }
 }
