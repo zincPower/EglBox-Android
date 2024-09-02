@@ -22,8 +22,8 @@ import com.jiangpengyong.sample.f_geometry.geometry.shape.Torus
  * @des 圆环
  */
 class TorusFilter(
-    majorRadius: Float = 1F,
-    minorRadius: Float = 0.5F,
+    majorRadius: Float = 0.7F,
+    minorRadius: Float = 0.3F,
     majorSegment: Int = 72,
     minorSegment: Int = 30,
 ) : GLFilter() {

@@ -187,7 +187,10 @@ class TorusActivity : AppCompatActivity() {
 
         private class Renderer : GLSurfaceView.Renderer {
             private val mFilterId = "TorusFilter"
-            private val mFilter = TorusFilter().apply { id = mFilterId }
+            private val mFilter = TorusFilter(
+                majorSegment = 120,
+                minorSegment = 60,
+            ).apply { id = mFilterId }
             private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
 
@@ -200,9 +203,10 @@ class TorusActivity : AppCompatActivity() {
             override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
                 mFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
-//                GLES20.glEnable(GLES20.GL_CULL_FACE)
+                GLES20.glEnable(GLES20.GL_CULL_FACE)
 //                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.png").absolutePath).let { bitmap ->
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/images2.webp").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_gradient.jpg").absolutePath).let { bitmap ->
+//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/celestial_body/2k_saturn_ring_alpha.png").absolutePath).let { bitmap ->
                     mTexture.init()
                     mTexture.setData(bitmap)
                     bitmap.recycle()
