@@ -19,6 +19,10 @@ class GeometryMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.cone).setOnClickListener {
             startActivity(Intent(this, ConeActivity::class.java))
         }
+
+        findViewById<View>(R.id.torus).setOnClickListener {
+            startActivity(Intent(this, TorusActivity::class.java))
+        }
     }
 
 }
