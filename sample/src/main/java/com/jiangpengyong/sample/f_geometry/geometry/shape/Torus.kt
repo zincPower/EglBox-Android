@@ -94,9 +94,9 @@ class Torus(
         // 组装法向量
         val normalVector1 = VectorUtil.cross(
             floatArrayOf(
-                mVertexOrgList[curVertexIndex + minorIndex * 3 + 0] - mVertexOrgList[nextVertexIndex + minorIndex * 3 + 3],
-                mVertexOrgList[curVertexIndex + minorIndex * 3 + 1] - mVertexOrgList[nextVertexIndex + minorIndex * 3 + 4],
-                mVertexOrgList[curVertexIndex + minorIndex * 3 + 2] - mVertexOrgList[nextVertexIndex + minorIndex * 3 + 5]
+                mVertexOrgList[curVertexIndex + minorIndex * 3 + 0] - mVertexOrgList[nextVertexIndex + minorIndex * 3 + 0],
+                mVertexOrgList[curVertexIndex + minorIndex * 3 + 1] - mVertexOrgList[nextVertexIndex + minorIndex * 3 + 1],
+                mVertexOrgList[curVertexIndex + minorIndex * 3 + 2] - mVertexOrgList[nextVertexIndex + minorIndex * 3 + 2]
             ),
             floatArrayOf(
                 mVertexOrgList[curVertexIndex + minorIndex * 3 + 3] - mVertexOrgList[curVertexIndex + minorIndex * 3 + 0],
