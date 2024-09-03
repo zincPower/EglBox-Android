@@ -13,11 +13,13 @@ import kotlin.math.sin
  * @author jiang peng yong
  * @date 2024/8/31 17:44
  * @email 56002982@qq.com
- * @des 圆环
+ * @des 螺旋管
  */
-class Torus(
+class Spring(
     val majorRadius: Float,     // 主半径，圆环中心到圆环切面中心距离
     val minorRadius: Float,     // 子半径，圆环切面半径
+    val distance: Float,        // 螺旋管一圈的距离
+    val height: Float,          // 螺旋管高度
     val majorSegment: Int,      // 裁剪主圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
     val minorSegment: Int,      // 裁剪子圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
 ) {
@@ -178,11 +180,10 @@ class Torus(
     private fun initData() {
         var curMajorAngle = 0F
         while (curMajorAngle < 360F) {
-            val curMajorRadian = curMajorAngle.toRadians().toFloat()
-            calculateVertex(mVertexOrgList, curMajorRadian)
+            calculateVertex(mVertexOrgList, curMajorAngle)
             curMajorAngle += mMajorSpanAngle
         }
-        calculateVertex(mVertexOrgList, 0F.toRadians().toFloat())
+        calculateVertex(mVertexOrgList, 360F)
 
         curMajorAngle = 0F
         while (curMajorAngle < 360F) {
@@ -192,15 +193,17 @@ class Torus(
         calculateTexture(mTextureOrgList, 360F)
     }
 
-    private fun calculateVertex(vertexOrgList: ArrayList<Float>, curMajorRadian: Float) {
+    private fun calculateVertex(vertexOrgList: ArrayList<Float>, curMajorAngle: Float) {
+        val curMajorRadian = curMajorAngle.toRadians().toFloat()
         var curMinorAngle = 0F
+        val offsetDistance = distance * curMajorAngle / 360F
         while (curMinorAngle < 360F) {
             val curMinorRadian = curMinorAngle.toRadians()
 
             val temp = majorRadius + minorRadius * cos(curMinorRadian)
 
             val x = temp * cos(curMajorRadian)
-            val y = minorRadius * sin(curMinorRadian)
+            val y = minorRadius * sin(curMinorRadian) + offsetDistance
             val z = temp * sin(curMajorRadian)
 
             vertexOrgList.add(x.toFloat())
@@ -213,7 +216,7 @@ class Torus(
         val curMinorRadian = 360F.toRadians()
         val temp = majorRadius + minorRadius * cos(curMinorRadian)
         val x = temp * cos(curMajorRadian)
-        val y = minorRadius * sin(curMinorRadian)
+        val y = minorRadius * sin(curMinorRadian) + offsetDistance
         val z = temp * sin(curMajorRadian)
         vertexOrgList.add(x.toFloat())
         vertexOrgList.add(y.toFloat())

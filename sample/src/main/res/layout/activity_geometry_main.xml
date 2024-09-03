@@ -18,4 +18,9 @@
         style="@style/common_button"
         android:text="3、圆环" />
 
+    <TextView
+        android:id="@+id/spring"
+        style="@style/common_button"
+        android:text="4、螺旋管" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>

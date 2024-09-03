@@ -139,6 +139,9 @@
         <activity
             android:name="com.jiangpengyong.sample.f_geometry.TorusActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.f_geometry.SpringActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"

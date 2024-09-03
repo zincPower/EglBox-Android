@@ -24,8 +24,9 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.NormalTypeCubeProgram
+import com.jiangpengyong.sample.f_geometry.geometry.filter.ConeFilter
 import com.jiangpengyong.sample.f_geometry.geometry.filter.CylinderFilter
-import com.jiangpengyong.sample.f_geometry.geometry.filter.TorusFilter
+import com.jiangpengyong.sample.f_geometry.geometry.filter.SpringFilter
 import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -34,9 +35,9 @@ import javax.microedition.khronos.opengles.GL10
  * @author jiang peng yong
  * @date 2024/8/26 08:29
  * @email 56002982@qq.com
- * @des 圆环
+ * @des 螺旋管
  */
-class TorusActivity : AppCompatActivity() {
+class SpringActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -49,7 +50,7 @@ class TorusActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_geometry_torus)
+        setContentView(R.layout.activity_geometry_spring)
 
         mRenderView = findViewById(R.id.surface_view)
 
@@ -186,11 +187,8 @@ class TorusActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilterId = "TorusFilter"
-            private val mFilter = TorusFilter(
-                majorSegment = 120,
-                minorSegment = 60,
-            ).apply { id = mFilterId }
+            private val mFilterId = "SpringFilter"
+            private val mFilter = SpringFilter().apply { id = mFilterId }
             private val mContext = FilterContext(RenderType.OnScreen)
             private val mImage = ImageInOut()
 
@@ -205,8 +203,6 @@ class TorusActivity : AppCompatActivity() {
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.png").absolutePath).let { bitmap ->
-//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_gradient.jpg").absolutePath).let { bitmap ->
-//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/celestial_body/2k_saturn_ring_alpha.png").absolutePath).let { bitmap ->
                     mTexture.init()
                     mTexture.setData(bitmap)
                     bitmap.recycle()

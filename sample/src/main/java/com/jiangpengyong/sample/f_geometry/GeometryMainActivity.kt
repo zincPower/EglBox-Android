@@ -23,6 +23,10 @@ class GeometryMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.torus).setOnClickListener {
             startActivity(Intent(this, TorusActivity::class.java))
         }
+
+        findViewById<View>(R.id.spring).setOnClickListener {
+            startActivity(Intent(this, SpringActivity::class.java))
+        }
     }
 
 }
