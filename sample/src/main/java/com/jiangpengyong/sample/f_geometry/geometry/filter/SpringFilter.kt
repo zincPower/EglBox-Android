@@ -25,7 +25,7 @@ class SpringFilter(
     majorRadius: Float = 0.7F,
     minorRadius: Float = 0.3F,
     distance: Float = 1F,
-    height: Float = 3F,
+    angle: Float = 720F,
     majorSegment: Int = 72,
     minorSegment: Int = 30,
 ) : GLFilter() {
@@ -49,7 +49,7 @@ class SpringFilter(
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
     init {
-        val spring = Spring(majorRadius, minorRadius, distance, height, majorSegment, minorSegment)
+        val spring = Spring(majorRadius, minorRadius, distance, angle, majorSegment, minorSegment)
         mSpringInfo = spring.create()
     }
 

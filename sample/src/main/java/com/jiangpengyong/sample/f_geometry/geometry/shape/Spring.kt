@@ -18,14 +18,15 @@ import kotlin.math.sin
 class Spring(
     val majorRadius: Float,     // 主半径，圆环中心到圆环切面中心距离
     val minorRadius: Float,     // 子半径，圆环切面半径
-    val distance: Float,        // 螺旋管一圈的距离
-    val height: Float,          // 螺旋管高度
+    val distance: Float,        // 螺旋管一圈 y 轴盘旋的距离
+    val angle: Float,           // 螺旋管度数
     val majorSegment: Int,      // 裁剪主圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
     val minorSegment: Int,      // 裁剪子圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
 ) {
     private var mGeometryInfo: GeometryInfo? = null
     private val mMajorSpanAngle = 360F / majorSegment
     private val mMinorSpanAngle = 360F / minorSegment
+    private val mTotalMajorSegment = (angle / 360F).toInt() * majorSegment
     private val mVertexOrgList = ArrayList<Float>()
     private val mTextureOrgList = ArrayList<Float>()
 
@@ -40,7 +41,7 @@ class Spring(
         val vertexList = ArrayList<Float>()
         val textureList = ArrayList<Float>()
         val normalList = ArrayList<Float>()
-        for (majorIndex in 0 until majorSegment) {
+        for (majorIndex in 0 until mTotalMajorSegment - 1) {
             // 组装顶点坐标
             // 当前点，minorSegment + 1 因为每一个圈都多一个计算
             val curVertexIndex = majorIndex * (minorSegment + 1) * 3
@@ -178,25 +179,17 @@ class Spring(
      * 初始化点数据
      */
     private fun initData() {
-        var curMajorAngle = 0F
-        while (curMajorAngle < 360F) {
+        for (curMajorSegment in 0 until mTotalMajorSegment) {
+            val curMajorAngle = curMajorSegment * mMajorSpanAngle
             calculateVertex(mVertexOrgList, curMajorAngle)
-            curMajorAngle += mMajorSpanAngle
-        }
-        calculateVertex(mVertexOrgList, 360F)
-
-        curMajorAngle = 0F
-        while (curMajorAngle < 360F) {
             calculateTexture(mTextureOrgList, curMajorAngle)
-            curMajorAngle += mMajorSpanAngle
         }
-        calculateTexture(mTextureOrgList, 360F)
     }
 
     private fun calculateVertex(vertexOrgList: ArrayList<Float>, curMajorAngle: Float) {
         val curMajorRadian = curMajorAngle.toRadians().toFloat()
         var curMinorAngle = 0F
-        val offsetDistance = distance * curMajorAngle / 360F
+        val offsetDistance = distance * curMajorAngle / 360F - (angle / 360F * distance / 2)
         while (curMinorAngle < 360F) {
             val curMinorRadian = curMinorAngle.toRadians()
 

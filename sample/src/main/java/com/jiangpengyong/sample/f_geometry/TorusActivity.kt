@@ -204,9 +204,8 @@ class TorusActivity : AppCompatActivity() {
                 mFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.png").absolutePath).let { bitmap ->
-//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_gradient.jpg").absolutePath).let { bitmap ->
-//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/celestial_body/2k_saturn_ring_alpha.png").absolutePath).let { bitmap ->
+//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.png").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
                     mTexture.init()
                     mTexture.setData(bitmap)
                     bitmap.recycle()

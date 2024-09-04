@@ -180,15 +180,10 @@ class Torus(
         while (curMajorAngle < 360F) {
             val curMajorRadian = curMajorAngle.toRadians().toFloat()
             calculateVertex(mVertexOrgList, curMajorRadian)
-            curMajorAngle += mMajorSpanAngle
-        }
-        calculateVertex(mVertexOrgList, 0F.toRadians().toFloat())
-
-        curMajorAngle = 0F
-        while (curMajorAngle < 360F) {
             calculateTexture(mTextureOrgList, curMajorAngle)
             curMajorAngle += mMajorSpanAngle
         }
+        calculateVertex(mVertexOrgList, 0F.toRadians().toFloat())
         calculateTexture(mTextureOrgList, 360F)
     }
 
