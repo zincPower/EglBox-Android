@@ -17,6 +17,9 @@ enum class DrawMode(val value: Int) {
     Triangles(GLES20.GL_TRIANGLES),
     TriangleFan(GLES20.GL_TRIANGLE_FAN),
     TriangleStrip(GLES20.GL_TRIANGLE_STRIP),
+    Lines(GLES20.GL_LINES),
+    LineStrip(GLES20.GL_LINE_STRIP),
+    LineLoop(GLES20.GL_LINE_LOOP),
 }
 
 enum class FrontFace(val value: Int) {

@@ -43,7 +43,7 @@ class SolarSystemFilter : GLFilter() {
     private val mSunProgram = SunProgram()
     private val mPlanetProgram = PlanetProgram()
     private val mEarthProgram = EarthProgram()
-    private val mRingProgram = RingProgram(bigRadius = 0.9F, smallRadius = 1.5F)
+    private val mRingProgram = RingProgram()
     private val mOrbitProgram = OrbitProgram()
 
     // 地球信息，作为其他天体基准

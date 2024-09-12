@@ -27,6 +27,10 @@ class GeometryMainActivity : AppCompatActivity() {
         findViewById<View>(R.id.spring).setOnClickListener {
             startActivity(Intent(this, SpringActivity::class.java))
         }
+
+        findViewById<View>(R.id.geometry_ball).setOnClickListener {
+            startActivity(Intent(this, GeometryBallActivity::class.java))
+        }
     }
 
 }
