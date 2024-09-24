@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jiangpengyong.sample.widget.FlowLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/teapot"
+        style="@style/common_button"
+        android:text="1、茶壶" />
+
+    <TextView
+        android:id="@+id/teapot_without_a_lid"
+        style="@style/common_button"
+        android:text="2、茶壶（没有盖）" />
+
+    <TextView
+        android:id="@+id/film"
+        style="@style/common_button"
+        android:text="3、胶卷" />
+
+</com.jiangpengyong.sample.widget.FlowLayout>
