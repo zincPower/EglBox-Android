@@ -2,7 +2,6 @@ package com.jiangpengyong.eglbox_core.view
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
@@ -10,9 +9,8 @@ import android.util.Size
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
-import com.jiangpengyong.eglbox_core.filter.FilterData
 import com.jiangpengyong.eglbox_core.filter.Orientation
-import com.jiangpengyong.eglbox_core.processor.display.DisplayProcessor
+import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ImageError
 import com.jiangpengyong.eglbox_core.processor.image.ImageParams
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
@@ -25,12 +23,12 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author: jiang peng yong
  * @date: 2024/8/15 12:55
  * @email: 56002982@qq.com
- * @desc: GL 显示控件
+ * @desc: GL 预览控件
  */
-class GLDisplayView : FrameLayout {
+class GLPreviewView : FrameLayout {
     private val mSurfaceId = "GLPreviewView-${System.currentTimeMillis()}"
     private val mFilterIdCreator = AtomicInteger()
-    private val mDisplayProcessor = DisplayProcessor()
+    private val mPreviewProcessor = PreviewProcessor()
     private val mImageProcessor = ImageProcessor()
 
     constructor(context: Context) : super(context) {
@@ -51,7 +49,7 @@ class GLDisplayView : FrameLayout {
     }
 
     private fun init(context: Context) {
-        mDisplayProcessor.apply {
+        mPreviewProcessor.apply {
             launch()
             setPreviewSurfaceId(mSurfaceId)
         }
@@ -62,43 +60,43 @@ class GLDisplayView : FrameLayout {
     }
 
     private fun release() {
-        mDisplayProcessor.destroy()
+        mPreviewProcessor.destroy()
         mImageProcessor.destroy()
     }
 
     fun requestRender() {
-        mDisplayProcessor.requestRender()
+        mPreviewProcessor.requestRender()
     }
 
     fun setImage(bitmap: Bitmap, isAutoRelease: Boolean) {
-        mDisplayProcessor.setImage(bitmap, isAutoRelease)
+        mPreviewProcessor.setImage(bitmap, isAutoRelease)
         requestRender()
     }
 
     fun setBlank() {
-        mDisplayProcessor.setBlank()
+        mPreviewProcessor.setBlank()
         requestRender()
     }
 
-    fun addFilter(filterType: DisplayProcessor.FilterType, name: String, order: Int): String? {
+    fun addFilter(filterType: PreviewProcessor.FilterType, name: String, order: Int): String? {
         val filter = FilterCenter.createFilter(name)
         if (filter == null) {
             Log.e(TAG, "Filter create failure.")
             return null
         }
         val filterId = mFilterIdCreator.incrementAndGet().toString()
-        mDisplayProcessor.addFilter(filterType, filterId, name, order, filter)
+        mPreviewProcessor.addFilter(filterType, filterId, name, order, filter)
         requestRender()
         return filterId
     }
 
     fun removeFilter(filterId: String) {
-        mDisplayProcessor.removeFilter(filterId)
+        mPreviewProcessor.removeFilter(filterId)
         requestRender()
     }
 
     fun exportImage(bitmap: Bitmap, data: HashMap<String, Any>, callback: (result: Bitmap?) -> Unit) {
-        mDisplayProcessor.getFilterData(DisplayProcessor.FilterType.Process) { filterData ->
+        mPreviewProcessor.getFilterData(PreviewProcessor.FilterType.Process) { filterData ->
             if (filterData == null) {
                 callback(null)
                 return@getFilterData

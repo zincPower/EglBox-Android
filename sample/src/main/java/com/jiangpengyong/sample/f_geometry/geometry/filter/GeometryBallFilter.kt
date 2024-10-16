@@ -11,11 +11,9 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.sample.f_geometry.geometry.DrawMode
 import com.jiangpengyong.sample.f_geometry.geometry.GeometryInfo
 import com.jiangpengyong.sample.f_geometry.geometry.GeometryProgram
 import com.jiangpengyong.sample.f_geometry.geometry.shape.GeometryBall
-import com.jiangpengyong.sample.f_geometry.geometry.shape.Spring
 
 /**
  * @author jiang peng yong
@@ -109,7 +107,7 @@ class GeometryBallFilter(
     }
 
     private fun updateProjectionMatrix(context: FilterContext) {
-        val displaySize = context.displaySize
+        val displaySize = context.previewSize
         if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
             val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
             if (displaySize.width > displaySize.height) {

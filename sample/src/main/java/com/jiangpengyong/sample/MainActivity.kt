@@ -12,7 +12,7 @@ import com.jiangpengyong.sample.d_light.LightMainActivity
 import com.jiangpengyong.sample.e_texture.TextureMainActivity
 import com.jiangpengyong.sample.f_geometry.GeometryMainActivity
 import com.jiangpengyong.sample.font.FontActivity
-import com.jiangpengyong.sample.view.GLDisplayViewActivity
+import com.jiangpengyong.sample.view.GLPreviewViewActivity
 
 /**
  * @author jiang peng yong
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.preview_view).setOnClickListener {
-            startActivity(Intent(this, GLDisplayViewActivity::class.java))
+            startActivity(Intent(this, GLPreviewViewActivity::class.java))
         }
     }
 }

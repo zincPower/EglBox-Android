@@ -103,7 +103,7 @@ class ProjectionActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -168,13 +168,13 @@ class ProjectionActivity : AppCompatActivity() {
         }
 
         private fun updateProjection() {
-            val displaySize = mContext?.displaySize ?: return
-            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+            val previewSize = mContext?.previewSize ?: return
+            val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
             val left: Float
             val right: Float
             val bottom: Float
             val top: Float
-            if (displaySize.width > displaySize.height) {   // 纵向屏
+            if (previewSize.width > previewSize.height) {   // 纵向屏
                 left = -ratio
                 right = ratio
                 bottom = -1F
@@ -203,7 +203,7 @@ class ProjectionActivity : AppCompatActivity() {
         }
 
         private fun updateViewport() {
-            val size = mContext?.displaySize ?: return
+            val size = mContext?.previewSize ?: return
             if (mViewportMode == ViewportMode.Full) {
                 GLES20.glViewport(0, 0, size.width, size.height)
             } else {

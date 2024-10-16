@@ -42,7 +42,7 @@ class TorusFilter(
     private var mXAngle = 0F
     private var mYAngle = 0F
 
-    private var mDisplaySize = Size(0, 0)
+    private var mPreviewSize = Size(0, 0)
     private var mLightPosition = floatArrayOf(0F, 0F, 5F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
@@ -113,10 +113,10 @@ class TorusFilter(
     }
 
     private fun updateProjectionMatrix(context: FilterContext) {
-        val displaySize = context.displaySize
-        if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
-            if (displaySize.width > displaySize.height) {
+        val previewSize = context.previewSize
+        if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+            val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
+            if (previewSize.width > previewSize.height) {
                 mProjectMatrix.setFrustumM(
                     -ratio, ratio,
                     -1F, 1F,
@@ -129,7 +129,7 @@ class TorusFilter(
                     5F, 20F
                 )
             }
-            mDisplaySize = displaySize
+            mPreviewSize = previewSize
         }
     }
 

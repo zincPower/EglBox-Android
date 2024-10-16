@@ -85,7 +85,7 @@
 
     </com.jiangpengyong.sample.widget.FlowLayout>
 
-    <com.jiangpengyong.eglbox_core.view.GLDisplayView
+    <com.jiangpengyong.eglbox_core.view.GLPreviewView
         android:id="@+id/preview_view"
         android:layout_width="0dp"
         android:layout_height="match_parent"

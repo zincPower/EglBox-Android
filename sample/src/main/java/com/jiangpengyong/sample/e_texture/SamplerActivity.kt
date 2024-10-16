@@ -16,7 +16,6 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
-import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
@@ -30,7 +29,6 @@ import com.jiangpengyong.sample.utils.SizeUtils
 import java.io.File
 import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL
 import javax.microedition.khronos.opengles.GL10
 
 
@@ -116,7 +114,7 @@ class SamplerActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -135,7 +133,7 @@ class SamplerActivity : AppCompatActivity() {
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
 
-        private var mDisplaySize = Size(0, 0)
+        private var mPreviewSize = Size(0, 0)
 
         private var mPointSize = 0F
 
@@ -181,24 +179,24 @@ class SamplerActivity : AppCompatActivity() {
         override fun onReceiveMessage(message: Message) {}
 
         private fun updateProjectionMatrix(context: FilterContext) {
-            val displaySize = context.displaySize
-            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-                if (displaySize.width > displaySize.height) {
-                    val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+            val previewSize = context.previewSize
+            if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+                if (previewSize.width > previewSize.height) {
+                    val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
                         5F, 30F
                     )
                 } else {
-                    val ratio = displaySize.height.toFloat() / displaySize.width.toFloat()
+                    val ratio = previewSize.height.toFloat() / previewSize.width.toFloat()
                     mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
                         5F, 30F
                     )
                 }
-                mDisplaySize = displaySize
+                mPreviewSize = previewSize
             }
         }
     }

@@ -12,7 +12,6 @@ import android.util.Size
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
-import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -23,11 +22,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.d_light.NormalTypeCubeProgram
-import com.jiangpengyong.sample.f_geometry.geometry.filter.ConeFilter
-import com.jiangpengyong.sample.f_geometry.geometry.filter.CylinderFilter
 import com.jiangpengyong.sample.f_geometry.geometry.filter.GeometryBallFilter
-import com.jiangpengyong.sample.f_geometry.geometry.filter.SpringFilter
 import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -213,7 +208,7 @@ class GeometryBallActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {

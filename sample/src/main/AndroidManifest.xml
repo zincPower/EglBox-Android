@@ -155,7 +155,7 @@
             android:screenOrientation="landscape" />
 
         <activity
-            android:name="com.jiangpengyong.sample.view.GLDisplayViewActivity"
+            android:name="com.jiangpengyong.sample.view.GLPreviewViewActivity"
             android:screenOrientation="landscape" />
     </application>
 </manifest>

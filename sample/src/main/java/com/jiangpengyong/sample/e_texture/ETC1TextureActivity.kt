@@ -1,7 +1,6 @@
 package com.jiangpengyong.sample.e_texture
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.opengl.ETC1Util
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
@@ -123,7 +122,7 @@ class ETC1TextureActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -163,7 +162,7 @@ class ETC1TextureActivity : AppCompatActivity() {
             } else {
                 mTexture2DProgram.setScaleType(mScaleType)
             }
-            mContext?.let { mTexture2DProgram.setTargetSize(it.displaySize) }
+            mContext?.let { mTexture2DProgram.setTargetSize(it.previewSize) }
             mTexture2DProgram.draw()
         }
 

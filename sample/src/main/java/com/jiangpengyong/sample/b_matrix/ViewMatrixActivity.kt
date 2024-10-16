@@ -106,7 +106,7 @@ class ViewMatrixActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -166,20 +166,20 @@ class ViewMatrixActivity : AppCompatActivity() {
         private var mState = State.Out
 
         // 预览尺寸
-        private var mDisplaySize = Size(0, 0)
+        private var mPreviewSize = Size(0, 0)
 
         override fun onInit() {
             mCubeProgram.init()
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-            val displaySize = mContext?.displaySize ?: return
+            val previewSize = mContext?.previewSize ?: return
 
             // 计算更新投影矩阵
-            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-                val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+            if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+                val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
                 // 设置投影矩阵
-                if (displaySize.width > displaySize.height) {
+                if (previewSize.width > previewSize.height) {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
@@ -192,7 +192,7 @@ class ViewMatrixActivity : AppCompatActivity() {
                         2F, 20F
                     )
                 }
-                mDisplaySize = displaySize
+                mPreviewSize = previewSize
             }
 
             // 根据模式更新视图矩阵

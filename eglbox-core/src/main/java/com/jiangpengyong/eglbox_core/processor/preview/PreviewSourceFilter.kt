@@ -1,7 +1,6 @@
-package com.jiangpengyong.eglbox_core.processor.display
+package com.jiangpengyong.eglbox_core.processor.preview
 
 import android.graphics.Bitmap
-import android.icu.number.Scale
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
@@ -10,11 +9,9 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.SourceFilter
 import com.jiangpengyong.eglbox_core.gles.GLTexture
-import com.jiangpengyong.eglbox_core.gles.Target
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.program.ScaleType
-import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.program.isValid
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 
@@ -24,7 +21,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
  * @email: 56002982@qq.com
  * @desc: 上屏接收数据节点
  */
-class DisplaySourceFilter : SourceFilter() {
+class PreviewSourceFilter : SourceFilter() {
     private val mVertexMatrix = ModelMatrix().apply {
         scale(1F, -1F, 1F)
     }
@@ -40,7 +37,7 @@ class DisplaySourceFilter : SourceFilter() {
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val texture = imageInOut.texture ?: return
 
-        context.displaySize = mPreviewSize
+        context.previewSize = mPreviewSize
 
         val texture2DProgram = context.texture2DProgram
         texture2DProgram.reset()
@@ -68,11 +65,11 @@ class DisplaySourceFilter : SourceFilter() {
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            MessageType.DISPLAY_SET_IMAGE -> {
+            MessageType.PREVIEW_SET_IMAGE -> {
                 mIsNeedBlank = false
                 val bitmap = message.obj as? Bitmap
                 if (bitmap == null) {
-                    Logger.e(TAG, "DISPLAY_SET_IMAGE receive invalid bitmap.")
+                    Logger.e(TAG, "PREVIEW_SET_IMAGE receive invalid bitmap.")
                     return
                 }
                 mTexture.setData(bitmap)
@@ -82,7 +79,7 @@ class DisplaySourceFilter : SourceFilter() {
                 updateTexture(mTexture)
             }
 
-            MessageType.DISPLAY_SET_BLANK -> {
+            MessageType.PREVIEW_SET_BLANK -> {
                 val width = message.arg1
                 val height = message.arg2
                 if (width != 0 && height != 0) {
@@ -118,6 +115,6 @@ class DisplaySourceFilter : SourceFilter() {
     }
 
     companion object {
-        const val TAG = "DisplaySourceFilter"
+        const val TAG = "PreviewSourceFilter"
     }
 }

@@ -30,7 +30,7 @@ class BallFilter : GLFilter() {
     private var xAngle = 0F
     private var yAngle = 0F
 
-    private var mDisplaySize = Size(0, 0)
+    private var mPreviewSize = Size(0, 0)
 
     override fun onInit() {
         mProgram.init()
@@ -68,7 +68,7 @@ class BallFilter : GLFilter() {
     }
 
     private fun updateProjectionMatrix(size: Size) {
-        if (mDisplaySize.width != size.width || mDisplaySize.height != size.height) {
+        if (mPreviewSize.width != size.width || mPreviewSize.height != size.height) {
             mProjectMatrix.reset()
             if (size.width > size.height) {
                 val ratio = size.width.toFloat() / size.height.toFloat()
@@ -85,7 +85,7 @@ class BallFilter : GLFilter() {
                     2F, 10F
                 )
             }
-            mDisplaySize = size
+            mPreviewSize = size
         }
     }
 

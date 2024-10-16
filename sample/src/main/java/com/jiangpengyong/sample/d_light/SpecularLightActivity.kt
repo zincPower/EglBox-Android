@@ -241,7 +241,7 @@ class SpecularLightActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -267,7 +267,7 @@ class SpecularLightActivity : AppCompatActivity() {
         private var mXAngle = 0F
         private var mYAngle = 0F
 
-        private var mDisplaySize = Size(0, 0)
+        private var mPreviewSize = Size(0, 0)
 
         private var mLightPosition = floatArrayOf(0F, 0F, 5F)
         private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
@@ -305,24 +305,24 @@ class SpecularLightActivity : AppCompatActivity() {
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
-            val displaySize = context.displaySize
-            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-                if (displaySize.width > displaySize.height) {
-                    val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
+            val previewSize = context.previewSize
+            if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+                if (previewSize.width > previewSize.height) {
+                    val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
                         5F, 20F
                     )
                 } else {
-                    val ratio = displaySize.height.toFloat() / displaySize.width.toFloat()
+                    val ratio = previewSize.height.toFloat() / previewSize.width.toFloat()
                     mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
                         5F, 20F
                     )
                 }
-                mDisplaySize = displaySize
+                mPreviewSize = previewSize
             }
         }
 

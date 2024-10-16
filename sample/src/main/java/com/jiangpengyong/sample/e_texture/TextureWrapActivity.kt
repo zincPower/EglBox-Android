@@ -3,7 +3,6 @@ package com.jiangpengyong.sample.e_texture
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
-import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.os.Message
@@ -22,7 +21,6 @@ import com.jiangpengyong.eglbox_core.gles.Target
 import com.jiangpengyong.eglbox_core.gles.WrapMode
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
-import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
 import java.io.File
@@ -131,7 +129,7 @@ class TextureWrapActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -160,7 +158,7 @@ class TextureWrapActivity : AppCompatActivity() {
             imageInOut.texture?.let { mTexture2DProgram.setTexture(it) }
             mTexture2DProgram.isMirrorY(true)
             mTexture2DProgram.setScaleType(ScaleType.FIT_XY)
-            mContext?.let { mTexture2DProgram.setTargetSize(it.displaySize) }
+            mContext?.let { mTexture2DProgram.setTargetSize(it.previewSize) }
             mTextureCoordinates?.let { mTexture2DProgram.setTextureCoordinates(it) }
             mTexture2DProgram.draw()
         }

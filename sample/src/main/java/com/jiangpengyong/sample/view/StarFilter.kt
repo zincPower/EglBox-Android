@@ -24,7 +24,7 @@ class StarFilter : GLFilter() {
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
-    private var mDisplaySize = Size(0, 0)
+    private var mPreviewSize = Size(0, 0)
 
     override fun onInit() {
         mStarProgram.init()
@@ -66,7 +66,7 @@ class StarFilter : GLFilter() {
 
     // 为了方便观察，使用正交投影
     private fun updateProjectionMatrix(size: Size) {
-        if (mDisplaySize.width != size.width || mDisplaySize.height != size.height) {
+        if (mPreviewSize.width != size.width || mPreviewSize.height != size.height) {
             if (size.width > size.height) {
                 val ratio = size.width.toFloat() / size.height.toFloat()
                 mProjectMatrix.setOrthoM(
@@ -82,7 +82,7 @@ class StarFilter : GLFilter() {
                     2F, 20F
                 )
             }
-            mDisplaySize = size
+            mPreviewSize = size
         }
     }
 }

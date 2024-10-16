@@ -104,7 +104,7 @@ class ModelMatrixActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -149,7 +149,7 @@ class ModelMatrixActivity : AppCompatActivity() {
         private var mMode = ModelMode.Translation
         private val mRatio = 1 / 100F
         private var mCurrentOffset = 0F
-        private var mDisplaySize = Size(0, 0)
+        private var mPreviewSize = Size(0, 0)
 
         private val mCubeProgram = CubeProgram()
         private val mProjectMatrix = ProjectMatrix()
@@ -166,12 +166,12 @@ class ModelMatrixActivity : AppCompatActivity() {
         }
 
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-            if (mDisplaySize.width != context.displaySize.width || mDisplaySize.height != context.displaySize.height) {
+            if (mPreviewSize.width != context.previewSize.width || mPreviewSize.height != context.previewSize.height) {
                 updateModelMatrix(context)
                 updateProjectionMatrix(context)
-                mDisplaySize = context.displaySize
+                mPreviewSize = context.previewSize
             }
-            if (!mDisplaySize.isValid()) return
+            if (!mPreviewSize.isValid()) return
             when (mMode) {
                 ModelMode.Translation -> handleTranslation()
                 ModelMode.Scale -> handleScale()
@@ -194,10 +194,10 @@ class ModelMatrixActivity : AppCompatActivity() {
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
-            val displaySize = context.displaySize
-            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-                val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
-                if (displaySize.width > displaySize.height) {
+            val previewSize = context.previewSize
+            if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+                val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
+                if (previewSize.width > previewSize.height) {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
@@ -210,7 +210,7 @@ class ModelMatrixActivity : AppCompatActivity() {
                         2F, 20F
                     )
                 }
-                mDisplaySize = displaySize
+                mPreviewSize = previewSize
             }
         }
 

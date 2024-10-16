@@ -131,7 +131,7 @@ class DrawingModeActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -203,7 +203,7 @@ private class StarFilter : GLFilter() {
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
-    private var mDisplaySize = Size(0, 0)
+    private var mPreviewSize = Size(0, 0)
     private var mDrawingMode = DrawingMode.Points.value
 
     override fun onInit() {
@@ -241,10 +241,10 @@ private class StarFilter : GLFilter() {
 
     // 为了方便观察，使用正交投影
     private fun updateProjectionMatrix(context: FilterContext) {
-        val displaySize = context.displaySize
-        if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
-            if (displaySize.width > displaySize.height) {
+        val previewSize = context.previewSize
+        if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+            val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
+            if (previewSize.width > previewSize.height) {
                 mProjectMatrix.setOrthoM(
                     -ratio, ratio,
                     -1F, 1F,
@@ -257,7 +257,7 @@ private class StarFilter : GLFilter() {
                     2F, 20F
                 )
             }
-            mDisplaySize = displaySize
+            mPreviewSize = previewSize
         }
     }
 }

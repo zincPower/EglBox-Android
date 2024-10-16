@@ -126,7 +126,7 @@ class TextureSampleActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -182,7 +182,7 @@ class TextureSampleActivity : AppCompatActivity() {
         override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
             mTexture2DProgram.reset()
             mTexture2DProgram.setScaleType(ScaleType.MATRIX)
-            mTexture2DProgram.setTargetSize(context.displaySize)
+            mTexture2DProgram.setTargetSize(context.previewSize)
 
             val smallTexture = if (mFilterMode and MIN_NEAREST == MIN_NEAREST) {
                 mMinNearestTexture
@@ -196,7 +196,7 @@ class TextureSampleActivity : AppCompatActivity() {
                 val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
                     ScaleType.CENTER_INSIDE,
                     Size(it.width, it.height),
-                    context.displaySize,
+                    context.previewSize,
                 )
                 mMatrix.reset()
                 mMatrix.scale(scaleX, scaleY, 1F)
@@ -219,7 +219,7 @@ class TextureSampleActivity : AppCompatActivity() {
                 val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
                     ScaleType.CENTER_INSIDE,
                     Size(it.width, it.height),
-                    context.displaySize,
+                    context.previewSize,
                 )
                 mMatrix.reset()
                 mMatrix.scale(scaleX, scaleY, 1F)

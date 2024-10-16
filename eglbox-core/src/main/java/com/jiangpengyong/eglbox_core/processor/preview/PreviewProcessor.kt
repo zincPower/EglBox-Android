@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox_core.processor.display
+package com.jiangpengyong.eglbox_core.processor.preview
 
 import android.graphics.Bitmap
 import android.os.Message
@@ -19,7 +19,7 @@ import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
  * @email: 56002982@qq.com
  * @desc: 上屏处理器
  */
-class DisplayProcessor : GLProcessor() {
+class PreviewProcessor : GLProcessor() {
     enum class FilterType(val id: String) { Process("process"), Decoration("decoration") }
 
     private val mProcessFilters = GLFilterGroup()
@@ -75,7 +75,7 @@ class DisplayProcessor : GLProcessor() {
 
     fun setImage(bitmap: Bitmap, isAutoRelease: Boolean) {
         val message = Message.obtain()
-        message.what = MessageType.DISPLAY_SET_IMAGE
+        message.what = MessageType.PREVIEW_SET_IMAGE
         message.obj = bitmap
         message.arg1 = if (isAutoRelease) 1 else 0
         sendMessageToFilter(SOURCE_FILTER_ID, message)
@@ -83,7 +83,7 @@ class DisplayProcessor : GLProcessor() {
 
     fun setBlank() {
         val message = Message.obtain()
-        message.what = MessageType.DISPLAY_SET_BLANK
+        message.what = MessageType.PREVIEW_SET_BLANK
         sendMessageToFilter(SOURCE_FILTER_ID, message)
     }
 
@@ -96,10 +96,10 @@ class DisplayProcessor : GLProcessor() {
     override fun getRenderType(): RenderType = RenderType.OnScreen
 
     override fun configFilterChain(filterChain: FilterChain) {
-        filterChain.setSourceFilter(SOURCE_FILTER_ID, DisplaySourceFilter())
+        filterChain.setSourceFilter(SOURCE_FILTER_ID, PreviewSourceFilter())
         filterChain.addFilter(FilterType.Process.id, FilterType.Process.id, 0, mProcessFilters)
         filterChain.addFilter(FilterType.Decoration.id, FilterType.Decoration.id, 0, mDecorateFilters)
-        filterChain.setSinkFilter(SINK_FILTER_ID, DisplaySinkFilter())
+        filterChain.setSinkFilter(SINK_FILTER_ID, PreviewSinkFilter())
     }
 
     override fun onReceiveMessageFromFilter(filterId: String, message: Message) {
@@ -113,6 +113,6 @@ class DisplayProcessor : GLProcessor() {
     }
 
     companion object {
-        const val TAG = "DisplayProcessor"
+        const val TAG = "PreviewProcessor"
     }
 }

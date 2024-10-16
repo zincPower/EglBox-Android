@@ -11,13 +11,10 @@ import android.util.Size
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButton.OnCheckedChangeListener
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
@@ -252,7 +249,7 @@ class FullLightActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -277,7 +274,7 @@ class FullLightActivity : AppCompatActivity() {
         private var mXAngle = 0F
         private var mYAngle = 0F
 
-        private var mDisplaySize = Size(0, 0)
+        private var mPreviewSize = Size(0, 0)
 
         private var mLightPosition = floatArrayOf(0F, 0F, 5F)
         private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
@@ -309,10 +306,10 @@ class FullLightActivity : AppCompatActivity() {
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
-            val displaySize = context.displaySize
-            if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-                val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
-                if (displaySize.width > displaySize.height) {
+            val previewSize = context.previewSize
+            if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+                val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
+                if (previewSize.width > previewSize.height) {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
@@ -325,7 +322,7 @@ class FullLightActivity : AppCompatActivity() {
                         5F, 20F
                     )
                 }
-                mDisplaySize = displaySize
+                mPreviewSize = previewSize
             }
         }
 

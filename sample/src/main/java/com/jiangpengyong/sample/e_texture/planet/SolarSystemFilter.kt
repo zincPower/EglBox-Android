@@ -37,7 +37,7 @@ class SolarSystemFilter : GLFilter() {
     private var mYAngle = 30F
 
     // 屏幕尺寸
-    private var mDisplaySize = Size(0, 0)
+    private var mPreviewSize = Size(0, 0)
 
     // 绘制程序
     private val mSunProgram = SunProgram()
@@ -130,10 +130,10 @@ class SolarSystemFilter : GLFilter() {
      * 更新投影矩阵
      */
     private fun updateProjectionMatrix(context: FilterContext) {
-        val displaySize = context.displaySize
-        if (mDisplaySize.width != displaySize.width || mDisplaySize.height != displaySize.height) {
-            val ratio = displaySize.width.toFloat() / displaySize.height.toFloat()
-            if (displaySize.width > displaySize.height) {
+        val previewSize = context.previewSize
+        if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+            val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
+            if (previewSize.width > previewSize.height) {
                 mProjectMatrix.setFrustumM(
                     -ratio, ratio,
                     -1F, 1F,
@@ -146,7 +146,7 @@ class SolarSystemFilter : GLFilter() {
                     5F, 1000F
                 )
             }
-            mDisplaySize = displaySize
+            mPreviewSize = previewSize
         }
     }
 

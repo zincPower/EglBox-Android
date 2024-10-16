@@ -24,7 +24,6 @@ import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
 import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL
 import javax.microedition.khronos.opengles.GL10
 
 /**
@@ -128,7 +127,7 @@ class TextureSwizzleActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -167,7 +166,7 @@ class TextureSwizzleActivity : AppCompatActivity() {
             } else {
                 mTexture2DProgram.setScaleType(mScaleType)
             }
-            mContext?.let { mTexture2DProgram.setTargetSize(it.displaySize) }
+            mContext?.let { mTexture2DProgram.setTargetSize(it.previewSize) }
             mTexture2DProgram.draw()
         }
 

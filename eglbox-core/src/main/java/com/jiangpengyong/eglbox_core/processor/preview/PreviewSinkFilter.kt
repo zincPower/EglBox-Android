@@ -1,11 +1,10 @@
-package com.jiangpengyong.eglbox_core.processor.display
+package com.jiangpengyong.eglbox_core.processor.preview
 
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import android.util.Size
-import android.view.Surface
 import com.jiangpengyong.eglbox_core.egl.WindowSurface
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
@@ -23,7 +22,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
  * @email: 56002982@qq.com
  * @desc: 上屏上屏节点
  */
-class DisplaySinkFilter : SinkFilter() {
+class PreviewSinkFilter : SinkFilter() {
     private var mMatrix = ModelMatrix()
     private var mPreviewSize = Size(0, 0)
     private var mBeforeImageSize = Size(0, 0)
@@ -151,6 +150,6 @@ class DisplaySinkFilter : SinkFilter() {
     }
 
     companion object {
-        private const val TAG = "DisplaySinkFilter"
+        private const val TAG = "PreviewSinkFilter"
     }
 }

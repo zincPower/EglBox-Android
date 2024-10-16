@@ -118,7 +118,7 @@ class Texture2DActivity : AppCompatActivity() {
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
                 GLES20.glViewport(0, 0, width, height)
-                mContext.displaySize = Size(width, height)
+                mContext.previewSize = Size(width, height)
             }
 
             override fun onDrawFrame(gl: GL10?) {
@@ -157,7 +157,7 @@ class Texture2DActivity : AppCompatActivity() {
             } else {
                 mTexture2DProgram.setScaleType(mScaleType)
             }
-            mContext?.let { mTexture2DProgram.setTargetSize(it.displaySize) }
+            mContext?.let { mTexture2DProgram.setTargetSize(it.previewSize) }
             mTexture2DProgram.draw()
         }
 

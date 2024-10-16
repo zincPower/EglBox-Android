@@ -24,11 +24,11 @@ class FilterContext(val renderType: RenderType) {
     private var mListener: MessageListener? = null
 
     /**
-     * 展示的尺寸
+     * 预览的尺寸
      * 如果是上屏环境 [RenderType.OnScreen] ，则为最后上屏的控件尺寸
      * 如果是离屏环境 [RenderType.OffScreen] ，则为 PBuffer 的创建尺寸
      */
-    var displaySize = Size(0, 0)
+    var previewSize = Size(0, 0)
 
     // 单次渲染数据，再一次渲染后会清空
     val renderData = HashMap<String, Any>()
@@ -63,7 +63,7 @@ class FilterContext(val renderType: RenderType) {
     fun release() {
         mCachePool.release()
         mListener = null
-        displaySize = Size(0, 0)
+        previewSize = Size(0, 0)
         renderData.clear()
         contextData.clear()
         texture2DProgram.release()
