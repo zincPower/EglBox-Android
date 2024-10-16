@@ -117,6 +117,8 @@ class GLEngine private constructor(config: GLEngineConfig) {
 
     fun getLooper(): Looper? = mGLThread?.getLooper()
 
+    fun getGLThread():GLThread? = mGLThread
+
     fun notifyWindowCreated(window: Any?, width: Int, height: Int) {
         mGLThread?.handleWindowCreated(window, width, height)
     }

@@ -2,15 +2,23 @@ package com.jiangpengyong.eglbox_core.view
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
+import android.util.Size
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
+import com.jiangpengyong.eglbox_core.filter.FilterData
+import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.processor.display.DisplayProcessor
+import com.jiangpengyong.eglbox_core.processor.image.ImageError
+import com.jiangpengyong.eglbox_core.processor.image.ImageParams
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
-import com.jiangpengyong.eglbox_core.processor.offscreen.OffscreenProcessor
+import com.jiangpengyong.eglbox_core.processor.image.ImageProcessor
+import com.jiangpengyong.eglbox_core.processor.image.ProcessFinishCallback
+import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -23,7 +31,7 @@ class GLDisplayView : FrameLayout {
     private val mSurfaceId = "GLPreviewView-${System.currentTimeMillis()}"
     private val mFilterIdCreator = AtomicInteger()
     private val mDisplayProcessor = DisplayProcessor()
-    private val mOffscreenProcessor = OffscreenProcessor()
+    private val mImageProcessor = ImageProcessor()
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -47,7 +55,7 @@ class GLDisplayView : FrameLayout {
             launch()
             setPreviewSurfaceId(mSurfaceId)
         }
-        mOffscreenProcessor.launch()
+        mImageProcessor.launch()
         val textureView = TextureView(context)
         textureView.surfaceTextureListener = SurfaceTextureListenerImpl(mSurfaceId)
         addView(textureView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -55,7 +63,7 @@ class GLDisplayView : FrameLayout {
 
     private fun release() {
         mDisplayProcessor.destroy()
-        mOffscreenProcessor.destroy()
+        mImageProcessor.destroy()
     }
 
     fun requestRender() {
@@ -89,10 +97,38 @@ class GLDisplayView : FrameLayout {
         requestRender()
     }
 
-    fun exportImage(callback: (result: Bitmap) -> Unit) {
+    fun exportImage(bitmap: Bitmap, data: HashMap<String, Any>, callback: (result: Bitmap?) -> Unit) {
         mDisplayProcessor.getFilterData(DisplayProcessor.FilterType.Process) { filterData ->
+            if (filterData == null) {
+                callback(null)
+                return@getFilterData
+            }
             // TODO 离屏处理
             Log.i(TAG, "FilterData=${filterData}")
+            mImageProcessor.process(
+                ImageParams(
+                    bitmap = bitmap,
+                    targetSize = Size(bitmap.width, bitmap.height),
+                    normalOrientation = Orientation.Orientation_0,
+                    deviceOrientation = Orientation.Orientation_0,
+                    normalMirror = false,
+                    focusMirror = false,
+                    data = data,
+                    filterData = filterData
+                ), object : ProcessFinishCallback {
+                    override fun onSuccess(pixelBuffer: ByteBuffer, size: Size, data: Map<String, Any>) {
+                        Bitmap.createBitmap(size.width, size.height, Bitmap.Config.ARGB_8888)
+                            .apply {
+                                copyPixelsFromBuffer(pixelBuffer)
+                                callback(this)
+                            }
+                    }
+
+                    override fun onFailure(error: ImageError) {
+                        Log.e(TAG, "Process image failure. error=${error}")
+                        callback(null)
+                    }
+                })
         }
     }
 
@@ -122,6 +158,6 @@ class GLDisplayView : FrameLayout {
 }
 
 interface ExportCallback {
-    fun onSuccess(bitmap: Bitmap)
+    fun onSuccess(pixelBuffer: ByteArray, size: Size, data: Map<String, Any>)
     fun onFailure()
 }

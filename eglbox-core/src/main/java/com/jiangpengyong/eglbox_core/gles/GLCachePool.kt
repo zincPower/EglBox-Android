@@ -23,14 +23,14 @@ class GLCachePool(
     }
 
     fun getFBO(): GLFrameBuffer {
-        if (mFBOCache.isEmpty()) {
-            return GLFrameBuffer().apply { init() }
+        return if (mFBOCache.isEmpty()) {
+            GLFrameBuffer().apply { init() }
         } else {
             var fbo = mFBOCache.removeFirst()
             if (!fbo.isInit()) {
                 fbo = GLFrameBuffer().apply { init() }
             }
-            return fbo
+            fbo
         }
     }
 

@@ -171,17 +171,17 @@ class DrawRangeElementsModeActivity : AppCompatActivity() {
         )
         private var mColorBuffer = allocateFloatBuffer(
             floatArrayOf(
-                1F, 1F, 1F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
-                1F, 0F, 0F, 0F,
+                1F, 1F, 1F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
+                1F, 0F, 0F, 1F,
             )
         )
 

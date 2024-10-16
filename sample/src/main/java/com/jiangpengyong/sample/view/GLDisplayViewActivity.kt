@@ -2,7 +2,9 @@ package com.jiangpengyong.sample.view
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.jiangpengyong.eglbox_core.processor.display.DisplayProcessor
@@ -83,9 +85,19 @@ class GLDisplayViewActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.export).setOnClickListener {
-            displayView.exportImage {
-
+            displayView.exportImage(
+                bitmap = BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.png").absolutePath),
+                data = hashMapOf(),
+            ) { bitmap ->
+                runOnUiThread {
+                    findViewById<ImageView>(R.id.result_image)
+                        .setImageBitmap(bitmap)
+                }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "GLDisplayViewActivity"
     }
 }

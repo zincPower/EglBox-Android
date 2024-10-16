@@ -31,9 +31,9 @@ class TriangleProgram : GLProgram() {
     )
     private val mColorBuffer = allocateFloatBuffer(
         floatArrayOf(
-            1F, 0F, 0F, 0F,
-            0F, 1F, 0F, 0F,
-            0F, 0F, 1F, 0F
+            1F, 0F, 0F, 1F,
+            0F, 1F, 0F, 1F,
+            0F, 0F, 1F, 1F
         )
     )
 

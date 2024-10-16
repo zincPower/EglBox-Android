@@ -77,7 +77,7 @@ class FilterChain(renderType: RenderType) {
 
     @GLThread
     fun notifySurfaceSizeChanged(surface: EglSurface) {
-
+        // TODO
     }
 
     @GLThread
@@ -139,6 +139,13 @@ class FilterChain(renderType: RenderType) {
     fun removeListener(listener: MessageListener) {
         this.mListener.removeListener(listener)
     }
+
+    @GLThread
+    fun setDeviceOrientation(orientation: Orientation) {
+        mContext.deviceOrientation = orientation
+    }
+
+    fun getContext() = mContext
 
     companion object {
         const val TAG = "FilterChain"

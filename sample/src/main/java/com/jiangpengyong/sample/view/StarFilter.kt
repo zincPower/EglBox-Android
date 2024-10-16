@@ -46,7 +46,7 @@ class StarFilter : GLFilter() {
                 context.texture2DProgram.draw()
                 drawStar()
             }
-            fbo.unbindTexture()?.let { imageInOut.reset(it) }
+            fbo.unbindTexture()?.let { imageInOut.out(it) }
         }
     }
 
@@ -113,18 +113,18 @@ class StarProgram : GLProgram() {
     )
     private var mColorBuffer = allocateFloatBuffer(
         floatArrayOf(
-            1F, 1F, 1F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
-            1F, 0F, 0F, 0F,
+            1F, 1F, 1F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
+            1F, 0F, 0F, 1F,
         )
     )
 

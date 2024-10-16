@@ -164,7 +164,7 @@ class PointSpriteArrayActivity : AppCompatActivity() {
 
             override fun onDrawFrame(gl: GL10?) {
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-                mImage.reset(mTexture)
+                mImage.out(mTexture)
                 mFilter.draw(mImage)
                 mImage.clear()
             }

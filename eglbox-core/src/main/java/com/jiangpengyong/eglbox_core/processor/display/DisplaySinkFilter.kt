@@ -61,7 +61,9 @@ class DisplaySinkFilter : SinkFilter() {
         }
 
         if (mIsNeedCalculate) {
-            mMatrix = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, mPreviewSize, mBeforeImageSize)
+            val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, mBeforeImageSize, mPreviewSize)
+            mMatrix.reset()
+            mMatrix.scale(scaleX, scaleY, 1F)
             mIsNeedCalculate = false
         }
 

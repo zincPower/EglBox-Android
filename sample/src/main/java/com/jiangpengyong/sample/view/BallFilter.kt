@@ -59,7 +59,7 @@ class BallFilter : GLFilter() {
                 GLES20.glDisable(GLES20.GL_DEPTH_TEST)
                 GLES20.glDisable(GLES20.GL_CULL_FACE)
             }
-            fbo.unbindTexture()?.let { imageInOut.reset(it) }
+            fbo.unbindTexture()?.let { imageInOut.out(it) }
         }
     }
 

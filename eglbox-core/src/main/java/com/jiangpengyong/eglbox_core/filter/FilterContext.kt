@@ -28,7 +28,7 @@ class FilterContext(val renderType: RenderType) {
      * 如果是上屏环境 [RenderType.OnScreen] ，则为最后上屏的控件尺寸
      * 如果是离屏环境 [RenderType.OffScreen] ，则为 PBuffer 的创建尺寸
      */
-    var displaySize: Size = Size(0, 0)
+    var displaySize = Size(0, 0)
 
     // 单次渲染数据，再一次渲染后会清空
     val renderData = HashMap<String, Any>()
@@ -36,7 +36,11 @@ class FilterContext(val renderType: RenderType) {
     // 滤镜链上下文数据，生命周期和滤镜链一样
     val contextData = HashMap<String, Any>()
 
+    // 2D 图像渲染
     val texture2DProgram = Texture2DProgram(Target.TEXTURE_2D)
+
+    // 设备角度
+    var deviceOrientation = Orientation.Orientation_0
 
     /**
      * EGL 环境

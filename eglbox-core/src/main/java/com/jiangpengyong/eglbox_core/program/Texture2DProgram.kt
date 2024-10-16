@@ -1,5 +1,6 @@
 package com.jiangpengyong.eglbox_core.program
 
+import android.icu.number.Scale
 import android.opengl.GLES20
 import android.util.Size
 import com.jiangpengyong.eglbox_core.gles.GLProgram
@@ -215,11 +216,13 @@ class Texture2DProgram(val target: Target) : GLProgram() {
         mBeforeTexture2DInfo.update(mCurrentTexture2DInfo)
         mTextureMatrix = IDENTITY_MATRIX_4x4
 
-        val matrix = VertexAlgorithmFactory.calculate(
+        val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
             mCurrentTexture2DInfo.scaleType,
+            textureSize,
             targetSize,
-            textureSize
         )
+        val matrix = ModelMatrix()
+        matrix.scale(scaleX, scaleY, 1F)
         matrix.scale(
             if (mCurrentTexture2DInfo.isMirrorX) -1F else 1F,
             if (mCurrentTexture2DInfo.isMirrorY) -1F else 1F,
@@ -308,7 +311,7 @@ enum class ScaleType {
 
 object VertexAlgorithmFactory {
 
-    private val algorithm = ArrayList<VertexAlgorithm>()
+    private val algorithm = ArrayList<ScaleAlgorithm>()
 
     init {
         algorithm.add(CenterCropAlgorithm())
@@ -316,31 +319,33 @@ object VertexAlgorithmFactory {
         algorithm.add(FitXYAlgorithm())
     }
 
-    fun calculate(scaleType: ScaleType, targetSize: Size, sourceSize: Size): ModelMatrix {
+    fun calculate(scaleType: ScaleType, sourceSize: Size, targetSize: Size): ScaleInfo {
         for (item in algorithm) {
             if (item.getScaleType() == scaleType) {
-                return item.handle(targetSize, sourceSize)
+                return item.handle(sourceSize, targetSize)
             }
         }
-        return ModelMatrix()
+        return ScaleInfo(
+            scaleX = 1F,
+            scaleY = 1F,
+        )
     }
 
 }
 
-interface VertexAlgorithm {
+interface ScaleAlgorithm {
     fun getScaleType(): ScaleType
 
-    fun handle(targetSize: Size, sourceSize: Size): ModelMatrix
+    fun handle(sourceSize: Size, targetSize: Size): ScaleInfo
 }
 
-class CenterCropAlgorithm : VertexAlgorithm {
+class CenterCropAlgorithm : ScaleAlgorithm {
     override fun getScaleType(): ScaleType = ScaleType.CENTER_CROP
-    override fun handle(targetSize: Size, sourceSize: Size): ModelMatrix {
-        val matrix = ModelMatrix()
+    override fun handle(sourceSize: Size, targetSize: Size): ScaleInfo {
         val targetRatio = targetSize.width.toFloat() / targetSize.height.toFloat()
         val sourceRatio = sourceSize.width.toFloat() / sourceSize.height.toFloat()
-        var scaleX = 1F
-        var scaleY = 1F
+        val scaleX: Float
+        val scaleY: Float
         if (targetRatio < sourceRatio) { // 横图
             val width = sourceSize.height * targetRatio
             scaleX = sourceSize.width.toFloat() / width
@@ -353,21 +358,21 @@ class CenterCropAlgorithm : VertexAlgorithm {
         Logger.i(
             "CenterCropAlgorithm",
             "handle targetRatio=${targetRatio}, sourceRatio=${sourceRatio}, scaleX=${scaleX}, scaleY=${scaleY}"
-        );
-        matrix.reset()
-        matrix.scale(scaleX, scaleY, 1F)
-        return matrix
+        )
+        return ScaleInfo(
+            scaleX = scaleX,
+            scaleY = scaleY,
+        )
     }
 }
 
-class CenterInsideAlgorithm : VertexAlgorithm {
+class CenterInsideAlgorithm : ScaleAlgorithm {
     override fun getScaleType(): ScaleType = ScaleType.CENTER_INSIDE
-    override fun handle(targetSize: Size, sourceSize: Size): ModelMatrix {
-        val matrix = ModelMatrix()
+    override fun handle(sourceSize: Size, targetSize: Size): ScaleInfo {
         val targetRatio = targetSize.width.toFloat() / targetSize.height.toFloat()
         val sourceRatio = sourceSize.width.toFloat() / sourceSize.height.toFloat()
-        var scaleX = 1F
-        var scaleY = 1F
+        val scaleX: Float
+        val scaleY: Float
         if (targetRatio < sourceRatio) { // 横图
             val height = targetSize.width.toFloat() / sourceRatio
             scaleX = 1.0F
@@ -381,13 +386,22 @@ class CenterInsideAlgorithm : VertexAlgorithm {
             "CenterInsideAlgorithm",
             "handle targetRatio=${targetRatio}, sourceRatio=${sourceRatio}, scaleX=${scaleX}, scaleY=${scaleY}"
         );
-        matrix.reset()
-        matrix.scale(scaleX, scaleY, 1F)
-        return matrix
+        return ScaleInfo(
+            scaleX = scaleX,
+            scaleY = scaleY,
+        )
     }
 }
 
-class FitXYAlgorithm : VertexAlgorithm {
+class FitXYAlgorithm : ScaleAlgorithm {
     override fun getScaleType(): ScaleType = ScaleType.FIT_XY
-    override fun handle(targetSize: Size, sourceSize: Size): ModelMatrix = ModelMatrix()
+    override fun handle(sourceSize: Size, targetSize: Size): ScaleInfo = ScaleInfo(
+        scaleX = 1F,
+        scaleY = 1F,
+    )
 }
+
+data class ScaleInfo(
+    val scaleX: Float,  // x 轴缩放
+    val scaleY: Float,  // y 轴缩放
+)

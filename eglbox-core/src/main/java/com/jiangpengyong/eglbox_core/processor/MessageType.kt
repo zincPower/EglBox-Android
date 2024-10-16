@@ -5,12 +5,20 @@ object MessageType {
     const val REQUEST_RENDER = -10000
 
     // 上屏处理，设置图片
-    const val DISPLAY_SET_IMAGE = -20001
+    const val DISPLAY_SET_IMAGE = -10001
 
     // 上屏处理，设置空白
-    const val DISPLAY_SET_BLANK = -20002
+    const val DISPLAY_SET_BLANK = -10002
 
-    const val SURFACE_CREATED = -20003
-    const val SURFACE_CHANGED = -20004
-    const val SURFACE_DESTROY = -20005
+    // native window 生命周期
+    const val SURFACE_CREATED = -10003
+    const val SURFACE_CHANGED = -10004
+    const val SURFACE_DESTROY = -10005
+
+    // 后置处理参数
+    const val PROCESS_INPUT_PARAMS = -10006
+    // 后置处理回调
+    const val PROCESS_INPUT_CALLBACK = -10007
+    // 后置处理出图
+    const val PROCESS_RESULT_OUTPUT = -10007
 }

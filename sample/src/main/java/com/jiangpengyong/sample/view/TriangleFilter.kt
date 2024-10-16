@@ -26,7 +26,7 @@ class TriangleFilter : GLFilter() {
                 context.texture2DProgram.draw()
                 mTriangleProgram.draw()
             }
-            fbo.unbindTexture()?.let { imageInOut.reset(it) }
+            imageInOut.out(fbo)
         }
     }
 
@@ -66,9 +66,9 @@ class TriangleProgram : GLProgram() {
     )
     private val mColorBuffer = allocateFloatBuffer(
         floatArrayOf(
-            1F, 0F, 0F, 0F,
-            0F, 1F, 0F, 0F,
-            0F, 0F, 1F, 0F
+            1F, 0F, 0F, 1F,
+            0F, 1F, 0F, 1F,
+            0F, 0F, 1F, 1F
         )
     )
 

@@ -2,6 +2,7 @@ package com.jiangpengyong.eglbox_core.gles
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.logger.Logger
+import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
 
@@ -147,7 +148,7 @@ class GLFrameBuffer : GLObject {
             return null
         }
         val pixelSize = width * height * 4
-        val pixels = IntBuffer.allocate(pixelSize)
+        val pixels = ByteBuffer.allocate(pixelSize)
         pixels.position(0)
         use {
             GLES20.glReadPixels(
@@ -169,7 +170,7 @@ class GLFrameBuffer : GLObject {
         return "[ GLFrameBuffer id=${id}, texture=${mTexture} ] "
     }
 
-    companion object{
+    companion object {
         private const val TAG = "GLFrameBuffer"
     }
 }

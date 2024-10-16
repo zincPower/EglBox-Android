@@ -22,8 +22,8 @@ import com.jiangpengyong.eglbox_core.processor.MessageType.REQUEST_RENDER
  * @desc: GL 处理器
  */
 abstract class GLProcessor : MessageListener {
-    private var mGLEngine: GLEngine? = null
-    private var mGLRenderer: FilterChainRenderer? = null
+    protected var mGLEngine: GLEngine? = null
+    protected var mGLRenderer: FilterChainRenderer? = null
 
     @MainThread
     fun launch() {

@@ -114,12 +114,12 @@ class GLTexture(
         GLES20.glBindTexture(target.value, id)
         // https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glTexImage2D.xml
         GLUtils.texImage2D(
-            target.value,               // 纹理类型
-            0,                           // 层次
+            target.value,                       // 纹理类型
+            0,                             // 层次
             GLUtils.getInternalFormat(bitmap),  // 指定纹理的内部格式
             bitmap,                             // 纹理图像
-            GLUtils.getType(bitmap),            // 指定 texel 数据的格式，必须匹配 internal format。
-            0                           // 纹理边框尺寸
+            GLUtils.getType(bitmap),            // 指定 texel 数据的格式，必须匹配 internal format
+            0,                           // 纹理边框尺寸
         )
         unbind()
         Logger.i(TAG, "Create texture by bitmap. id=$id, size=${this.width} x ${this.height}")

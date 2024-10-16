@@ -21,6 +21,7 @@ import com.jiangpengyong.eglbox_core.gles.Target
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
+import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
 import java.io.File
@@ -139,6 +140,7 @@ class TextureSampleActivity : AppCompatActivity() {
     class Texture2DFilter : GLFilter() {
         private val mTexture2DProgram = Texture2DProgram(Target.TEXTURE_2D)
         private var mFilterMode = MIN_NEAREST or MAG_NEAREST
+        private val mMatrix = ModelMatrix()
 
         private val mMinNearestTexture = GLTexture(
             minFilter = MinFilter.NEAREST,
@@ -191,14 +193,16 @@ class TextureSampleActivity : AppCompatActivity() {
             }
             smallTexture?.let {
                 mTexture2DProgram.setTexture(it)
-                val matrix = VertexAlgorithmFactory.calculate(
+                val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
                     ScaleType.CENTER_INSIDE,
-                    context.displaySize,
                     Size(it.width, it.height),
+                    context.displaySize,
                 )
-                matrix.scale(0.8F, -0.8F, 1F)
-                matrix.translate(-1.3F, 0F, 0F)
-                mTexture2DProgram.setVertexMatrix(matrix.matrix)
+                mMatrix.reset()
+                mMatrix.scale(scaleX, scaleY, 1F)
+                mMatrix.scale(0.8F, -0.8F, 1F)
+                mMatrix.translate(-1.3F, 0F, 0F)
+                mTexture2DProgram.setVertexMatrix(mMatrix.matrix)
                 mTexture2DProgram.draw()
             }
 
@@ -212,14 +216,16 @@ class TextureSampleActivity : AppCompatActivity() {
 
             bigTexture?.let {
                 mTexture2DProgram.setTexture(it)
-                val matrix = VertexAlgorithmFactory.calculate(
+                val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
                     ScaleType.CENTER_INSIDE,
-                    context.displaySize,
                     Size(it.width, it.height),
+                    context.displaySize,
                 )
-                matrix.scale(0.8F, -0.8F, 1F)
-                matrix.translate(1.3F, 0F, 0F)
-                mTexture2DProgram.setVertexMatrix(matrix.matrix)
+                mMatrix.reset()
+                mMatrix.scale(scaleX, scaleY, 1F)
+                mMatrix.scale(0.8F, -0.8F, 1F)
+                mMatrix.translate(1.3F, 0F, 0F)
+                mTexture2DProgram.setVertexMatrix(mMatrix.matrix)
                 mTexture2DProgram.draw()
             }
         }

@@ -13,7 +13,7 @@ abstract class SourceFilter : GLFilter() {
     private var mTexture: GLTexture? = null
 
     fun getImage(): ImageInOut {
-        mTexture?.let { mImage.reset(it) }
+        mTexture?.let { mImage.out(it) }
         return mImage
     }
 

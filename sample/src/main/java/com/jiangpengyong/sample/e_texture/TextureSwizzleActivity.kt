@@ -135,9 +135,9 @@ class TextureSwizzleActivity : AppCompatActivity() {
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
 
                 if (mTextureType == 1) {
-                    mImage.reset(mTexture1)
+                    mImage.out(mTexture1)
                 } else {
-                    mImage.reset(mTexture2)
+                    mImage.out(mTexture2)
                 }
 
                 mFilter.draw(mImage)

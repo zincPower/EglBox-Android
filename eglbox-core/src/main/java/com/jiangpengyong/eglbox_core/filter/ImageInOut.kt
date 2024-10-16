@@ -18,18 +18,6 @@ class ImageInOut {
         mContext = context
     }
 
-    fun reset(texture: GLTexture) {
-        val curTex = this.texture
-        if (curTex != null && curTex.id != texture.id) {
-            if (mContext == null) {
-                curTex.release()
-            } else {
-                mContext?.recycle(curTex)
-            }
-        }
-        this.texture = texture
-    }
-
     fun isValid(): Boolean {
         val curTex = texture
         return curTex != null && curTex.isInit() && curTex.width > 0 && curTex.height > 0
@@ -37,10 +25,12 @@ class ImageInOut {
 
     fun out(texture: GLTexture, isAutoRelease: Boolean = true) {
         if (this.texture != null && this.texture?.id != texture.id && isAutoRelease) {
-            if (mContext == null) {
-                texture.release()
-            } else {
-                mContext?.recycle(texture)
+            this.texture?.let {
+                if (mContext == null) {
+                    it.release()
+                } else {
+                    mContext?.recycle(it)
+                }
             }
         }
         this.texture = texture

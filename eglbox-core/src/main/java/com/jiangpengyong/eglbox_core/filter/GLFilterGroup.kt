@@ -69,11 +69,7 @@ class GLFilterGroup : GLFilter() {
         // 所以按照滤镜数据的组装顺序进行数据恢复，使用原则则交由外部进行
         val childData = inputData.children
         if (childData.size != mFilters.size) {
-            Logger.e(
-                TAG,
-                "FilterData 和 Filter 的长度不同，滤镜链有问题。" +
-                        "ChildData size=${childData.size}, Filter size=${mFilters.size}"
-            )
+            Logger.e(TAG, "FilterData 和 Filter 的长度不同，滤镜链有问题。ChildData size=${childData.size}, Filter size=${mFilters.size}")
             return
         }
         mFilters.forEachIndexed { index, item ->

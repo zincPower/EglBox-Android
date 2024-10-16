@@ -137,9 +137,9 @@ class TextureWrapActivity : AppCompatActivity() {
             override fun onDrawFrame(gl: GL10?) {
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
                 when (mWrapMode) {
-                    1 -> mImage.reset(mRepeatTexture)
-                    2 -> mImage.reset(mMirrorTexture)
-                    3 -> mImage.reset(mEdgeTexture)
+                    1 -> mImage.out(mRepeatTexture)
+                    2 -> mImage.out(mMirrorTexture)
+                    3 -> mImage.out(mEdgeTexture)
                 }
                 mFilter.draw(mImage)
                 mImage.clear()
