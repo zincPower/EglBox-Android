@@ -12,6 +12,7 @@ import com.jiangpengyong.sample.d_light.LightMainActivity
 import com.jiangpengyong.sample.e_texture.TextureMainActivity
 import com.jiangpengyong.sample.f_geometry.GeometryMainActivity
 import com.jiangpengyong.sample.font.FontActivity
+import com.jiangpengyong.sample.g_model.ModelMainActivity
 import com.jiangpengyong.sample.view.GLPreviewViewActivity
 
 /**
@@ -47,6 +48,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.geometry).setOnClickListener {
             startActivity(Intent(this, GeometryMainActivity::class.java))
+        }
+
+        findViewById<View>(R.id.model).setOnClickListener {
+            startActivity(Intent(this, ModelMainActivity::class.java))
         }
 
         findViewById<View>(R.id.font).setOnClickListener {

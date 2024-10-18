@@ -3,6 +3,7 @@ package com.jiangpengyong.eglbox_core.view
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
+import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
@@ -93,6 +94,10 @@ class GLPreviewView : FrameLayout {
     fun removeFilter(filterId: String) {
         mPreviewProcessor.removeFilter(filterId)
         requestRender()
+    }
+
+    fun sendMessageToFilter(filterId: String, message: Message) {
+        mPreviewProcessor.sendMessageToFilter(filterId, message)
     }
 
     fun exportImage(bitmap: Bitmap, data: HashMap<String, Any>, callback: (result: Bitmap?) -> Unit) {

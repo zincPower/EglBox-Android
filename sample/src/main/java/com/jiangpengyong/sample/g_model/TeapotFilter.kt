@@ -1,5 +1,6 @@
-package com.jiangpengyong.sample.f_geometry.geometry.filter
+package com.jiangpengyong.sample.g_model
 
+import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
@@ -11,27 +12,19 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.sample.f_geometry.geometry.GeometryInfo
-import com.jiangpengyong.sample.f_geometry.geometry.GeometryProgram
-import com.jiangpengyong.sample.f_geometry.geometry.shape.GeometryBall
+import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 
 /**
  * @author jiang peng yong
- * @date 2024/8/31 17:25
+ * @date 2024/10/10 08:56
  * @email 56002982@qq.com
- * @des 几何球
+ * @des 茶壶滤镜
  */
-class GeometryBallFilter(
-    val length: Float = 2F,
-    val n: Int = 5
-) : GLFilter() {
-    private val mProgram = GeometryProgram()
+class TeapotFilter : GLFilter() {
+    private val mProgram = Model3DProgram()
 
-    private var mTopTexture: GLTexture? = null
-    private var mBottomTexture: GLTexture? = null
-    private var mSideTexture: GLTexture? = null
-
-    private val mSpringInfo: GeometryInfo = GeometryBall(length, n).create()
+    private var mModel3DInfo: Model3DInfo? = null
+    private var mTexture: GLTexture? = null
 
     private val mProjectMatrix = ProjectMatrix()
     private val mViewMatrix = ViewMatrix()
@@ -44,16 +37,6 @@ class GeometryBallFilter(
     private var mLightPosition = floatArrayOf(0F, 0F, 5F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
-    fun setTexture(
-        topTexture: GLTexture,
-        sideTexture: GLTexture,
-        bottomTexture: GLTexture,
-    ) {
-        this.mTopTexture = topTexture
-        this.mSideTexture = sideTexture
-        this.mBottomTexture = bottomTexture
-    }
-
     override fun onInit() {
         mProgram.init()
         updateViewMatrix()
@@ -61,7 +44,7 @@ class GeometryBallFilter(
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         updateProjectionMatrix(context)
-        drawTorus()
+        drawModel()
     }
 
     override fun onRelease() {
@@ -80,27 +63,49 @@ class GeometryBallFilter(
 
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}
-    override fun onReceiveMessage(message: Message) = synchronized(this) {
-        if (message.what == RESET) {
-            mXAngle = 0F
-            mYAngle = 0F
-            mModelMatrix.reset()
+    override fun onReceiveMessage(message: Message) {
+        synchronized(this) {
+            when (message.what) {
+                MessageWhat.RESET.value -> {
+                    mXAngle = 0F
+                    mYAngle = 0F
+                    mModelMatrix.reset()
+                }
+
+                MessageWhat.OBJ_DATA.value -> {
+                    message.obj?.toString()?.let {
+                        mModel3DInfo = Obj3DModelUtils.load(it)
+                    }
+                }
+
+                MessageWhat.OBJ_TEXTURE.value -> {
+                    (message.obj as? Bitmap)?.apply {
+                        mTexture?.release()
+                        mTexture = GLTexture()
+                        mTexture?.init()
+                        mTexture?.setData(this)
+                    }
+                }
+
+                else -> {}
+            }
         }
     }
 
-    private fun drawTorus() {
-        mTopTexture?.let { mProgram.setTexture(it) }
+    private fun drawModel() {
+        val model3DInfo = mModel3DInfo ?: return
+        val texture = mTexture ?: return
+        mProgram.setTexture(texture)
         mProgram.setCameraPosition(mCameraPosition)
         mProgram.setLightPosition(mLightPosition)
         mProgram.setData(
-            vertexBuffer = mSpringInfo.vertexBuffer,
-            textureBuffer = mSpringInfo.textureBuffer,
-            normalBuffer = mSpringInfo.normalBuffer,
-            vertexCount = mSpringInfo.vertexCount
+            vertexBuffer = allocateFloatBuffer(model3DInfo.vertexData),
+            textureBuffer = model3DInfo.textureData?.let { allocateFloatBuffer(it) },
+            normalBuffer = model3DInfo.normalData?.let { allocateFloatBuffer(it) },
+            vertexCount = model3DInfo.count
         )
-        GLES20.glFrontFace(mSpringInfo.frontFace.value)
-        mProgram.setDrawMode(mSpringInfo.drawMode)
-//        mProgram.setDrawMode(DrawMode.LineStrip)
+        GLES20.glFrontFace(model3DInfo.frontFace.value)
+        mProgram.setDrawMode(DrawMode.Triangles)
         mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
         mProgram.setMMatrix(mModelMatrix)
         mProgram.draw()
@@ -136,6 +141,12 @@ class GeometryBallFilter(
     }
 
     companion object {
-        const val RESET = 10000
+        const val TAG = "TeapotFilter"
     }
+}
+
+enum class MessageWhat(val value: Int) {
+    RESET(10000),
+    OBJ_DATA(10001),
+    OBJ_TEXTURE(10002),
 }

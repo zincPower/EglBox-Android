@@ -24,5 +24,10 @@ class App : Application() {
             assetDir = "images",
             srcFolder = filesDir
         )
+        FileUtils.copyFiles(
+            assetManager = assets,
+            assetDir = "model",
+            srcFolder = filesDir
+        )
     }
 }

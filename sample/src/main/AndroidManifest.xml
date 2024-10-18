@@ -149,6 +149,9 @@
         <activity
             android:name="com.jiangpengyong.sample.g_model.ModelMainActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.g_model.TeapotActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
