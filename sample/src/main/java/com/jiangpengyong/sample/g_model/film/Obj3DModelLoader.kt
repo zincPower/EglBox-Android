@@ -1,11 +1,13 @@
-package com.jiangpengyong.sample.g_model
+package com.jiangpengyong.sample.g_model.film
 
 import android.content.res.Resources
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.logger.Logger
+import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.nio.FloatBuffer
 
 /**
  * @author jiang peng yong
@@ -48,7 +50,7 @@ import java.io.InputStreamReader
  *   -----> 如果再出现一个 g ，表示一组的结束
  * f -----> 一个面
  */
-object Obj3DModelUtils {
+object Obj3DModelLoader {
     private const val TAG = "Load3DMaxObjUtils"
 
     private const val VERTEX = "v"
@@ -113,6 +115,12 @@ object Obj3DModelUtils {
         val textureResultData = arrayListOf<Float>()
         // 组成面的法向量数据
         val normalResultData = arrayListOf<Float>()
+        var top = Float.MIN_VALUE
+        var bottom = Float.MAX_VALUE
+        var left = Float.MAX_VALUE
+        var right = Float.MIN_VALUE
+        var near = Float.MIN_VALUE
+        var far = Float.MAX_VALUE
 
         var isSuccess = true
 
@@ -141,9 +149,18 @@ object Obj3DModelUtils {
 
                     // 获取顶点数据，并存入
                     try {
-                        vertexData.add(temps[1].toFloat())
-                        vertexData.add(temps[2].toFloat())
-                        vertexData.add(temps[3].toFloat())
+                        val x = temps[1].toFloat()
+                        val y = temps[2].toFloat()
+                        val z = temps[3].toFloat()
+                        left = Math.min(x, left)
+                        right = Math.max(x, right)
+                        top = Math.max(y, top)
+                        bottom = Math.min(y, bottom)
+                        near = Math.max(z, near)
+                        far = Math.min(z, far)
+                        vertexData.add(x)
+                        vertexData.add(y)
+                        vertexData.add(z)
                     } catch (e: Exception) {
                         Logger.e(TAG, "Vertex data parse failure. e=${e.message}")
                         isSuccess = false
@@ -350,11 +367,12 @@ object Obj3DModelUtils {
 
         return if (isSuccess) {  // 成功
             Model3DInfo(
-                vertexResultData.toFloatArray(),
-                textureResultData.toFloatArray(),
-                textureSize,
-                normalResultData.toFloatArray(),
-                FrontFace.CCW
+                vertexData = vertexResultData.toFloatArray(),
+                textureData = textureResultData.toFloatArray(),
+                textureStep = textureSize,
+                normalData = normalResultData.toFloatArray(),
+                frontFace = FrontFace.CW,
+                space = Space(top, bottom, left, right, near, far)
             )
         } else {
             null
@@ -406,6 +424,7 @@ data class Model3DInfo(
     val textureStep: Int = 0,              // 纹理跨度
     val normalData: FloatArray?,           // 法向量数据
     val frontFace: FrontFace,              // 卷绕方向
+    val space: Space,                      // 空间
 ) {
     /**
      * 顶点数据
@@ -424,6 +443,15 @@ data class Model3DInfo(
      */
     val hasTexture: Boolean
         get() = (textureData?.size ?: 0) > 0
+
+    val vertexBuffer: FloatBuffer
+        get() = allocateFloatBuffer(vertexData)
+
+    val textureBuffer: FloatBuffer?
+        get() = textureData?.let { allocateFloatBuffer(it) }
+
+    val normalBuffer: FloatBuffer?
+        get() = normalData?.let { allocateFloatBuffer(it) }
 }
 
 /**
@@ -436,3 +464,18 @@ enum class FrontFace(val value: Int) {
     CW(GLES20.GL_CW),
     CCW(GLES20.GL_CCW),
 }
+
+/**
+ * @author jiang peng yong
+ * @date 2024/10/18 22:40
+ * @email 56002982@qq.com
+ * @des 空间
+ */
+data class Space(
+    val top: Float,
+    val bottom: Float,
+    val left: Float,
+    val right: Float,
+    val near: Float,
+    val far: Float,
+)

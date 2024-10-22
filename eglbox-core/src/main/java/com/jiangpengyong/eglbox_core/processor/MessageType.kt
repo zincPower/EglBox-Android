@@ -23,4 +23,7 @@ object MessageType {
 
     // 后置处理出图
     const val PROCESS_RESULT_OUTPUT = -10007
+
+    // 触碰事件
+    const val TOUCH_EVENT = -18000
 }

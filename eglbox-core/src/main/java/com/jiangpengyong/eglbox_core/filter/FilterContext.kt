@@ -11,7 +11,11 @@ import com.jiangpengyong.eglbox_core.gles.GLCachePool
 import com.jiangpengyong.eglbox_core.gles.GLFrameBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.gles.Target
+import com.jiangpengyong.eglbox_core.processor.bean.Angle
+import com.jiangpengyong.eglbox_core.processor.bean.Scale
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
+import com.jiangpengyong.eglbox_core.utils.ModelMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 
 /**
  * @author jiang peng yong
@@ -29,6 +33,10 @@ class FilterContext(val renderType: RenderType) {
      * 如果是离屏环境 [RenderType.OffScreen] ，则为 PBuffer 的创建尺寸
      */
     var previewSize = Size(0, 0)
+        set(value) {
+            // TODO 更新 space 的投影矩阵
+            field = value
+        }
 
     // 单次渲染数据，再一次渲染后会清空
     val renderData = HashMap<String, Any>()
@@ -41,6 +49,13 @@ class FilterContext(val renderType: RenderType) {
 
     // 设备角度
     var deviceOrientation = Orientation.Orientation_0
+        set(value) {
+            // TODO 更新 space 的投影矩阵
+            field = value
+        }
+
+    // 3D 空间信息
+    val space3D = Space3D()
 
     /**
      * EGL 环境
@@ -93,4 +108,21 @@ class FilterContext(val renderType: RenderType) {
     fun sendMessage(filterId: String, message: Message) {
         mListener?.onReceiveMessage(filterId, message)
     }
+}
+
+class Space3D {
+    var angle: Angle = Angle(0F, 0F, 0F)
+        set(value) {
+            field = value
+            gestureMatrix.reset()
+            gestureMatrix.rotate(value.angleX, 0F, 1F, 0F)
+            gestureMatrix.rotate(value.angleY, 1F, 0F, 0F)
+            gestureMatrix.rotate(value.angleZ, 0F, 0F, 1F)
+        }
+    var scale: Float = 1F
+
+    val projectMatrix: ProjectMatrix = ProjectMatrix().apply { reset() }
+    val gestureMatrix: ModelMatrix = ModelMatrix().apply { reset() }
+    var near: Float = 10F
+    var farval: Float = 100F
 }

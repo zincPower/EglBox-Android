@@ -2,6 +2,7 @@ package com.jiangpengyong.eglbox_core.processor.image
 
 import android.os.Message
 import android.util.Log
+import com.jiangpengyong.eglbox_core.GLThread
 import com.jiangpengyong.eglbox_core.engine.GLEngine
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterChain
@@ -89,6 +90,7 @@ class ImageProcessor : GLProcessor() {
 
     fun isLaunched(): Boolean = mTaskPool?.isRunning()?.get() ?: false
 
+    @GLThread
     private fun processTask(task: ImageProcessTask) {
         Log.i(TAG, "Start process task. task=${task}")
 

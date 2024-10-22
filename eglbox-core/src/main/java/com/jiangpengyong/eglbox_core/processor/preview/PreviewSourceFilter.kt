@@ -11,6 +11,7 @@ import com.jiangpengyong.eglbox_core.filter.SourceFilter
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.processor.MessageType
+import com.jiangpengyong.eglbox_core.processor.bean.Angle
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.isValid
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -98,6 +99,12 @@ class PreviewSourceFilter : SourceFilter() {
                 if (mIsNeedBlank) {
                     setBlank(mPreviewSize.width, mPreviewSize.height)
                 }
+            }
+
+            MessageType.TOUCH_EVENT -> {
+                val angle = message.obj as? Angle
+                angle ?: return
+                mContext?.space3D?.angle = angle
             }
         }
     }

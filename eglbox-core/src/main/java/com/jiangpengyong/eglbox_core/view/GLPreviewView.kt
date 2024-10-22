@@ -3,20 +3,26 @@ package com.jiangpengyong.eglbox_core.view
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
+import android.os.Bundle
 import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
+import android.view.MotionEvent
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
 import com.jiangpengyong.eglbox_core.filter.Orientation
+import com.jiangpengyong.eglbox_core.processor.GLProcessor.Companion.SOURCE_FILTER_ID
+import com.jiangpengyong.eglbox_core.processor.MessageType
+import com.jiangpengyong.eglbox_core.processor.bean.Angle
 import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ImageError
 import com.jiangpengyong.eglbox_core.processor.image.ImageParams
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
 import com.jiangpengyong.eglbox_core.processor.image.ImageProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ProcessFinishCallback
+import com.jiangpengyong.eglbox_core.processor.preview.PreviewSourceFilter
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -31,6 +37,9 @@ class GLPreviewView : FrameLayout {
     private val mFilterIdCreator = AtomicInteger()
     private val mPreviewProcessor = PreviewProcessor()
     private val mImageProcessor = ImageProcessor()
+
+    private var mBeforeY = 0f
+    private var mBeforeX = 0f
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -100,14 +109,38 @@ class GLPreviewView : FrameLayout {
         mPreviewProcessor.sendMessageToFilter(filterId, message)
     }
 
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        event ?: return false
+        val y = event.y
+        val x = event.x
+        when (event.action) {
+            MotionEvent.ACTION_MOVE -> {
+                val dx: Float = x - mBeforeX
+                val angleX = dx * TOUCH_SCALE_FACTOR
+
+                val dy: Float = y - mBeforeY
+                val angleY = dy * TOUCH_SCALE_FACTOR
+
+                Message.obtain().apply {
+                    what = MessageType.TOUCH_EVENT
+                    obj = Angle(angleX, angleY, 1F)
+                    sendMessageToFilter(SOURCE_FILTER_ID, this)
+                }
+                requestRender()
+            }
+        }
+        mBeforeY = y
+        mBeforeX = x
+        return true
+    }
+
     fun exportImage(bitmap: Bitmap, data: HashMap<String, Any>, callback: (result: Bitmap?) -> Unit) {
         mPreviewProcessor.getFilterData(PreviewProcessor.FilterType.Process) { filterData ->
             if (filterData == null) {
                 callback(null)
                 return@getFilterData
             }
-            // TODO 离屏处理
-            Log.i(TAG, "FilterData=${filterData}")
+            Log.i(TAG, "ExportImage filter data=${filterData}")
             mImageProcessor.process(
                 ImageParams(
                     bitmap = bitmap,
@@ -157,10 +190,7 @@ class GLPreviewView : FrameLayout {
 
     companion object {
         const val TAG = "GLPreviewView"
+        private const val TOUCH_SCALE_FACTOR = 1 / 4F
+        private const val RESET = 10000
     }
-}
-
-interface ExportCallback {
-    fun onSuccess(pixelBuffer: ByteArray, size: Size, data: Map<String, Any>)
-    fun onFailure()
 }

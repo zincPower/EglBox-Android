@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.g_model.film.FilmActivity
 
 class ModelMainActivity:AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +21,7 @@ class ModelMainActivity:AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.film).setOnClickListener{
-
+            startActivity(Intent(this, FilmActivity::class.java))
         }
     }
 }
