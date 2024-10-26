@@ -1,5 +1,6 @@
 package com.jiangpengyong.eglbox_core.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
@@ -38,8 +39,10 @@ class GLPreviewView : FrameLayout {
     private val mPreviewProcessor = PreviewProcessor()
     private val mImageProcessor = ImageProcessor()
 
-    private var mBeforeY = 0f
-    private var mBeforeX = 0f
+    private var mAngleX = 0F
+    private var mAngleY = 0F
+    private var mBeforeY = 0F
+    private var mBeforeX = 0F
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -109,28 +112,31 @@ class GLPreviewView : FrameLayout {
         mPreviewProcessor.sendMessageToFilter(filterId, message)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
         val y = event.y
         val x = event.x
         when (event.action) {
             MotionEvent.ACTION_MOVE -> {
-                val dx: Float = x - mBeforeX
-                val angleX = dx * TOUCH_SCALE_FACTOR
+                val dx = x - mBeforeX
+                mAngleX += dx * TOUCH_SCALE_FACTOR
 
-                val dy: Float = y - mBeforeY
-                val angleY = dy * TOUCH_SCALE_FACTOR
+                val dy = y - mBeforeY
+                mAngleY += dy * TOUCH_SCALE_FACTOR
+
+                Log.i(TAG, "angleX=${mAngleX} angleY=${mAngleY}")
 
                 Message.obtain().apply {
                     what = MessageType.TOUCH_EVENT
-                    obj = Angle(angleX, angleY, 1F)
+                    obj = Angle(mAngleX, mAngleY, 0F)
                     sendMessageToFilter(SOURCE_FILTER_ID, this)
                 }
                 requestRender()
             }
         }
-        mBeforeY = y
         mBeforeX = x
+        mBeforeY = y
         return true
     }
 

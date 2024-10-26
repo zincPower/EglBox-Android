@@ -14,6 +14,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
+import com.zinc.base.utils.Model3DInfo
 import javax.microedition.khronos.opengles.GL
 
 /**
@@ -91,7 +92,6 @@ class FilmFilter : GLFilter() {
                 MessageWhat.OBJ_DATA.value -> {
                     mModel3DInfo = message.obj as? Model3DInfo
                     mModelMatrix.reset()
-                    mModelMatrix.rotate(-45F, 1F, 0F, 0F)
                     mModel3DInfo?.space?.apply {
                         mModelMatrix.translate(
                             -(left + right) / 2F,

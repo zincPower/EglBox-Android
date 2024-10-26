@@ -122,24 +122,19 @@ class Model3DProgram : GLProgram() {
         texture.bind()
         GLES20.glUniform3f(mLightPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
         GLES20.glUniform3f(mCameraPositionHandle, mCameraPosition[0], mCameraPosition[1], mCameraPosition[2])
-        EGLBox.checkError("peng45")
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
-        EGLBox.checkError("peng3")
 
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
         GLES20.glUniform1i(mIsAddScatteredLightHandle, if (mIsAddScatteredLight) 1 else 0)
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
-        EGLBox.checkError("peng6")
 
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)
-        EGLBox.checkError("peng7")
         GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, mTextureBuffer)
 
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mNormalHandle)
         GLES20.glEnableVertexAttribArray(mTextureHandle)
-        EGLBox.checkError("peng8")
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)

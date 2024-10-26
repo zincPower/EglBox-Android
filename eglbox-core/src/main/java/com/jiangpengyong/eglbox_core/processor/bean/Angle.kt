@@ -7,7 +7,7 @@ package com.jiangpengyong.eglbox_core.processor.bean
  * @des 角度
  */
 data class Angle(
-    var angleX: Float,
-    var angleY: Float,
-    var angleZ: Float,
+    val angleX: Float,
+    val angleY: Float,
+    val angleZ: Float,
 )

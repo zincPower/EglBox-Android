@@ -115,14 +115,15 @@ class Space3D {
         set(value) {
             field = value
             gestureMatrix.reset()
-            gestureMatrix.rotate(value.angleX, 0F, 1F, 0F)
-            gestureMatrix.rotate(value.angleY, 1F, 0F, 0F)
-            gestureMatrix.rotate(value.angleZ, 0F, 0F, 1F)
+            // TODO 角度问题
+            gestureMatrix.rotate(-value.angleX, 0F, 1F, 0F)
+            gestureMatrix.rotate(-value.angleY, 1F, 0F, 0F)
+            gestureMatrix.rotate(-value.angleZ, 0F, 0F, 1F)
         }
     var scale: Float = 1F
 
     val projectMatrix: ProjectMatrix = ProjectMatrix().apply { reset() }
     val gestureMatrix: ModelMatrix = ModelMatrix().apply { reset() }
     var near: Float = 10F
-    var farval: Float = 100F
+    var far: Float = 100F
 }

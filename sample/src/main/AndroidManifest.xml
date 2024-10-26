@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.jiangpengyong.sample.g_model.film.FilmActivity"
+            android:name="com.jiangpengyong.sample.MainActivity"
             android:exported="true"
             android:screenOrientation="landscape">
             <intent-filter>
@@ -152,9 +152,9 @@
         <activity
             android:name="com.jiangpengyong.sample.g_model.TeapotActivity"
             android:screenOrientation="landscape" />
-<!--        <activity-->
-<!--            android:name="com.jiangpengyong.sample.g_model.film.FilmActivity"-->
-<!--            android:screenOrientation="landscape" />-->
+        <activity
+            android:name="com.jiangpengyong.sample.g_model.film.FilmActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"

@@ -10,6 +10,12 @@ import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 
+/**
+ * @author jiang peng yong
+ * @date 2024/10/24 08:14
+ * @email 56002982@qq.com
+ * @des 三角形滤镜
+ */
 class TriangleFilter : GLFilter() {
     private val mTriangleProgram = TriangleProgram()
 
@@ -38,13 +44,17 @@ class TriangleFilter : GLFilter() {
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {}
+
+    companion object{
+        const val TAG = "TriangleFilter"
+    }
 }
 
 /**
  * @author jiang peng yong
  * @date 2024/6/15 13:05
  * @email 56002982@qq.com
- * @des 绘制三角形
+ * @des 绘制三角形程序
  *    第一个点     第二个点
  *      红色       绿色
  *       ***********
