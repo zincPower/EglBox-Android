@@ -54,7 +54,7 @@ class BallFilter : GLFilter() {
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
                 GLES20.glFrontFace(GLES20.GL_CW)
-                mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+                mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix * context.space3D.gestureMatrix)
                 mProgram.draw()
                 GLES20.glDisable(GLES20.GL_DEPTH_TEST)
                 GLES20.glDisable(GLES20.GL_CULL_FACE)

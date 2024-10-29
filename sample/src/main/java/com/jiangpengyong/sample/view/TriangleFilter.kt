@@ -7,7 +7,10 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.GLProgram
+import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 
 /**
@@ -18,18 +21,47 @@ import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
  */
 class TriangleFilter : GLFilter() {
     private val mTriangleProgram = TriangleProgram()
+    private val mModelMatrix = ModelMatrix().apply {
+        rotate(60F, 1F, 0F, 0F)
+    }
+
+    private val mProjectMatrix = ProjectMatrix()
+    private val mViewMatrix = ViewMatrix()
 
     override fun onInit() {
         mTriangleProgram.init()
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+        mViewMatrix.setLookAtM(
+            0F, 0F, 3F,
+            0F, 0F, 0F,
+            0F, 1F, 0F
+        )
+        val previewSize = context.previewSize
+        if (previewSize.width > previewSize.height) {
+            val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
+            mProjectMatrix.setFrustumM(
+                -ratio, ratio,
+                -1F, 1F,
+                2F, 10F
+            )
+        } else {
+            val ratio = previewSize.height.toFloat() / previewSize.width.toFloat()
+            mProjectMatrix.setFrustumM(
+                -1F, 1F,
+                -ratio, ratio,
+                2F, 10F
+            )
+        }
+
         imageInOut.texture?.let { texture ->
             val fbo = context.getTexFBO(texture.width, texture.height)
             fbo.use {
                 context.texture2DProgram.reset()
                 context.texture2DProgram.setTexture(texture)
                 context.texture2DProgram.draw()
+                mTriangleProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix * context.space3D.gestureMatrix)
                 mTriangleProgram.draw()
             }
             imageInOut.out(fbo)
@@ -45,7 +77,7 @@ class TriangleFilter : GLFilter() {
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {}
 
-    companion object{
+    companion object {
         const val TAG = "TriangleFilter"
     }
 }
@@ -88,7 +120,11 @@ class TriangleProgram : GLProgram() {
 
     private val mVertexCount = 3
 
-    private val mMatrix = ModelMatrix()
+    private var mMatrix: GLMatrix = ModelMatrix()
+
+    fun setMatrix(matrix: GLMatrix) {
+        mMatrix = matrix
+    }
 
     override fun onInit() {
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")

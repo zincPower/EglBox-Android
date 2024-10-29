@@ -23,6 +23,6 @@ void main() {
 
     vec4 color = texture(sTexture, vTextureCoord);
 
-    fragColor = color * vAmbientLight + color * vDiffuseLight + color * vSpecularLight;
-//    fragColor = color;
+//    fragColor = color * vAmbientLight + color * vDiffuseLight + color * vSpecularLight;
+    fragColor = color;
 }

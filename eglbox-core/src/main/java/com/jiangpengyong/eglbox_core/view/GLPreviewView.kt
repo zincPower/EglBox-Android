@@ -112,6 +112,18 @@ class GLPreviewView : FrameLayout {
         mPreviewProcessor.sendMessageToFilter(filterId, message)
     }
 
+    fun resetRotation() {
+        mBeforeX = 0F
+        mBeforeY = 0F
+        mAngleX = 0F
+        mAngleY = 0F
+        Message.obtain().apply {
+            what = MessageType.TOUCH_RESET
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false

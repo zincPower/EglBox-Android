@@ -11,6 +11,7 @@ import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.eglbox_filter.BallFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File

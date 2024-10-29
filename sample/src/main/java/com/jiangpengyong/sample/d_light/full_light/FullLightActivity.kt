@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light
+package com.jiangpengyong.sample.d_light.full_light
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -26,7 +26,6 @@ import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-
 
 /**
  * @author jiang peng yong

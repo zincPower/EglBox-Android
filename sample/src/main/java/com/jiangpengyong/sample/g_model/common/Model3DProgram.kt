@@ -1,7 +1,6 @@
-package com.jiangpengyong.sample.g_model.film
+package com.jiangpengyong.sample.g_model.common
 
 import android.opengl.GLES20
-import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix

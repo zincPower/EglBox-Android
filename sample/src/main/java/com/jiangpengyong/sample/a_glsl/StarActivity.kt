@@ -14,7 +14,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_model.StarProgram
+import com.jiangpengyong.eglbox_filter.StarProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

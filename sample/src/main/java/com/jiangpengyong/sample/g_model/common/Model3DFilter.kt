@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.g_model.film
+package com.jiangpengyong.sample.g_model.common
 
 import android.graphics.Bitmap
 import android.opengl.GLES20
@@ -12,18 +12,14 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
-import com.jiangpengyong.sample.g_model.common.DrawMode
-import com.jiangpengyong.sample.g_model.common.Model3DInfo
-import com.jiangpengyong.sample.g_model.common.Model3DProgram
 
 /**
  * @author jiang peng yong
  * @date 2024/10/10 08:56
  * @email 56002982@qq.com
- * @des 茶壶滤镜
+ * @des 模型 3D 滤镜
  */
-class FilmFilter : GLFilter() {
+class Model3DFilter : GLFilter() {
     private val mProgram = Model3DProgram()
 
     private var mModel3DInfo: Model3DInfo? = null
@@ -33,42 +29,43 @@ class FilmFilter : GLFilter() {
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
 
-    private var mXAngle = 0F
-    private var mYAngle = 0F
-
     private var mPreviewSize = Size(0, 0)
     private var mLightPosition = floatArrayOf(0F, 0F, 500F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 500F)
 
     override fun onInit() {
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST)
-        GLES20.glEnable(GLES20.GL_CULL_FACE)
         mProgram.init()
-        updateViewMatrix()
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val srcTexture = imageInOut.texture ?: return
         val model3DInfo = mModel3DInfo ?: return
         val texture = mTexture ?: return
+
+        updateViewMatrix()
         updateProjectionMatrix(context)
         val fbo = context.getTexFBO(srcTexture.width, srcTexture.height)
+
         fbo.use {
+            GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+            GLES20.glEnable(GLES20.GL_CULL_FACE)
             mProgram.setTexture(texture)
             mProgram.setCameraPosition(mCameraPosition)
             mProgram.setLightPosition(mLightPosition)
             mProgram.setData(
-                vertexBuffer = allocateFloatBuffer(model3DInfo.vertexData),
+                vertexBuffer = model3DInfo.vertexBuffer,
                 textureBuffer = model3DInfo.textureBuffer,
                 normalBuffer = model3DInfo.normalBuffer,
                 vertexCount = model3DInfo.count
             )
-            GLES20.glFrontFace(model3DInfo.frontFace.value)
+            GLES20.glFrontFace(FrontFace.CW.value)
 
             mProgram.setDrawMode(DrawMode.Triangles)
             mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * context.space3D.gestureMatrix * mModelMatrix)
             mProgram.setMMatrix(context.space3D.gestureMatrix * mModelMatrix)
             mProgram.draw()
+            GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+            GLES20.glDisable(GLES20.GL_CULL_FACE)
         }
         imageInOut.out(fbo)
     }
@@ -83,13 +80,11 @@ class FilmFilter : GLFilter() {
     override fun onReceiveMessage(message: Message) {
         synchronized(this) {
             when (message.what) {
-                MessageWhat.RESET.value -> {
-                    mXAngle = 0F
-                    mYAngle = 0F
-                    mModelMatrix.reset()
+                Model3DMessageType.SET_MODEL_FRUSTUM.value -> {
+                    // TODO
                 }
 
-                MessageWhat.OBJ_DATA.value -> {
+                Model3DMessageType.SET_MODEL_DATA.value -> {
                     mModel3DInfo = message.obj as? Model3DInfo
                     mModelMatrix.reset()
                     mModel3DInfo?.space?.apply {
@@ -101,7 +96,7 @@ class FilmFilter : GLFilter() {
                     }
                 }
 
-                MessageWhat.OBJ_TEXTURE.value -> {
+                Model3DMessageType.SET_MODEL_TEXTURE_IMAGE.value -> {
                     (message.obj as? Bitmap)?.apply {
                         mTexture?.release()
                         mTexture = GLTexture()
@@ -150,8 +145,8 @@ class FilmFilter : GLFilter() {
     }
 }
 
-enum class MessageWhat(val value: Int) {
-    RESET(10000),
-    OBJ_DATA(10001),
-    OBJ_TEXTURE(10002),
+enum class Model3DMessageType(val value: Int) {
+    SET_MODEL_FRUSTUM(10001),       // 设置模型所处的视景体
+    SET_MODEL_DATA(10002),          // 设置模型数据
+    SET_MODEL_TEXTURE_IMAGE(10003), // 设置模型纹理数据
 }

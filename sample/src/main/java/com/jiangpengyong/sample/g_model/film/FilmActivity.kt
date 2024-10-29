@@ -12,7 +12,7 @@ import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.view.TriangleFilter
-import com.zinc.base.utils.Obj3DModelLoader
+import com.jiangpengyong.sample.g_model.common.Obj3DModelLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,7 +34,7 @@ class FilmActivity : AppCompatActivity() {
         FilterCenter.registerFilter(FilmFilter.TAG, FilmFilter::class.java)
         FilterCenter.registerFilter(TriangleFilter.TAG, TriangleFilter::class.java)
 
-        setContentView(R.layout.activity_teapot)
+        setContentView(R.layout.activity_model_3d)
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
             glPreviewView.setBlank()

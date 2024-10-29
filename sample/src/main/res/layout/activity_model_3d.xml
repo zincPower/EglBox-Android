@@ -13,6 +13,14 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/reset_rotation"
+            style="@style/common_button"
+            android:layout_width="100dp"
+            android:text="旋转重置"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/render"
             style="@style/common_button"
             android:layout_width="100dp"

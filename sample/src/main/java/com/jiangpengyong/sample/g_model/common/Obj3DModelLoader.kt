@@ -1,4 +1,4 @@
-package com.zinc.base.utils
+package com.jiangpengyong.sample.g_model.common
 
 import android.content.res.Resources
 import android.opengl.GLES20

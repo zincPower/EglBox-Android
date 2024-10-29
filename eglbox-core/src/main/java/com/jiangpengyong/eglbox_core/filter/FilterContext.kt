@@ -2,17 +2,16 @@ package com.jiangpengyong.eglbox_core.filter
 
 import android.os.Message
 import android.util.Size
-import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.egl.EGL
 import com.jiangpengyong.eglbox_core.egl.EglSurface
 import com.jiangpengyong.eglbox_core.egl.PBufferSurface
 import com.jiangpengyong.eglbox_core.egl.WindowSurface
+import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.gles.GLCachePool
 import com.jiangpengyong.eglbox_core.gles.GLFrameBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.gles.Target
 import com.jiangpengyong.eglbox_core.processor.bean.Angle
-import com.jiangpengyong.eglbox_core.processor.bean.Scale
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
@@ -115,10 +114,9 @@ class Space3D {
         set(value) {
             field = value
             gestureMatrix.reset()
-            // TODO 角度问题
-            gestureMatrix.rotate(-value.angleX, 0F, 1F, 0F)
-            gestureMatrix.rotate(-value.angleY, 1F, 0F, 0F)
-            gestureMatrix.rotate(-value.angleZ, 0F, 0F, 1F)
+            gestureMatrix.rotate(value.angleX, 0F, 1F, 0F)
+            gestureMatrix.rotate(value.angleY, 1F, 0F, 0F)
+            gestureMatrix.rotate(value.angleZ, 0F, 0F, 1F)
         }
     var scale: Float = 1F
 

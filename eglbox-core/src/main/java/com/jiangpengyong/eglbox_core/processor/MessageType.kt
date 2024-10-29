@@ -26,4 +26,6 @@ object MessageType {
 
     // 触碰事件
     const val TOUCH_EVENT = -18000
+    // 触碰重置
+    const val TOUCH_RESET = -18001
 }

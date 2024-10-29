@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light
+package com.jiangpengyong.sample.d_light.full_light
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram

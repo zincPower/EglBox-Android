@@ -101,10 +101,16 @@ class PreviewSourceFilter : SourceFilter() {
                 }
             }
 
+            // TODO 抽到更高
             MessageType.TOUCH_EVENT -> {
                 val angle = message.obj as? Angle
                 angle ?: return
                 mContext?.space3D?.angle = angle
+            }
+
+            // TODO 抽到更高
+            MessageType.TOUCH_RESET -> {
+                mContext?.space3D?.angle = Angle(0F, 0F, 0F)
             }
         }
     }

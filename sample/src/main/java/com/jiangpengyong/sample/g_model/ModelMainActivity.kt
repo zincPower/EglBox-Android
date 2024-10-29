@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.g_model.film.FilmActivity
+import com.jiangpengyong.sample.g_model.teapot.TeapotActivity
 
 class ModelMainActivity:AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

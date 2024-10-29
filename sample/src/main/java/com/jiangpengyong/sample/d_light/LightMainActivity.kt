@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.d_light.full_light.FullLightActivity
 
 /**
  * @author jiang peng yong

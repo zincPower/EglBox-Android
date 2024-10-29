@@ -81,7 +81,7 @@
             android:name="com.jiangpengyong.sample.d_light.SpecularLightActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.FullLightActivity"
+            android:name="com.jiangpengyong.sample.d_light.full_light.FullLightActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name="com.jiangpengyong.sample.d_light.LightSourceTypeActivity"
@@ -150,7 +150,7 @@
             android:name="com.jiangpengyong.sample.g_model.ModelMainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.g_model.TeapotActivity"
+            android:name="com.jiangpengyong.sample.g_model.teapot.TeapotActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name="com.jiangpengyong.sample.g_model.film.FilmActivity"

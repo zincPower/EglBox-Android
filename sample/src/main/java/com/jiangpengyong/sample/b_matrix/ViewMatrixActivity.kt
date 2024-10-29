@@ -18,7 +18,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_model.CubeProgram
+import com.jiangpengyong.eglbox_filter.CubeProgram
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.utils.toRadians
 import javax.microedition.khronos.egl.EGLConfig
