@@ -1,31 +1,21 @@
 package com.jiangpengyong.eglbox_core.processor
 
-object MessageType {
-    // 驱动渲染
-    const val REQUEST_RENDER = -10000
+object PreviewMessageType {
+    const val SET_IMAGE = -10001    // 设置图片
+    const val SET_BLANK = -10002    // 设置空白
+    const val SURFACE_CREATED = -10003  // native window 生命周期，创建
+    const val SURFACE_CHANGED = -10004  // native window 生命周期，变化
+    const val SURFACE_DESTROY = -10005  // native window 生命周期，销毁
+}
 
-    // 上屏处理，设置图片
-    const val PREVIEW_SET_IMAGE = -10001
+object ImageMessageType {
+    const val INPUT_PARAMS = -11001     // 后置处理参数
+    const val INPUT_CALLBACK = -11002   // 后置处理回调
+    const val RESULT_OUTPUT = -11003    // 后置处理出图
+}
 
-    // 上屏处理，设置空白
-    const val PREVIEW_SET_BLANK = -10002
-
-    // native window 生命周期
-    const val SURFACE_CREATED = -10003
-    const val SURFACE_CHANGED = -10004
-    const val SURFACE_DESTROY = -10005
-
-    // 后置处理参数
-    const val PROCESS_INPUT_PARAMS = -10006
-
-    // 后置处理回调
-    const val PROCESS_INPUT_CALLBACK = -10007
-
-    // 后置处理出图
-    const val PROCESS_RESULT_OUTPUT = -10007
-
-    // 触碰事件
-    const val TOUCH_EVENT = -18000
-    // 触碰重置
-    const val TOUCH_RESET = -18001
+object CommonMessageType {
+    const val REQUEST_RENDER = -12001   // 驱动渲染
+    const val UPDATE_ROTATION = -12002  // 触碰事件
+    const val RESET_ROTATION = -12003  // 触碰重置
 }

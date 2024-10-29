@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
-import android.os.Bundle
 import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
@@ -14,8 +13,8 @@ import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
 import com.jiangpengyong.eglbox_core.filter.Orientation
+import com.jiangpengyong.eglbox_core.processor.CommonMessageType
 import com.jiangpengyong.eglbox_core.processor.GLProcessor.Companion.SOURCE_FILTER_ID
-import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.processor.bean.Angle
 import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ImageError
@@ -23,7 +22,6 @@ import com.jiangpengyong.eglbox_core.processor.image.ImageParams
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
 import com.jiangpengyong.eglbox_core.processor.image.ImageProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ProcessFinishCallback
-import com.jiangpengyong.eglbox_core.processor.preview.PreviewSourceFilter
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -118,7 +116,7 @@ class GLPreviewView : FrameLayout {
         mAngleX = 0F
         mAngleY = 0F
         Message.obtain().apply {
-            what = MessageType.TOUCH_RESET
+            what = CommonMessageType.RESET_ROTATION
             sendMessageToFilter(SOURCE_FILTER_ID, this)
         }
         requestRender()
@@ -133,14 +131,10 @@ class GLPreviewView : FrameLayout {
             MotionEvent.ACTION_MOVE -> {
                 val dx = x - mBeforeX
                 mAngleX += dx * TOUCH_SCALE_FACTOR
-
                 val dy = y - mBeforeY
                 mAngleY += dy * TOUCH_SCALE_FACTOR
-
-                Log.i(TAG, "angleX=${mAngleX} angleY=${mAngleY}")
-
                 Message.obtain().apply {
-                    what = MessageType.TOUCH_EVENT
+                    what = CommonMessageType.UPDATE_ROTATION
                     obj = Angle(mAngleX, mAngleY, 0F)
                     sendMessageToFilter(SOURCE_FILTER_ID, this)
                 }

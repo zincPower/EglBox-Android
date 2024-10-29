@@ -1,6 +1,5 @@
 package com.jiangpengyong.eglbox_core.processor.image
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
@@ -9,7 +8,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.filter.SourceFilter
-import com.jiangpengyong.eglbox_core.processor.MessageType
+import com.jiangpengyong.eglbox_core.processor.ImageMessageType
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -77,7 +76,7 @@ class ImageSourceFilter : SourceFilter() {
 
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            MessageType.PROCESS_INPUT_PARAMS -> {
+            ImageMessageType.INPUT_PARAMS -> {
                 handleImageParams(message.obj as? ImageParams)
             }
         }

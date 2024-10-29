@@ -9,7 +9,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterData
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.GLFilterGroup
 import com.jiangpengyong.eglbox_core.processor.GLProcessor
-import com.jiangpengyong.eglbox_core.processor.MessageType
+import com.jiangpengyong.eglbox_core.processor.PreviewMessageType
 import com.jiangpengyong.eglbox_core.processor.listener.PreviewSurfaceListener
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
 
@@ -75,7 +75,7 @@ class PreviewProcessor : GLProcessor() {
 
     fun setImage(bitmap: Bitmap, isAutoRelease: Boolean) {
         val message = Message.obtain()
-        message.what = MessageType.PREVIEW_SET_IMAGE
+        message.what = PreviewMessageType.SET_IMAGE
         message.obj = bitmap
         message.arg1 = if (isAutoRelease) 1 else 0
         sendMessageToFilter(SOURCE_FILTER_ID, message)
@@ -83,7 +83,7 @@ class PreviewProcessor : GLProcessor() {
 
     fun setBlank() {
         val message = Message.obtain()
-        message.what = MessageType.PREVIEW_SET_BLANK
+        message.what = PreviewMessageType.SET_BLANK
         sendMessageToFilter(SOURCE_FILTER_ID, message)
     }
 

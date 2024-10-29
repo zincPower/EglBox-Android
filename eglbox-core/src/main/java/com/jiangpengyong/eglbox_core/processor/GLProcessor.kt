@@ -13,7 +13,7 @@ import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.MessageListener
 import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.logger.Logger
-import com.jiangpengyong.eglbox_core.processor.MessageType.REQUEST_RENDER
+import com.jiangpengyong.eglbox_core.processor.bean.Angle
 
 /**
  * @author: jiang peng yong
@@ -99,13 +99,27 @@ abstract class GLProcessor : MessageListener {
 
     @MainThread
     fun sendMessageToFilter(filterId: String, message: Message) = enqueueEvent {
-        mGLRenderer?.filterChain?.sendMessageToFilter(filterId, message)
+        when (message.what) {
+            CommonMessageType.RESET_ROTATION -> {
+                mGLRenderer?.filterChain?.getContext()?.space3D?.angle = Angle(0F, 0F, 0F)
+            }
+
+            CommonMessageType.UPDATE_ROTATION -> {
+                val angle = message.obj as? Angle
+                angle ?: return@enqueueEvent
+                mGLRenderer?.filterChain?.getContext()?.space3D?.angle = angle
+            }
+
+            else -> {
+                mGLRenderer?.filterChain?.sendMessageToFilter(filterId, message)
+            }
+        }
     }
 
     @GLThread
     override fun onReceiveMessage(filterId: String, message: Message) {
         when (message.what) {
-            REQUEST_RENDER -> requestRender()
+            CommonMessageType.REQUEST_RENDER -> requestRender()
             else -> onReceiveMessageFromFilter(filterId, message)
         }
     }
