@@ -1,4 +1,4 @@
 rootProject.name = "EglBox-Android"
 include ':sample'
 include ':eglbox-core'
-include ':eglbox-model'
+include ':eglbox-filter'
