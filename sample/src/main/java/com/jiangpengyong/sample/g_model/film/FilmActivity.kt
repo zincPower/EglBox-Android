@@ -11,8 +11,8 @@ import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_sample.R
-import com.jiangpengyong.sample.view.TriangleFilter
 import com.jiangpengyong.sample.g_model.common.Obj3DModelLoader
+import com.jiangpengyong.sample.view.TriangleFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,7 +45,7 @@ class FilmActivity : AppCompatActivity() {
             filterId?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
                     val file = File(filesDir, "model/teapot/teapot.obj")
-                    val model3DInfo = Obj3DModelLoader.load("model/teapot/teapot.obj", this@FilmActivity.baseContext.resources, textureFlip = true)
+                    val model3DInfo = Obj3DModelLoader.load(file, textureFlip = true)
                     if (model3DInfo == null) {
                         Logger.e(TAG, "Obj parser failure. File=${file}")
                         return@launch

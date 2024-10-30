@@ -78,35 +78,29 @@ class Model3DFilter : GLFilter() {
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
-        synchronized(this) {
-            when (message.what) {
-                Model3DMessageType.SET_MODEL_FRUSTUM.value -> {
-                    // TODO
+        when (message.what) {
+            Model3DMessageType.SET_MODEL_DATA.value -> {
+                mModel3DInfo = message.obj as? Model3DInfo
+                mModelMatrix.reset()
+                mModel3DInfo?.space?.apply {
+                    mModelMatrix.translate(
+                        -(left + right) / 2F,
+                        -(top + bottom) / 2F,
+                        -(near + far) / 2F,
+                    )
                 }
-
-                Model3DMessageType.SET_MODEL_DATA.value -> {
-                    mModel3DInfo = message.obj as? Model3DInfo
-                    mModelMatrix.reset()
-                    mModel3DInfo?.space?.apply {
-                        mModelMatrix.translate(
-                            -(left + right) / 2F,
-                            -(top + bottom) / 2F,
-                            -(near + far) / 2F,
-                        )
-                    }
-                }
-
-                Model3DMessageType.SET_MODEL_TEXTURE_IMAGE.value -> {
-                    (message.obj as? Bitmap)?.apply {
-                        mTexture?.release()
-                        mTexture = GLTexture()
-                        mTexture?.init()
-                        mTexture?.setData(this)
-                    }
-                }
-
-                else -> {}
             }
+
+            Model3DMessageType.SET_MODEL_TEXTURE_IMAGE.value -> {
+                (message.obj as? Bitmap)?.apply {
+                    mTexture?.release()
+                    mTexture = GLTexture()
+                    mTexture?.init()
+                    mTexture?.setData(this)
+                }
+            }
+
+            else -> {}
         }
     }
 
@@ -146,7 +140,6 @@ class Model3DFilter : GLFilter() {
 }
 
 enum class Model3DMessageType(val value: Int) {
-    SET_MODEL_FRUSTUM(10001),       // 设置模型所处的视景体
     SET_MODEL_DATA(10002),          // 设置模型数据
     SET_MODEL_TEXTURE_IMAGE(10003), // 设置模型纹理数据
 }
