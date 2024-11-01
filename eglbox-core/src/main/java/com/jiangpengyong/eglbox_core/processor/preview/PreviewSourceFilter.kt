@@ -10,8 +10,8 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.SourceFilter
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.logger.Logger
+import com.jiangpengyong.eglbox_core.processor.CommonMessageType
 import com.jiangpengyong.eglbox_core.processor.PreviewMessageType
-import com.jiangpengyong.eglbox_core.processor.bean.Angle
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.isValid
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -94,7 +94,7 @@ class PreviewSourceFilter : SourceFilter() {
                 }
             }
 
-            PreviewMessageType.SURFACE_CREATED -> {
+            CommonMessageType.SURFACE_CREATED -> {
                 mPreviewSize = Size(message.arg1, message.arg2)
                 if (mIsNeedBlank) {
                     setBlank(mPreviewSize.width, mPreviewSize.height)

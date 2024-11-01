@@ -4,8 +4,10 @@ import android.opengl.Matrix
 import android.util.Log
 import java.nio.FloatBuffer
 
+// 矩阵长度
 private const val MATRIX_LENGTH = 16
 
+// 单位矩阵
 val IDENTITY_MATRIX_4x4 = floatArrayOf(
     1.0F, 0.0F, 0.0F, 0.0F,
     0.0F, 1.0F, 0.0F, 0.0F,
@@ -365,6 +367,10 @@ open class GLMatrix {
         return result
     }
 
+    /**
+     * 四维矩阵 与 长度为 4 的列向量相乘
+     * @param other 为 3 维的列向量
+     */
     operator fun times(other: FloatArray): FloatArray {
         if (other.size != 3) {
             Log.e(TAG, "The parameter requires an array of length three.")

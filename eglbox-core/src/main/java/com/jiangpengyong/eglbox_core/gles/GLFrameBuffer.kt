@@ -3,8 +3,6 @@ package com.jiangpengyong.eglbox_core.gles
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.logger.Logger
 import java.nio.ByteBuffer
-import java.nio.IntBuffer
-
 
 /**
  * @author: jiang peng yong

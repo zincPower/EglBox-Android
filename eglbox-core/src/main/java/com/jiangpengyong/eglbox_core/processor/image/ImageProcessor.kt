@@ -205,6 +205,7 @@ enum class ImageError {
     FilterCreateFailure,
     FilterChainInvalid,
     GLThreadInvalid,
-    OutputParamsInvalid,
-    ReadPixelsFailure,
+    OutputParamsInvalid, // 输出参数异常
+    ReadPixelsFailure, // 读取像素失败
+    SnapshotFailure, // 截图失败
 }

@@ -17,7 +17,7 @@ abstract class SourceFilter : GLFilter() {
         return mImage
     }
 
-    protected fun updateTexture(texture: GLTexture) {
+    protected fun updateTexture(texture: GLTexture?) {
         this.mTexture = texture
     }
 }

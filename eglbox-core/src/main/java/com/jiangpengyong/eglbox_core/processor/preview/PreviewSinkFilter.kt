@@ -10,7 +10,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.SinkFilter
 import com.jiangpengyong.eglbox_core.logger.Logger
-import com.jiangpengyong.eglbox_core.processor.PreviewMessageType
+import com.jiangpengyong.eglbox_core.processor.CommonMessageType
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.program.isValid
@@ -22,7 +22,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
  * @email: 56002982@qq.com
  * @desc: 上屏上屏节点
  */
-class PreviewSinkFilter : SinkFilter() {
+open class PreviewSinkFilter : SinkFilter() {
     private var mMatrix = ModelMatrix()
     private var mPreviewSize = Size(0, 0)
     private var mBeforeImageSize = Size(0, 0)
@@ -88,21 +88,21 @@ class PreviewSinkFilter : SinkFilter() {
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            PreviewMessageType.SURFACE_CREATED -> {
+            CommonMessageType.SURFACE_CREATED -> {
                 val width = message.arg1
                 val height = message.arg2
                 Logger.i(TAG, "Create preview window. size=${width}x${height}")
                 createPreviewWindow(message.obj, width, height)
             }
 
-            PreviewMessageType.SURFACE_CHANGED -> {
+            CommonMessageType.SURFACE_CHANGED -> {
                 val width = message.arg1
                 val height = message.arg2
                 Logger.i(TAG, "Update preview window. size=${width}x${height}")
                 updatePreviewWindow(message.obj, width, height)
             }
 
-            PreviewMessageType.SURFACE_DESTROY -> {
+            CommonMessageType.SURFACE_DESTROY -> {
                 val curSurface = message.obj
                 val isEqual = if (mSurface == curSurface) "true" else "false"
                 Logger.i(TAG, "Destroy preview window. mWindow==window is $isEqual")
