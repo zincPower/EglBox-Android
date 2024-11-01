@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.g_model.film
+package com.jiangpengyong.sample.g_model
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -11,6 +11,8 @@ import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.g_model.common.Model3DFilter
+import com.jiangpengyong.sample.g_model.common.Model3DMessageType
 import com.jiangpengyong.sample.g_model.common.Obj3DModelLoader
 import com.jiangpengyong.sample.view.TriangleFilter
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +33,7 @@ class FilmActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        FilterCenter.registerFilter(FilmFilter.TAG, FilmFilter::class.java)
+        FilterCenter.registerFilter(Model3DFilter.TAG, Model3DFilter::class.java)
         FilterCenter.registerFilter(TriangleFilter.TAG, TriangleFilter::class.java)
 
         setContentView(R.layout.activity_model_3d)
@@ -39,12 +41,10 @@ class FilmActivity : AppCompatActivity() {
         glPreviewView.post {
             glPreviewView.setBlank()
 
-            filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, TriangleFilter.TAG, 0)
-
-            filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, FilmFilter.TAG, 0)
+            filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, Model3DFilter.TAG, 0)
             filterId?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val file = File(filesDir, "model/teapot/teapot.obj")
+                    val file = File(filesDir, "model/film/film.obj")
                     val model3DInfo = Obj3DModelLoader.load(file, textureFlip = true)
                     if (model3DInfo == null) {
                         Logger.e(TAG, "Obj parser failure. File=${file}")
@@ -53,19 +53,19 @@ class FilmActivity : AppCompatActivity() {
                     Logger.i(TAG, "Model 3D info. Space=${model3DInfo.space} File=${file}")
                     withContext(Dispatchers.Main) {
                         glPreviewView.sendMessageToFilter(it, Message.obtain().apply {
-                            what = MessageWhat.OBJ_DATA.value
+                            what = Model3DMessageType.SET_MODEL_DATA.value
                             obj = model3DInfo
                         })
                         glPreviewView.requestRender()
                     }
                 }
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val bitmap = (File(filesDir, "model/teapot/teapot.png").absolutePath.let {
+                    val bitmap = (File(filesDir, "model/film/film.jpg").absolutePath.let {
                         BitmapFactory.decodeFile(it)
                     })
                     withContext(Dispatchers.Main) {
                         glPreviewView.sendMessageToFilter(it, Message.obtain().apply {
-                            what = MessageWhat.OBJ_TEXTURE.value
+                            what = Model3DMessageType.SET_MODEL_TEXTURE_IMAGE.value
                             obj = bitmap
                         })
                         glPreviewView.requestRender()

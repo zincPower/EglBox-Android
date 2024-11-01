@@ -153,7 +153,7 @@
             android:name="com.jiangpengyong.sample.g_model.teapot.TeapotActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.g_model.film.FilmActivity"
+            android:name="com.jiangpengyong.sample.g_model.FilmActivity"
             android:screenOrientation="landscape" />
 
         <activity
