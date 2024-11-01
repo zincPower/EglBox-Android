@@ -66,7 +66,7 @@ class Model3DFilter : GLFilter() {
             )
 
             GLES20.glFrontFace(model3DInfo.frontFace.value)
-            val modelMatrix = mModelMatrix * context.space3D.gestureMatrix
+            val modelMatrix = context.space3D.gestureMatrix * mModelMatrix
             mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * modelMatrix)
             mProgram.setMMatrix(modelMatrix)
             mProgram.draw()

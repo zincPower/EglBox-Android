@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.g_model.teapot
+package com.jiangpengyong.sample.g_model
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -10,8 +10,6 @@ import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
-import com.jiangpengyong.eglbox_filter.BallFilter
-import com.jiangpengyong.eglbox_filter.TriangleFilter
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.g_model.common.Model3DFilter
 import com.jiangpengyong.sample.g_model.common.Model3DMessageType
