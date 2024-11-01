@@ -117,6 +117,12 @@ object Obj3DModelLoader {
         val normalResultData = arrayListOf<Float>()
 
         var isSuccess = true
+        var top = Float.MIN_VALUE
+        var bottom = Float.MAX_VALUE
+        var left = Float.MAX_VALUE
+        var right = Float.MIN_VALUE
+        var near = Float.MIN_VALUE
+        var far = Float.MAX_VALUE
 
         loop@ while (bufferedReader.readLine().also { line = it } != null) {
 
@@ -143,9 +149,18 @@ object Obj3DModelLoader {
 
                     // 获取顶点数据，并存入
                     try {
-                        vertexData.add(temps[1].toFloat())
-                        vertexData.add(temps[2].toFloat())
-                        vertexData.add(temps[3].toFloat())
+                        val x = temps[1].toFloat()
+                        val y = temps[2].toFloat()
+                        val z = temps[3].toFloat()
+                        top = Math.max(y, top)
+                        bottom = Math.min(y, bottom)
+                        left = Math.min(x, left)
+                        right = Math.max(x, right)
+                        near = Math.max(z, near)
+                        far = Math.min(z, far)
+                        vertexData.add(x)
+                        vertexData.add(y)
+                        vertexData.add(z)
                     } catch (e: Exception) {
                         Logger.e(TAG, "Vertex data parse failure. e=${e.message}")
                         isSuccess = false
@@ -357,7 +372,7 @@ object Obj3DModelLoader {
                 textureStep = textureSize,
                 normalData = normalResultData.toFloatArray(),
                 frontFace = FrontFace.CCW,
-                space = Space(0F, 0F, 0F, 0F, 0F, 0F)
+                space = Space(top, bottom, left, right, near, far)
             )
         } else {
             null

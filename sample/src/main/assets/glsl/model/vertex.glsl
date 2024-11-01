@@ -12,7 +12,7 @@ uniform vec3 uCameraPosition;
 in vec3 aPosition;
 // 法向量
 in vec3 aNormal;
-in vec2 aTextureCoord;
+//in vec2 aTextureCoord;
 // 光滑度
 in float aShininess;
 
@@ -30,7 +30,7 @@ out vec4 vDiffuseLight;
 // 该顶点镜面光最终亮度
 out vec4 vSpecularLight;
 
-out vec2 vTextureCoord;
+//out vec2 vTextureCoord;
 
 // 计算该顶点的散射光最终强度
 vec4 calScatteredLight(
@@ -90,7 +90,7 @@ void main() {
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     // 将未转换的顶点位置传给片元着色器
     vPosition = aPosition;
-    vTextureCoord = aTextureCoord;
+//    vTextureCoord = aTextureCoord;
 
     // 环境光
     if (uIsAddAmbientLight == 1) {
