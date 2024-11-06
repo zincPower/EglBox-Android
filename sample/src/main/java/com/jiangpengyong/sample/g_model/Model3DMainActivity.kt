@@ -31,7 +31,9 @@ class Model3DMainActivity : AppCompatActivity() {
     private var filterId: String? = null
     private var modelInfos: Map<Int, ModelInfo> = hashMapOf(
         R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg"),
-        R.id.teapot to ModelInfo("model/teapot/teapot.obj", "model/teapot/teapot.png")
+        R.id.teapot_only_vertex to ModelInfo("model/teapot/teapot.obj", null),
+        R.id.teapot_vertex_normal to ModelInfo("model/teapot/teapot.obj", null),
+        R.id.teapot_all to ModelInfo("model/teapot/teapot.obj", "model/teapot/teapot.png")
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,8 +78,9 @@ class Model3DMainActivity : AppCompatActivity() {
             }
         }
 
+        val texturePath = modelInfo.texturePath ?: return
         lifecycleScope.launch(Dispatchers.IO) {
-            val bitmap = (File(filesDir, modelInfo.texturePath).absolutePath.let {
+            val bitmap = (File(filesDir, texturePath).absolutePath.let {
                 BitmapFactory.decodeFile(it)
             })
             withContext(Dispatchers.Main) {

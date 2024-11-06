@@ -97,6 +97,7 @@ class EarthProgram : GLProgram() {
         mDayTextureHandle = getUniformLocation("sTextureDay")
         mNightTextureHandle = getUniformLocation("sTextureNight")
 
+        // TODO
         mNightTexture.init()
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/celestial_body/2k_earth_nightmap.jpg").absolutePath).let { bitmap ->
             mNightTexture.setData(bitmap)

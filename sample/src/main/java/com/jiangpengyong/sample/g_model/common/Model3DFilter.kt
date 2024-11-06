@@ -8,6 +8,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
+import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
@@ -16,6 +17,12 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_filter.EGLBoxRuntime
 import java.nio.FloatBuffer
 
+/**
+ * @author jiang peng yong
+ * @date 2024/11/7 06:59
+ * @email 56002982@qq.com
+ * @des 3D 模型滤镜
+ */
 class Model3DFilter : GLFilter() {
     private val mProgram = Model3DProgram()
 
@@ -57,18 +64,22 @@ class Model3DFilter : GLFilter() {
 
             GLES20.glFrontFace(model3DInfo.frontFace.value)
             val modelMatrix = context.space3D.gestureMatrix * mModelMatrix
+            mProgram.setTexture(mTexture)
             mProgram.setMVPMatrix(context.space3D.projectionMatrix * context.space3D.viewMatrix * modelMatrix)
             mProgram.setMMatrix(modelMatrix)
             mProgram.draw()
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
             GLES20.glDisable(GLES20.GL_CULL_FACE)
+
+            EGLBox.checkError("jiang")
         }
         imageInOut.out(fbo)
     }
 
     override fun onRelease() {
         mProgram.release()
+        mTexture?.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}
@@ -91,7 +102,7 @@ class Model3DFilter : GLFilter() {
             Model3DMessageType.SET_MODEL_TEXTURE_IMAGE.value -> {
                 (message.obj as? Bitmap)?.apply {
                     mTexture?.release()
-                    mTexture = GLTexture()
+                    mTexture = GLTexture.createColorTexture()
                     mTexture?.init()
                     mTexture?.setData(this)
                 }
@@ -126,6 +137,7 @@ class Model3DProgram : GLProgram() {
     private var mIsAddAmbientLightHandle = 0
     private var mIsAddScatteredLightHandle = 0
     private var mIsAddSpecularHandle = 0
+    private var mTextureCoordHandle = 0
 
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mMMatrix: GLMatrix = GLMatrix()
@@ -133,10 +145,15 @@ class Model3DProgram : GLProgram() {
     private var mLightPosition = floatArrayOf(0F, 0F, 5F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
     private var mShininess = 50F
+    private var mTexture: GLTexture? = null
 
     private var mIsAddAmbientLight = true
     private var mIsAddScatteredLight = true
     private var mIsAddSpecularLight = true
+
+    fun setTexture(texture: GLTexture?) {
+        mTexture = texture
+    }
 
     fun setMVPMatrix(matrix: GLMatrix) {
         mMVPMatrix = matrix
@@ -190,6 +207,7 @@ class Model3DProgram : GLProgram() {
         mPositionHandle = getAttribLocation("aPosition")
         mNormalHandle = getAttribLocation("aNormal")
         mShininessHandle = getAttribLocation("aShininess")
+        mTextureCoordHandle = getAttribLocation("aTextureCoord")
         mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
         mIsAddScatteredLightHandle = getUniformLocation("uIsAddScatteredLight")
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
@@ -199,6 +217,7 @@ class Model3DProgram : GLProgram() {
         mVertexBuffer ?: return
         mNormalBuffer ?: return
 
+        mTexture?.bind()
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         // 模型矩阵
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
@@ -210,14 +229,20 @@ class Model3DProgram : GLProgram() {
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
         GLES20.glUniform1i(mIsAddScatteredLightHandle, if (mIsAddScatteredLight) 1 else 0)
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
+        // 顶点
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         // 法向量
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)
+        // 纹理
+        GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, mTextureBuffer)
+        GLES20.glEnableVertexAttribArray(mTextureCoordHandle)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mNormalHandle)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mNormalHandle)
+        GLES20.glDisableVertexAttribArray(mTextureCoordHandle)
+        mTexture?.unbind()
     }
 
     override fun onRelease() {
@@ -231,14 +256,15 @@ class Model3DProgram : GLProgram() {
         mIsAddAmbientLightHandle = 0
         mIsAddScatteredLightHandle = 0
         mIsAddSpecularHandle = 0
+        mTextureCoordHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/light/full_light/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/normal/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/light/full_light/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/normal/fragment.glsl")
 }
 
 enum class Model3DMessageType(val value: Int) {
-    SET_MODEL_DATA(90000),          // 设置模型数据
-    SET_MODEL_TEXTURE_IMAGE(90001), // 设置模型纹理数据
+    SET_MODEL_DATA(10000),          // 设置模型数据
+    SET_MODEL_TEXTURE_IMAGE(10001), // 设置模型纹理数据
 }

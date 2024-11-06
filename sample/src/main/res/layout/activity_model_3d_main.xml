@@ -36,33 +36,10 @@
                 android:id="@+id/film"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="胶卷"
                 android:checked="true"
+                android:text="胶卷"
                 android:textColor="@color/primary_black"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/teapot"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <RadioButton
-                android:id="@+id/teapot"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="茶壶"
-                android:textColor="@color/primary_black"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toStartOf="@id/film"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </RadioGroup>
-
-        <RadioGroup
-            android:id="@+id/teapot_type"
-            android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                android:textSize="12sp" />
 
             <RadioButton
                 android:id="@+id/teapot_only_vertex"
