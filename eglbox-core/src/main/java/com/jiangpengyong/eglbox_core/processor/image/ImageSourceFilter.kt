@@ -89,7 +89,7 @@ class ImageSourceFilter : SourceFilter() {
         }
         mImageParams = imageParams
         Log.i(TAG, "handleImageParam filterId=${id} imageParams=${imageParams}")
-        mContext?.getTexture(imageParams.bitmap.width, imageParams.bitmap.height)
+        mContext?.getColorTexture(imageParams.bitmap.width, imageParams.bitmap.height)
             ?.let { texture ->
                 // TODO 可以使用 update
                 texture.setData(imageParams.bitmap)

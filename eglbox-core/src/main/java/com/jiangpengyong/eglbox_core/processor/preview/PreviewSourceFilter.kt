@@ -33,7 +33,10 @@ class PreviewSourceFilter : SourceFilter() {
     private val mSpace3DHandler = Space3DHandler()
 
     override fun onInit() {
-        mContext?.space3D?.let { mSpace3DHandler.space3D = it }
+        mContext?.space3D?.let {
+            mSpace3DHandler.space3D = it
+            it.init()
+        }
         mTexture.init()
     }
 

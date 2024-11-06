@@ -32,6 +32,7 @@ class TeapotActivity : AppCompatActivity() {
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
             glPreviewView.setBlank()
+            glPreviewView.setViewpoint(0F, 0F, 100F)
             filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, Model3DFilter.TAG, 0)
 
             filterId?.let {

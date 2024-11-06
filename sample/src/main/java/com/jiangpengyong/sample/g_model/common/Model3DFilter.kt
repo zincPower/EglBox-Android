@@ -4,17 +4,15 @@ import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
-import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
-import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.EGLBoxRuntime
 import java.nio.FloatBuffer
 
@@ -24,28 +22,18 @@ class Model3DFilter : GLFilter() {
     private var mModel3DInfo: Model3DInfo? = null
     private var mTexture: GLTexture? = null
 
-    private val mProjectMatrix = ProjectionMatrix()
-    private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
 
-    private var mPreviewSize = Size(0, 0)
     private var mLightPosition = floatArrayOf(0F, 0F, 100F)
-    private var mCameraPosition = floatArrayOf(0F, 0F, 100F)
 
     override fun onInit() {
         mProgram.init()
-        mViewMatrix.setLookAtM(
-            mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
-            0F, 0F, 0F,
-            0F, 1F, 0F
-        )
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val model3DInfo = mModel3DInfo ?: return
         val texture = imageInOut.texture ?: return
-        updateProjectionMatrix(Size(texture.width, texture.height))
-        val fbo = context.getTexFBO(texture.width, texture.height)
+        val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
         fbo.use {
             GLES20.glClearColor(0F, 0F, 0F, 1F)
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
@@ -57,7 +45,9 @@ class Model3DFilter : GLFilter() {
             context.texture2DProgram.draw()
 
             mProgram.setLightPosition(mLightPosition)
-            mProgram.setCameraPosition(mCameraPosition)
+            mProgram.setCameraPosition(context.space3D.viewPoint.let {
+                floatArrayOf(it.x, it.y, it.z)
+            })
             mProgram.setData(
                 model3DInfo.vertexBuffer,
                 model3DInfo.textureBuffer,
@@ -67,7 +57,7 @@ class Model3DFilter : GLFilter() {
 
             GLES20.glFrontFace(model3DInfo.frontFace.value)
             val modelMatrix = context.space3D.gestureMatrix * mModelMatrix
-            mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * modelMatrix)
+            mProgram.setMVPMatrix(context.space3D.projectionMatrix * context.space3D.viewMatrix * modelMatrix)
             mProgram.setMMatrix(modelMatrix)
             mProgram.draw()
 
@@ -79,29 +69,6 @@ class Model3DFilter : GLFilter() {
 
     override fun onRelease() {
         mProgram.release()
-    }
-
-    private fun updateProjectionMatrix(size: Size) {
-        if (mPreviewSize.width != size.width || mPreviewSize.height != size.height) {
-            mProjectMatrix.reset()
-            if (size.width > size.height) {
-                val ratio = size.width.toFloat() / size.height.toFloat()
-                mProjectMatrix.setFrustumM(
-                    -ratio, ratio,
-                    -1F, 1F,
-                    2F, 1000F
-                )
-            } else {
-                val ratio = size.height.toFloat() / size.width.toFloat()
-                mProjectMatrix.setFrustumM(
-                    -1F, 1F,
-                    -ratio, ratio,
-                    2F, 1000F
-                )
-            }
-            mPreviewSize = size
-        }
-
     }
 
     override fun onUpdateData(updateData: Bundle) {}

@@ -3,22 +3,45 @@ package com.jiangpengyong.eglbox_core.gles
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.logger.Logger
 
+/**
+ * @author jiang peng yong
+ * @date 2024/11/6 13:11
+ * @email 56002982@qq.com
+ * @des GL 缓存对象
+ */
 class GLCachePool(
     val fboCacheSize: Int = 3,
-    val textureCacheSize: Int = 3
+    val textureCacheSize: Int = 3,
+    val depthTextureCacheSize: Int = 2
 ) {
-    private val TAG = "GLCachePool"
-
     private val mFBOCache = ArrayList<GLFrameBuffer>(fboCacheSize)
     private val mTextureCache = ArrayList<GLTexture>(textureCacheSize)
+    private val mDepthTextureCache = ArrayList<GLTexture>(depthTextureCacheSize)
 
-    fun getTexFBO(width: Int, height: Int): GLFrameBuffer {
+    fun getTexFBO(width: Int, height: Int, depthType: DepthType): GLFrameBuffer {
         val fbo = getFBO()
-        val texture = getTexture(width, height)
-        fbo.bindTexture(texture, block = {
-            GLES20.glClearColor(0F, 0F, 0F, 1F)
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        })
+        when (depthType) {
+            DepthType.None -> {
+                val colorTexture = getColorTexture(width, height)
+                fbo.bindTexture(colorTexture, block = {
+                    GLES20.glClearColor(0F, 0F, 0F, 1F)
+                    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+                })
+            }
+
+            DepthType.RenderBuffer -> {
+
+            }
+
+            DepthType.Texture -> {
+                val colorTexture = getColorTexture(width, height)
+                val depthTexture = getDepthTexture(width, height)
+                fbo.bindTexture(colorTexture, depthTexture, block = {
+                    GLES20.glClearColor(0F, 0F, 0F, 1F)
+                    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
+                })
+            }
+        }
         return fbo
     }
 
@@ -34,7 +57,7 @@ class GLCachePool(
         }
     }
 
-    fun getTexture(width: Int, height: Int): GLTexture {
+    fun getColorTexture(width: Int, height: Int): GLTexture {
         var texture: GLTexture? = null
         val iterator = mTextureCache.iterator()
         while (iterator.hasNext()) {
@@ -46,7 +69,27 @@ class GLCachePool(
             }
         }
         if (texture == null) {
-            texture = GLTexture().apply {
+            texture = GLTexture.createColorTexture().apply {
+                init()
+                setData(width, height)
+            }
+        }
+        return texture
+    }
+
+    fun getDepthTexture(width: Int, height: Int): GLTexture {
+        var texture: GLTexture? = null
+        val iterator = mDepthTextureCache.iterator()
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+            if (item.width == width && item.height == height) {
+                texture = item
+                iterator.remove()
+                break
+            }
+        }
+        if (texture == null) {
+            texture = GLTexture.createDepthTexture().apply {
                 init()
                 setData(width, height)
             }
@@ -56,8 +99,12 @@ class GLCachePool(
 
     fun recycle(fbo: GLFrameBuffer) {
         if (!fbo.isInit()) return
-        if (fbo.haveTexture()) {
-            val texture = fbo.unbindTexture()
+        if (fbo.haveColorTexture()) {
+            val textures = fbo.unbindAllColorTextures()
+            textures?.forEach { recycle(it) }
+        }
+        if (fbo.haveDepthTexture()) {
+            val texture = fbo.unbindTexture(GLES20.GL_DEPTH_ATTACHMENT)
             texture?.let { recycle(it) }
         }
         mFBOCache.add(0, fbo)
@@ -74,15 +121,25 @@ class GLCachePool(
             texture.release()
             return
         }
-        for (item in mTextureCache) {
+        val textureCache: ArrayList<GLTexture>
+        val cacheSize: Int
+        if (texture.format == GLES20.GL_DEPTH_COMPONENT) {    // 深度纹理
+            textureCache = mDepthTextureCache
+            cacheSize = depthTextureCacheSize
+        } else {    // 其余为颜色纹理 TODO 需要细化不同格式？
+            textureCache = mTextureCache
+            cacheSize = textureCacheSize
+        }
+
+        for (item in textureCache) {
             if (item.id == texture.id) {
                 Logger.e(TAG, "Texture exist in cache. id=${item.id}")
-                return;
+                return
             }
         }
-        mTextureCache.add(0, texture)
-        if (mTextureCache.size > textureCacheSize) {
-            val lastTexture = mTextureCache.removeLastOrNull()
+        textureCache.add(0, texture)
+        if (textureCache.size > cacheSize) {
+            val lastTexture = textureCache.removeLastOrNull()
             lastTexture?.release()
         }
     }
@@ -97,12 +154,22 @@ class GLCachePool(
             item.release()
         }
         mTextureCache.clear()
+        for (item in mDepthTextureCache) {
+            item.release()
+        }
+        mDepthTextureCache.clear()
     }
 
     override fun toString(): String {
         return "[ GLCachePool mFBOCache=${mFBOCache.size}, " +
-                "mTextureCache=${mTextureCache.size} " +
+                "mTextureCache=${mTextureCache.size}, " +
+                "mDepthTextureCache=${mDepthTextureCache.size}, " +
                 "fboCacheSize=${fboCacheSize}, " +
-                "textureCacheSize=${textureCacheSize} ]"
+                "textureCacheSize=${textureCacheSize}, " +
+                "depthTextureCacheSize=${depthTextureCacheSize} ]"
+    }
+
+    companion object {
+        const val TAG = "GLCachePool"
     }
 }

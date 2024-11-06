@@ -64,6 +64,11 @@ class Space3D {
         }
     val projectionMatrix = ProjectionMatrix()
 
+    fun init() {
+        updateViewMatrix()
+        updateGestureMatrix()
+    }
+
     /**
      * 更新手势矩阵
      */
@@ -90,7 +95,7 @@ class Space3D {
      * 更新投影矩阵
      */
     private fun updateProjectMatrix(previewSize: Size) {
-        if (previewSize.isValid()) return
+        if (!previewSize.isValid()) return
         projectionMatrix.reset()
         val left: Float
         val right: Float

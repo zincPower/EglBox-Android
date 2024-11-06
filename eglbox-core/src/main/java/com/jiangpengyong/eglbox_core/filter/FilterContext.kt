@@ -7,6 +7,7 @@ import com.jiangpengyong.eglbox_core.egl.EglSurface
 import com.jiangpengyong.eglbox_core.egl.PBufferSurface
 import com.jiangpengyong.eglbox_core.egl.WindowSurface
 import com.jiangpengyong.eglbox_core.engine.RenderType
+import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLCachePool
 import com.jiangpengyong.eglbox_core.gles.GLFrameBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
@@ -31,8 +32,8 @@ class FilterContext(val renderType: RenderType) {
      */
     var previewSize = Size(0, 0)
         set(value) {
-            // TODO 更新 space 的投影矩阵
             field = value
+            space3D.previewSize = value
         }
 
     // 单次渲染数据，再一次渲染后会清空
@@ -90,16 +91,20 @@ class FilterContext(val renderType: RenderType) {
         mCachePool.recycle(texture)
     }
 
-    fun getTexFBO(width: Int, height: Int): GLFrameBuffer {
-        return mCachePool.getTexFBO(width, height)
+    fun getTexFBO(width: Int, height: Int, depthType: DepthType = DepthType.None): GLFrameBuffer {
+        return mCachePool.getTexFBO(width, height, depthType)
     }
 
     fun getFBO(): GLFrameBuffer {
         return mCachePool.getFBO()
     }
 
-    fun getTexture(width: Int, height: Int): GLTexture {
-        return mCachePool.getTexture(width, height)
+    fun getColorTexture(width: Int, height: Int): GLTexture {
+        return mCachePool.getColorTexture(width, height)
+    }
+
+    fun getDepthTexture(width: Int, height: Int): GLTexture {
+        return mCachePool.getDepthTexture(width, height)
     }
 
     fun sendMessage(filterId: String, message: Message) {

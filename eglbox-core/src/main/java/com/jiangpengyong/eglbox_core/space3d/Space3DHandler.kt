@@ -1,9 +1,6 @@
 package com.jiangpengyong.eglbox_core.space3d
 
 import android.os.Message
-import android.util.Size
-import com.jiangpengyong.eglbox_core.logger.Logger
-import com.jiangpengyong.eglbox_core.processor.MessageType
 
 /**
  * @author jiang peng yong
@@ -35,22 +32,6 @@ class Space3DHandler {
 
             Space3DMessageType.UPDATE_PROJECTION -> {
                 space3D.projection = message.obj as? Projection ?: return
-            }
-
-            MessageType.SURFACE_CREATED -> {
-                val width = message.arg1
-                val height = message.arg2
-                space3D.previewSize = Size(width, height)
-            }
-
-            MessageType.SURFACE_CHANGED -> {
-                val width = message.arg1
-                val height = message.arg2
-                space3D.previewSize = Size(width, height)
-            }
-
-            MessageType.SURFACE_DESTROY -> {
-                space3D.previewSize = Size(0, 0)
             }
         }
     }

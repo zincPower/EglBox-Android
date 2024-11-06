@@ -5,7 +5,6 @@ import android.opengl.ETC1Util
 import android.opengl.ETC1Util.ETC1Texture
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
-import android.opengl.GLES30
 import android.opengl.GLUtils
 import com.jiangpengyong.eglbox_core.logger.Logger
 
@@ -17,16 +16,14 @@ import com.jiangpengyong.eglbox_core.logger.Logger
  */
 class GLTexture(
     val target: Target = Target.TEXTURE_2D,
-    private val internalFormat: Int = GLES20.GL_RGBA,
-    private val format: Int = GLES20.GL_RGBA,
-    private val type: Int = GLES20.GL_UNSIGNED_BYTE,
-    private val minFilter: MinFilter = MinFilter.NEAREST,
-    private val magFilter: MagFilter = MagFilter.LINEAR,
-    private val wrapS: WrapMode = WrapMode.EDGE,
-    private val wrapT: WrapMode = WrapMode.EDGE,
+    val internalFormat: Int = GLES20.GL_RGBA,
+    val format: Int = GLES20.GL_RGBA,
+    val type: Int = GLES20.GL_UNSIGNED_BYTE,
+    val minFilter: MinFilter = MinFilter.NEAREST,
+    val magFilter: MagFilter = MagFilter.LINEAR,
+    val wrapS: WrapMode = WrapMode.EDGE,
+    val wrapT: WrapMode = WrapMode.EDGE,
 ) {
-    private val TAG: String = "GLTexture"
-
     var id = 0
         private set
     var width: Int = 0
@@ -57,6 +54,15 @@ class GLTexture(
         block?.invoke()
         unbind()
         Logger.i(TAG, "Init GLTexture success. id=$id")
+    }
+
+    fun updateSizeForOES(width: Int, height: Int) {
+        if (target != Target.EXTERNAL_OES) {
+            Logger.e(TAG, "Can't call updateSizeForOES function when target isn't EXTERNAL_OES type.")
+            return
+        }
+        this.width = width
+        this.height = height
     }
 
     /**
@@ -189,6 +195,39 @@ class GLTexture(
 
     override fun toString(): String {
         return "[ GLTexture id=$id, size=$width x $height ]"
+    }
+
+    companion object {
+        private const val TAG: String = "GLTexture"
+
+        /**
+         * 创建颜色纹理
+         */
+        fun createColorTexture() = GLTexture(
+            target = Target.TEXTURE_2D,
+            internalFormat = GLES20.GL_RGBA,
+            format = GLES20.GL_RGBA,
+            type = GLES20.GL_UNSIGNED_BYTE,
+            minFilter = MinFilter.NEAREST,
+            magFilter = MagFilter.LINEAR,
+            wrapS = WrapMode.EDGE,
+            wrapT = WrapMode.EDGE,
+        )
+
+        /**
+         * 创建深度纹理
+         * GL_DEPTH_COMPONENT16 需要 16 位，即 2 个字节，需要的类型至少能装下 16 位，选择 GL_UNSIGNED_SHORT
+         */
+        fun createDepthTexture() = GLTexture(
+            target = Target.TEXTURE_2D,
+            internalFormat = GLES20.GL_DEPTH_COMPONENT16,
+            format = GLES20.GL_DEPTH_COMPONENT,
+            type = GLES20.GL_UNSIGNED_SHORT,
+            minFilter = MinFilter.NEAREST,
+            magFilter = MagFilter.LINEAR,
+            wrapS = WrapMode.EDGE,
+            wrapT = WrapMode.EDGE,
+        )
     }
 }
 
