@@ -147,13 +147,7 @@
             android:screenOrientation="landscape" />
 
         <activity
-            android:name="com.jiangpengyong.sample.g_model.ModelMainActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name="com.jiangpengyong.sample.g_model.TeapotActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name="com.jiangpengyong.sample.g_model.FilmActivity"
+            android:name="com.jiangpengyong.sample.g_model.Model3DMainActivity"
             android:screenOrientation="landscape" />
 
         <activity
