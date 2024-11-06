@@ -6,7 +6,7 @@ import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.gles.GLTexture
-import com.jiangpengyong.eglbox_core.processor.StreamMessageType
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.processor.image.ImageError
 import com.jiangpengyong.eglbox_core.processor.image.ProcessFinishCallback
 import com.jiangpengyong.eglbox_core.program.ScaleType
@@ -97,7 +97,7 @@ class StreamSnapshot {
     }
 
     fun handleMessage(message: Message) {
-        if (message.what == StreamMessageType.SNAPSHOT_REQUEST) {
+        if (message.what == MessageType.SNAPSHOT_REQUEST) {
             mIsNeedSnapshot = true
             mSnapshotParams = message.obj as? SnapshotParams
         }

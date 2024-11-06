@@ -11,10 +11,8 @@ import com.jiangpengyong.eglbox_core.gles.GLCachePool
 import com.jiangpengyong.eglbox_core.gles.GLFrameBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.gles.Target
-import com.jiangpengyong.eglbox_core.processor.bean.Angle
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
-import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.space3d.Space3D
 
 /**
  * @author jiang peng yong
@@ -109,19 +107,3 @@ class FilterContext(val renderType: RenderType) {
     }
 }
 
-class Space3D {
-    var angle: Angle = Angle(0F, 0F, 0F)
-        set(value) {
-            field = value
-            gestureMatrix.reset()
-            gestureMatrix.rotate(value.angleX, 0F, 1F, 0F)
-            gestureMatrix.rotate(value.angleY, 1F, 0F, 0F)
-            gestureMatrix.rotate(value.angleZ, 0F, 0F, 1F)
-        }
-    var scale: Float = 1F
-
-    val projectMatrix: ProjectMatrix = ProjectMatrix().apply { reset() }
-    val gestureMatrix: ModelMatrix = ModelMatrix().apply { reset() }
-    var near: Float = 10F
-    var far: Float = 100F
-}

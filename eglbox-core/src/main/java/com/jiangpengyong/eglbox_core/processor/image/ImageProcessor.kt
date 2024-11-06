@@ -10,7 +10,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterData
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.GLFilterGroup
 import com.jiangpengyong.eglbox_core.processor.GLProcessor
-import com.jiangpengyong.eglbox_core.processor.ImageMessageType
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -44,7 +44,7 @@ class ImageProcessor : GLProcessor() {
     override fun onReceiveMessageFromFilter(filterId: String, message: Message) {
         Log.i(TAG, "onReceiveMessageFromFilter filterId=${filterId} message=${message.what}")
         when (message.what) {
-            ImageMessageType.RESULT_OUTPUT -> {
+            MessageType.RESULT_OUTPUT -> {
                 val result = message.obj as? ImageResult
                 if (result == null) {
                     Log.e(TAG, "PROCESS_RESULT_OUTPUT data is null.")
@@ -126,7 +126,7 @@ class ImageProcessor : GLProcessor() {
 
         // 3、设置源滤镜数据
         Message.obtain().apply {
-            what = ImageMessageType.INPUT_PARAMS
+            what = MessageType.INPUT_PARAMS
             obj = params
             filterChain.sendMessageToFilter(SOURCE_FILTER_ID, this)
             recycle()
@@ -134,7 +134,7 @@ class ImageProcessor : GLProcessor() {
 
         // 4、设置结束滤镜数据
         Message.obtain().apply {
-            what = ImageMessageType.INPUT_CALLBACK
+            what = MessageType.INPUT_CALLBACK
             arg1 = task.id
             obj = task.callback
             filterChain.sendMessageToFilter(SINK_FILTER_ID, this)
@@ -189,7 +189,7 @@ class ImageProcessor : GLProcessor() {
             error = error,
         )
         val message = Message.obtain().apply {
-            what = ImageMessageType.RESULT_OUTPUT
+            what = MessageType.RESULT_OUTPUT
             obj = imageResult
         }
         getFilterChain()?.getContext()?.sendMessage(SINK_FILTER_ID, message)

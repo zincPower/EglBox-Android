@@ -11,7 +11,7 @@ import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.sample.App
@@ -23,7 +23,7 @@ import kotlin.math.sin
 class BallFilter : GLFilter() {
     private val mProgram = TrigonometricBallProgram()
 
-    private val mProjectMatrix = ProjectMatrix()
+    private val mProjectMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
 

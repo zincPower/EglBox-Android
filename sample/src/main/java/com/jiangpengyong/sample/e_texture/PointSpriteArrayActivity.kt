@@ -21,7 +21,7 @@ import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateByteBuffer
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
@@ -174,7 +174,7 @@ class PointSpriteArrayActivity : AppCompatActivity() {
     class PointSpriteFilter : GLFilter() {
         private val mProgram = PointSpritArrayProgram()
 
-        private val mProjectMatrix = ProjectMatrix()
+        private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
 

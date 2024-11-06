@@ -19,9 +19,8 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
-import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
@@ -267,7 +266,7 @@ class FullLightActivity : AppCompatActivity() {
     class BallFilter : GLFilter() {
         private val mProgram = FullLightBallProgram()
 
-        private val mProjectMatrix = ProjectMatrix()
+        private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
 

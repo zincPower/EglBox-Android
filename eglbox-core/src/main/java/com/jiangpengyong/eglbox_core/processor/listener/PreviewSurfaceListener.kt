@@ -2,8 +2,8 @@ package com.jiangpengyong.eglbox_core.processor.listener
 
 import android.os.Message
 import com.jiangpengyong.eglbox_core.logger.Logger
-import com.jiangpengyong.eglbox_core.processor.CommonMessageType
 import com.jiangpengyong.eglbox_core.processor.GLProcessor
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -24,7 +24,7 @@ class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listen
             processor.enqueueEvent {
                 synchronized(mWindowLock) {
                     val message = Message.obtain()
-                    message.what = CommonMessageType.SURFACE_CREATED
+                    message.what = MessageType.SURFACE_CREATED
                     message.obj = window
                     message.arg1 = width
                     message.arg2 = height
@@ -56,7 +56,7 @@ class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listen
             processor.enqueueEvent {
                 synchronized(mWindowLock) {
                     val message = Message.obtain()
-                    message.what = CommonMessageType.SURFACE_CHANGED
+                    message.what = MessageType.SURFACE_CHANGED
                     message.obj = window
                     message.arg1 = width
                     message.arg2 = height
@@ -86,7 +86,7 @@ class PreviewSurfaceListener(processor: GLProcessor) : SurfaceViewManager.Listen
             processor.enqueueEvent {
                 synchronized(mWindowLock) {
                     val message = Message.obtain()
-                    message.what = CommonMessageType.SURFACE_DESTROY
+                    message.what = MessageType.SURFACE_DESTROY
                     message.obj = window
                     processor.sendMessageToFilter(GLProcessor.SOURCE_FILTER_ID, message)
                     processor.sendMessageToFilter(GLProcessor.SINK_FILTER_ID, message)

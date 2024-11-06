@@ -22,7 +22,7 @@ val IDENTITY_MATRIX_4x4 = floatArrayOf(
  * @des 包含 Model View Project 的 Matrix
  */
 class MVPMatrix {
-    private val mProjectMatrix = ProjectMatrix()
+    private val mProjectMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
 
@@ -240,7 +240,7 @@ class ModelMatrix : GLMatrix() {
  * @email 56002982@qq.com
  * @des 透视矩阵
  */
-class ProjectMatrix : GLMatrix() {
+class ProjectionMatrix : GLMatrix() {
     /**
      * 设置透视投影参数
      *
@@ -255,7 +255,7 @@ class ProjectMatrix : GLMatrix() {
         left: Float, right: Float,
         bottom: Float, top: Float,
         near: Float, far: Float
-    ): ProjectMatrix {
+    ): ProjectionMatrix {
         Matrix.frustumM(
             matrix,
             0,
@@ -280,7 +280,7 @@ class ProjectMatrix : GLMatrix() {
         left: Float, right: Float,
         bottom: Float, top: Float,
         near: Float, far: Float
-    ): ProjectMatrix {
+    ): ProjectionMatrix {
         Matrix.orthoM(
             matrix,
             0,

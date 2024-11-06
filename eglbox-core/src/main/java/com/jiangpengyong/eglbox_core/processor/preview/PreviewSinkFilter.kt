@@ -10,7 +10,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.SinkFilter
 import com.jiangpengyong.eglbox_core.logger.Logger
-import com.jiangpengyong.eglbox_core.processor.CommonMessageType
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.program.isValid
@@ -88,21 +88,21 @@ open class PreviewSinkFilter : SinkFilter() {
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            CommonMessageType.SURFACE_CREATED -> {
+            MessageType.SURFACE_CREATED -> {
                 val width = message.arg1
                 val height = message.arg2
                 Logger.i(TAG, "Create preview window. size=${width}x${height}")
                 createPreviewWindow(message.obj, width, height)
             }
 
-            CommonMessageType.SURFACE_CHANGED -> {
+            MessageType.SURFACE_CHANGED -> {
                 val width = message.arg1
                 val height = message.arg2
                 Logger.i(TAG, "Update preview window. size=${width}x${height}")
                 updatePreviewWindow(message.obj, width, height)
             }
 
-            CommonMessageType.SURFACE_DESTROY -> {
+            MessageType.SURFACE_DESTROY -> {
                 val curSurface = message.obj
                 val isEqual = if (mSurface == curSurface) "true" else "false"
                 Logger.i(TAG, "Destroy preview window. mWindow==window is $isEqual")

@@ -16,7 +16,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.CubeProgram
 import com.jiangpengyong.eglbox_sample.R
@@ -135,7 +135,7 @@ class ViewMatrixActivity : AppCompatActivity() {
         private val mCubeProgram = CubeProgram()
 
         // 投影矩阵
-        private val mProjectMatrix = ProjectMatrix()
+        private val mProjectMatrix = ProjectionMatrix()
 
         // 视图矩阵
         private val mViewMatrix = ViewMatrix()

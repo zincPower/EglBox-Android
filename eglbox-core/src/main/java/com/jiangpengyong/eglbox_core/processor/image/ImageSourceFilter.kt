@@ -8,7 +8,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.filter.SourceFilter
-import com.jiangpengyong.eglbox_core.processor.ImageMessageType
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -76,7 +76,7 @@ class ImageSourceFilter : SourceFilter() {
 
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            ImageMessageType.INPUT_PARAMS -> {
+            MessageType.INPUT_PARAMS -> {
                 handleImageParams(message.obj as? ImageParams)
             }
         }

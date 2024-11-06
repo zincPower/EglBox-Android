@@ -13,7 +13,7 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.EGLBoxRuntime
 import java.nio.FloatBuffer
@@ -24,7 +24,7 @@ class Model3DFilter : GLFilter() {
     private var mModel3DInfo: Model3DInfo? = null
     private var mTexture: GLTexture? = null
 
-    private val mProjectMatrix = ProjectMatrix()
+    private val mProjectMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
 

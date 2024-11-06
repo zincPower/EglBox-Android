@@ -21,7 +21,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
@@ -282,7 +282,7 @@ class LightSourceTypeActivity : AppCompatActivity() {
         private val mProgram = LightSourceTypeBallProgram()
         private val mLightPointProgram = LightPointProgram()
 
-        private val mProjectMatrix = ProjectMatrix()
+        private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
         private val mRotateMatrix = ModelMatrix()
         private val mLeftModelMatrix = ModelMatrix()

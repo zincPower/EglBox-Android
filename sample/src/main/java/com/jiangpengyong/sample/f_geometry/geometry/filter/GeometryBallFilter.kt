@@ -9,7 +9,7 @@ import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.sample.f_geometry.geometry.GeometryInfo
 import com.jiangpengyong.sample.f_geometry.geometry.GeometryProgram
@@ -33,7 +33,7 @@ class GeometryBallFilter(
 
     private val mSpringInfo: GeometryInfo = GeometryBall(length, n).create()
 
-    private val mProjectMatrix = ProjectMatrix()
+    private val mProjectMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix()
 

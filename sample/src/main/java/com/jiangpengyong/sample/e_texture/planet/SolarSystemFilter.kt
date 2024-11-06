@@ -9,7 +9,7 @@ import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectMatrix
+import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity.Companion.MESSAGE_TARGET
 import com.jiangpengyong.sample.utils.SizeUtils
@@ -28,7 +28,7 @@ class SolarSystemFilter : GLFilter() {
     }
 
     // 矩阵
-    private val mProjectMatrix = ProjectMatrix()
+    private val mProjectMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mGestureMatrix = ModelMatrix()
 

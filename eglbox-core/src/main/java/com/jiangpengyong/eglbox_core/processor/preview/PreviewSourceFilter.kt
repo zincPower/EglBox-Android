@@ -10,10 +10,10 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.SourceFilter
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.logger.Logger
-import com.jiangpengyong.eglbox_core.processor.CommonMessageType
-import com.jiangpengyong.eglbox_core.processor.PreviewMessageType
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.isValid
+import com.jiangpengyong.eglbox_core.space3d.Space3DHandler
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 
 /**
@@ -30,8 +30,10 @@ class PreviewSourceFilter : SourceFilter() {
     private val mTexture = GLTexture()
 
     private var mIsNeedBlank = false
+    private val mSpace3DHandler = Space3DHandler()
 
     override fun onInit() {
+        mContext?.space3D?.let { mSpace3DHandler.space3D = it }
         mTexture.init()
     }
 
@@ -65,8 +67,9 @@ class PreviewSourceFilter : SourceFilter() {
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
+        mSpace3DHandler.handleMessage(message)
         when (message.what) {
-            PreviewMessageType.SET_IMAGE -> {
+            MessageType.SET_IMAGE -> {
                 mIsNeedBlank = false
                 val bitmap = message.obj as? Bitmap
                 if (bitmap == null) {
@@ -80,7 +83,7 @@ class PreviewSourceFilter : SourceFilter() {
                 updateTexture(mTexture)
             }
 
-            PreviewMessageType.SET_BLANK -> {
+            MessageType.SET_BLANK -> {
                 val width = message.arg1
                 val height = message.arg2
                 if (width != 0 && height != 0) {
@@ -94,7 +97,7 @@ class PreviewSourceFilter : SourceFilter() {
                 }
             }
 
-            CommonMessageType.SURFACE_CREATED -> {
+            MessageType.SURFACE_CREATED -> {
                 mPreviewSize = Size(message.arg1, message.arg2)
                 if (mIsNeedBlank) {
                     setBlank(mPreviewSize.width, mPreviewSize.height)

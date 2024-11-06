@@ -13,15 +13,15 @@ import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
 import com.jiangpengyong.eglbox_core.filter.Orientation
-import com.jiangpengyong.eglbox_core.processor.CommonMessageType
 import com.jiangpengyong.eglbox_core.processor.GLProcessor.Companion.SOURCE_FILTER_ID
-import com.jiangpengyong.eglbox_core.processor.bean.Angle
 import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ImageError
 import com.jiangpengyong.eglbox_core.processor.image.ImageParams
 import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
 import com.jiangpengyong.eglbox_core.processor.image.ImageProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ProcessFinishCallback
+import com.jiangpengyong.eglbox_core.space3d.ProjectionType
+import com.jiangpengyong.eglbox_core.space3d.Space3DMessageType
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -110,18 +110,6 @@ class GLPreviewView : FrameLayout {
         mPreviewProcessor.sendMessageToFilter(filterId, message)
     }
 
-    fun resetRotation() {
-        mBeforeX = 0F
-        mBeforeY = 0F
-        mAngleX = 0F
-        mAngleY = 0F
-        Message.obtain().apply {
-            what = CommonMessageType.RESET_ROTATION
-            sendMessageToFilter(SOURCE_FILTER_ID, this)
-        }
-        requestRender()
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
@@ -133,9 +121,9 @@ class GLPreviewView : FrameLayout {
                 mAngleX += dx * TOUCH_SCALE_FACTOR
                 val dy = y - mBeforeY
                 mAngleY += dy * TOUCH_SCALE_FACTOR
-                Message.obtain().apply {
-                    what = CommonMessageType.UPDATE_ROTATION
-                    obj = Angle(mAngleX, mAngleY, 0F)
+                Space3DMessageType.obtainUpdateRotationMessage(
+                    mAngleX, mAngleY, 0F
+                ).apply {
                     sendMessageToFilter(SOURCE_FILTER_ID, this)
                 }
                 requestRender()
@@ -144,6 +132,44 @@ class GLPreviewView : FrameLayout {
         mBeforeX = x
         mBeforeY = y
         return true
+    }
+
+    fun resetRotation() {
+        mBeforeX = 0F
+        mBeforeY = 0F
+        mAngleX = 0F
+        mAngleY = 0F
+        Space3DMessageType.obtainResetRotationMessage().apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
+    fun setViewpoint(x: Float, y: Float, z: Float) {
+        Space3DMessageType.obtainUpdateViewpointMessage(x, y, z).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
+    fun setCenterPoint(x: Float, y: Float, z: Float) {
+        Space3DMessageType.obtainUpdateCenterPointMessage(x, y, z).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
+    fun setUpVector(x: Float, y: Float, z: Float) {
+        Space3DMessageType.obtainUpdateUpVectorMessage(x, y, z).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
+    fun setProjection(type: ProjectionType, near: Float, far: Float, ratio: Float) {
+        Space3DMessageType.obtainUpdateProjectionMessage(type, near, far, ratio).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
     }
 
     fun exportImage(bitmap: Bitmap, data: HashMap<String, Any>, callback: (result: Bitmap?) -> Unit) {
@@ -197,12 +223,10 @@ class GLPreviewView : FrameLayout {
 
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
         }
-
     }
 
     companion object {
         const val TAG = "GLPreviewView"
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
-        private const val RESET = 10000
     }
 }

@@ -9,7 +9,7 @@ import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.filter.SinkFilter
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.processor.GLProcessor
-import com.jiangpengyong.eglbox_core.processor.ImageMessageType
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 
 class ImageSinkFilter : SinkFilter() {
@@ -73,7 +73,7 @@ class ImageSinkFilter : SinkFilter() {
             )
         }
         val message = Message.obtain().apply {
-            what = ImageMessageType.RESULT_OUTPUT
+            what = MessageType.RESULT_OUTPUT
             obj = imageResult
         }
         context.sendMessage(GLProcessor.SINK_FILTER_ID, message)
@@ -86,7 +86,7 @@ class ImageSinkFilter : SinkFilter() {
 
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            ImageMessageType.INPUT_CALLBACK -> {
+            MessageType.INPUT_CALLBACK -> {
                 handleImageParams(message.arg1, message.obj as? ProcessFinishCallback)
             }
         }

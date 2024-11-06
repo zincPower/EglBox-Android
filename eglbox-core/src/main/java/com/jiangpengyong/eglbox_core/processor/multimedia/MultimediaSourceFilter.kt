@@ -9,7 +9,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.filter.SourceFilter
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.gles.Target
-import com.jiangpengyong.eglbox_core.processor.CommonMessageType
+import com.jiangpengyong.eglbox_core.processor.MessageType
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.program.isValid
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -40,7 +40,7 @@ class MultimediaSourceFilter : SourceFilter() {
         mSurfaceTexture = SurfaceTexture(mTexture.id)
         mSurfaceTexture?.setOnFrameAvailableListener { handleFrameAvailable() }
         Message.obtain().apply {
-            this.what = CommonMessageType.SURFACE_CREATED
+            this.what = MessageType.SURFACE_CREATED
             this.obj = mSurfaceTexture
             mContext?.sendMessage(id, this)
         }
@@ -67,7 +67,7 @@ class MultimediaSourceFilter : SourceFilter() {
 
     override fun onRelease() {
         Message.obtain().apply {
-            this.what = CommonMessageType.SURFACE_DESTROY
+            this.what = MessageType.SURFACE_DESTROY
             this.obj = mSurfaceTexture
             mContext?.sendMessage(id, this)
         }
