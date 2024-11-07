@@ -17,7 +17,6 @@ class GLFrameBuffer : GLObject {
 
     private var mColorTextures = mutableMapOf<Int, GLTexture>()
     private var mDepthTexture: GLTexture? = null
-    private var mDepthRenderBuffer: GLRenderBuffer? = null
 
     override fun init() {
         if (isInit()) {
