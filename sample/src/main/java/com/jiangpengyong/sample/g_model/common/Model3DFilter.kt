@@ -8,7 +8,6 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
-import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
@@ -71,8 +70,6 @@ class Model3DFilter : GLFilter() {
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
             GLES20.glDisable(GLES20.GL_CULL_FACE)
-
-            EGLBox.checkError("jiang")
         }
         imageInOut.out(fbo)
     }
