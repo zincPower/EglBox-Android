@@ -9,12 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_sample.R
-import com.jiangpengyong.sample.g_model.common.Model3DFilter
-import com.jiangpengyong.sample.g_model.common.Model3DMessageType
-import com.jiangpengyong.sample.g_model.common.Obj3DModelLoader
+import com.jiangpengyong.sample.g_model.all.Model3DMessageType
+import com.jiangpengyong.sample.g_model.onlyVertex.Model3DFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,10 +30,10 @@ class Model3DMainActivity : AppCompatActivity() {
     private lateinit var glPreviewView: GLPreviewView
     private var filterId: String? = null
     private var modelInfos: Map<Int, ModelInfo> = hashMapOf(
-        R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg"),
-        R.id.teapot_only_vertex to ModelInfo("model/teapot/teapot.obj", null),
-        R.id.teapot_vertex_normal to ModelInfo("model/teapot/teapot.obj", null),
-        R.id.teapot_all to ModelInfo("model/teapot/teapot.obj", "model/teapot/teapot.png")
+        R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg", Point(0F, 0F, 100F)),
+        R.id.teapot_only_vertex to ModelInfo("model/teapot/only_vertex/teapot.obj", null, Point(0F, 0F, 30F)),
+        R.id.teapot_without_lid to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F)),
+        R.id.teapot_all to ModelInfo("model/teapot/all/teapot.obj", "model/teapot/all/teapot.png", Point(0F, 0F, 100F))
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,10 +45,13 @@ class Model3DMainActivity : AppCompatActivity() {
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
             glPreviewView.setBlank()
-            glPreviewView.setViewpoint(0F, 0F, 100F)
             filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, Model3DFilter.TAG, 0)
 
-            filterId?.let { loadModel(it, modelInfos[R.id.film] ?: return@let) }
+            filterId?.let { filterId ->
+                modelInfos[R.id.film]?.let { modelInfo ->
+                    loadModel(filterId, modelInfo)
+                }
+            }
         }
 
         findViewById<TextView>(R.id.reset_rotation).setOnClickListener {
@@ -62,6 +65,7 @@ class Model3DMainActivity : AppCompatActivity() {
 
     private fun loadModel(filterId: String, modelInfo: ModelInfo) {
         lifecycleScope.launch(Dispatchers.IO) {
+            glPreviewView.setViewpoint(modelInfo.viewpoint.x, modelInfo.viewpoint.y, modelInfo.viewpoint.z)
             val file = File(filesDir, modelInfo.modelPath)
             val model3DInfo = Obj3DModelLoader.load(file, textureFlip = true)
             if (model3DInfo == null) {
@@ -98,4 +102,4 @@ class Model3DMainActivity : AppCompatActivity() {
     }
 }
 
-data class ModelInfo(val modelPath: String, val texturePath: String?)
+data class ModelInfo(val modelPath: String, val texturePath: String?, val viewpoint: Point)

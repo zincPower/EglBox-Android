@@ -53,10 +53,10 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <RadioButton
-                android:id="@+id/teapot_vertex_normal"
+                android:id="@+id/teapot_without_lid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="茶壶（顶点和法线）"
+                android:text="茶壶没盖子"
                 android:textColor="@color/primary_black"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toStartOf="@id/film"

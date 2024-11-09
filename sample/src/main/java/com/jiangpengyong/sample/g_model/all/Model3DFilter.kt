@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.g_model.common
+package com.jiangpengyong.sample.g_model.all
 
 import android.graphics.Bitmap
 import android.opengl.GLES20
@@ -14,13 +14,14 @@ import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_filter.EGLBoxRuntime
+import com.jiangpengyong.sample.g_model.Model3DInfo
 import java.nio.FloatBuffer
 
 /**
  * @author jiang peng yong
  * @date 2024/11/7 06:59
  * @email 56002982@qq.com
- * @des 3D 模型滤镜
+ * @des 3D 模型滤镜，支持顶点、法向量、纹理
  */
 class Model3DFilter : GLFilter() {
     private val mProgram = Model3DProgram()
@@ -39,6 +40,10 @@ class Model3DFilter : GLFilter() {
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val model3DInfo = mModel3DInfo ?: return
         val texture = imageInOut.texture ?: return
+        val vertexBuffer = model3DInfo.vertexBuffer
+        val textureBuffer = model3DInfo.textureBuffer ?: return
+        val normalBuffer = model3DInfo.normalBuffer ?: return
+
         val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
         fbo.use {
             GLES20.glClearColor(0F, 0F, 0F, 1F)
@@ -55,9 +60,9 @@ class Model3DFilter : GLFilter() {
                 floatArrayOf(it.x, it.y, it.z)
             })
             mProgram.setData(
-                model3DInfo.vertexBuffer,
-                model3DInfo.textureBuffer,
-                model3DInfo.normalBuffer,
+                vertexBuffer,
+                textureBuffer,
+                normalBuffer,
                 model3DInfo.count,
             )
 
@@ -116,7 +121,7 @@ class Model3DFilter : GLFilter() {
  * @author jiang peng yong
  * @date 2024/6/19 10:08
  * @email 56002982@qq.com
- * @des 模型 3D
+ * @des 模型 3D，支持顶点、法向量、纹理
  */
 class Model3DProgram : GLProgram() {
     private var mVertexBuffer: FloatBuffer? = null
@@ -185,9 +190,9 @@ class Model3DProgram : GLProgram() {
     }
 
     fun setData(
-        vertexBuffer: FloatBuffer?,
-        textureBuffer: FloatBuffer?,
-        normalBuffer: FloatBuffer?,
+        vertexBuffer: FloatBuffer,
+        textureBuffer: FloatBuffer,
+        normalBuffer: FloatBuffer,
         vertexCount: Int,
     ) {
         mVertexBuffer = vertexBuffer
@@ -256,9 +261,9 @@ class Model3DProgram : GLProgram() {
         mTextureCoordHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/normal/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/all/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/normal/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/all/fragment.glsl")
 }
 
 enum class Model3DMessageType(val value: Int) {

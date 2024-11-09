@@ -1,9 +1,12 @@
-package com.jiangpengyong.sample.g_model.common
+package com.jiangpengyong.sample.g_model
 
 import android.content.res.Resources
 import android.opengl.GLES20
+import android.util.Log
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
+import com.jiangpengyong.sample.utils.Math3D
+import com.jiangpengyong.sample.utils.Vector
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -231,40 +234,56 @@ object Obj3DModelLoader {
                     // 第三个顶点  "4/11/4"
                     val p3 = temps[3].split("/".toRegex())
                     // 因为存在多种数据的可能，保证每组数据长度一样
-                    if (p1.size != p2.size || p2.size != p3.size || p1.size != p3.size) {
+                    if (p1.size != p2.size || p2.size != p3.size) {
                         isSuccess = false
                         break@loop
                     }
+
+                    val isNeedCalculateNormal = p1.size < 3
 
                     // ================================= 顶点 start =================================
                     // 第一个点
                     try {
                         // p1 行号是从 1 开始，所以要 减一
                         val index1 = p1[0].toInt() - 1
-                        // x
-                        vertexResultData.add(vertexData[index1 * 3])
-                        // y
-                        vertexResultData.add(vertexData[index1 * 3 + 1])
-                        // z
-                        vertexResultData.add(vertexData[index1 * 3 + 2])
+                        val x1 = vertexData[index1 * 3]
+                        val y1 = vertexData[index1 * 3 + 1]
+                        val z1 = vertexData[index1 * 3 + 2]
+                        vertexResultData.add(x1)
+                        vertexResultData.add(y1)
+                        vertexResultData.add(z1)
 
                         // p2 行号是从 1 开始，所以要 减一
                         val index2 = p2[0].toInt() - 1
-                        // x
-                        vertexResultData.add(vertexData[index2 * 3])
-                        // y
-                        vertexResultData.add(vertexData[index2 * 3 + 1])
-                        // z
-                        vertexResultData.add(vertexData[index2 * 3 + 2])
+                        val x2 = vertexData[index2 * 3]
+                        val y2 = vertexData[index2 * 3 + 1]
+                        val z2 = vertexData[index2 * 3 + 2]
+                        vertexResultData.add(x2)
+                        vertexResultData.add(y2)
+                        vertexResultData.add(z2)
 
                         // p3 行号是从 1 开始，所以要 减一
                         val index3 = p3[0].toInt() - 1
-                        // x
-                        vertexResultData.add(vertexData[index3 * 3])
-                        // y
-                        vertexResultData.add(vertexData[index3 * 3 + 1])
-                        // z
-                        vertexResultData.add(vertexData[index3 * 3 + 2])
+                        val x3 = vertexData[index3 * 3]
+                        val y3 = vertexData[index3 * 3 + 1]
+                        val z3 = vertexData[index3 * 3 + 2]
+                        vertexResultData.add(x3)
+                        vertexResultData.add(y3)
+                        vertexResultData.add(z3)
+
+                        if (isNeedCalculateNormal) {
+                            val normal = Math3D.vectorNormal(
+                                Math3D.crossProduct(
+                                    v1 = Vector(x2 - x1, y2 - y1, z2 - z1),
+                                    v2 = Vector(x3 - x1, y3 - y1, z3 - z1),
+                                )
+                            )
+                            for (i in 0..2) {
+                                normalResultData.add(normal.x)
+                                normalResultData.add(normal.y)
+                                normalResultData.add(normal.z)
+                            }
+                        }
                     } catch (e: Exception) {
                         Logger.e(TAG, "Obtain texture failure. e=${e.message}")
                         isSuccess = false
