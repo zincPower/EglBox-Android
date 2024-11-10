@@ -13,8 +13,6 @@ import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_sample.R
-import com.jiangpengyong.sample.g_model.all.Model3DMessageType
-import com.jiangpengyong.sample.g_model.onlyVertex.Model3DFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

@@ -387,9 +387,9 @@ object Obj3DModelLoader {
         return if (isSuccess) {  // 成功
             Model3DInfo(
                 vertexData = vertexResultData.toFloatArray(),
-                textureData = textureResultData.toFloatArray(),
+                textureData = if (textureResultData.isEmpty()) null else textureResultData.toFloatArray(),
                 textureStep = textureSize,
-                normalData = normalResultData.toFloatArray(),
+                normalData = if (normalResultData.isEmpty()) null else normalResultData.toFloatArray(),
                 frontFace = FrontFace.CCW,
                 space = Space(top, bottom, left, right, near, far)
             )
