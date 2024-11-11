@@ -19,22 +19,29 @@ in float aShininess;
 
 // 控制三种光是否使用
 uniform int uIsAddAmbientLight;
-uniform int uIsAddScatteredLight;
+uniform int uIsAddDiffuseLight;
 uniform int uIsAddSpecularLight;
+uniform int uIsDoubleSideRending;
 
 // 将未转换的顶点位置传递给片元着色器
 out vec3 vPosition;
-// 环境光强度
-out vec4 vAmbientLight;
-// 该顶点散射光最终亮度
-out vec4 vDiffuseLight;
-// 该顶点镜面光最终亮度
-out vec4 vSpecularLight;
+// 正面环境光亮度
+out vec4 vFrontAmbientLight;
+// 正面散射光亮度
+out vec4 vFrontDiffuseLight;
+// 正面镜面光亮度
+out vec4 vFrontSpecularLight;
 // 输出纹理坐标
 out vec2 vTextureCoord;
+// 反面环境光亮度
+out vec4 vBackAmbientLight;
+// 反面散射光亮度
+out vec4 vBackDiffuseLight;
+// 反面镜面光亮度
+out vec4 vBackSpecularLight;
 
 // 计算该顶点的散射光最终强度
-vec4 calScatteredLight(
+vec4 calDiffuseLight(
     vec3 normal,
     vec3 lightLocation,
     vec4 ligthIntensity
@@ -95,25 +102,50 @@ void main() {
 
     // 环境光
     if (uIsAddAmbientLight == 1) {
-        vAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
+        vFrontAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
     } else {
-        vAmbientLight = vec4(0);
+        vFrontAmbientLight = vec4(0);
     }
 
     // 散射光
-    if (uIsAddScatteredLight == 1) {
-        vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-        vDiffuseLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
+    if (uIsAddDiffuseLight == 1) {
+        vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
+        vFrontDiffuseLight = calDiffuseLight(aNormal, uLightPosition, diffuseLightIntensity);
     } else {
-        vDiffuseLight = vec4(0);
+        vFrontDiffuseLight = vec4(0);
     }
 
     // 镜面光
     if (uIsAddSpecularLight == 1) {
         vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
-        vSpecularLight = calSpecularLight(aNormal, uLightPosition, specularLightIntensity);
+        vFrontSpecularLight = calSpecularLight(aNormal, uLightPosition, specularLightIntensity);
     } else {
-        vSpecularLight = vec4(0);
+        vFrontSpecularLight = vec4(0);
+    }
+
+    if(uisdoublesiderending && gl_FrontFacing){
+        // 环境光
+        if (uIsAddAmbientLight == 1) {
+            vBackAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
+        } else {
+            vBackAmbientLight = vec4(0);
+        }
+
+        // 散射光
+        if (uIsAddDiffuseLight == 1) {
+            vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
+            vBackDiffuseLight = calDiffuseLight(-aNormal, uLightPosition, diffuseLightIntensity);
+        } else {
+            vBackDiffuseLight = vec4(0);
+        }
+
+        // 镜面光
+        if (uIsAddSpecularLight == 1) {
+            vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
+            vBackSpecularLight = calSpecularLight(-aNormal, uLightPosition, specularLightIntensity);
+        } else {
+            vBackSpecularLight = vec4(0);
+        }
     }
 
     // 为了点绘制时，方便查看点绘制

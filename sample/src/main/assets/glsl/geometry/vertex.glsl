@@ -18,7 +18,7 @@ in float aShininess;
 
 // 控制三种光是否使用
 uniform int uIsAddAmbientLight;
-uniform int uIsAddScatteredLight;
+uniform int uIsAddDiffuseLight;
 uniform int uIsAddSpecularLight;
 
 // 将未转换的顶点位置传递给片元着色器
@@ -33,7 +33,7 @@ out vec4 vSpecularLight;
 out vec2 vTextureCoord;
 
 // 计算该顶点的散射光最终强度
-vec4 calScatteredLight(
+vec4 calDiffuseLight(
     vec3 normal,
     vec3 lightLocation,
     vec4 ligthIntensity
@@ -100,9 +100,9 @@ void main() {
     }
 
     // 散射光
-    if (uIsAddScatteredLight == 1) {
-        vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-        vDiffuseLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
+    if (uIsAddDiffuseLight == 1) {
+        vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
+        vDiffuseLight = calDiffuseLight(aNormal, uLightPosition, diffuseLightIntensity);
     } else {
         vDiffuseLight = vec4(0);
     }

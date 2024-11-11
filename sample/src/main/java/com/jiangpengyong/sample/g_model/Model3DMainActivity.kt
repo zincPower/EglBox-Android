@@ -28,10 +28,10 @@ class Model3DMainActivity : AppCompatActivity() {
     private lateinit var glPreviewView: GLPreviewView
     private var filterId: String? = null
     private var modelInfos: Map<Int, ModelInfo> = hashMapOf(
-        R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg", Point(0F, 0F, 100F)),
-        R.id.teapot_only_vertex to ModelInfo("model/teapot/only_vertex/teapot.obj", null, Point(0F, 0F, 30F)),
-        R.id.teapot_without_lid to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F)),
-        R.id.teapot_all to ModelInfo("model/teapot/all/teapot.obj", "model/teapot/all/teapot.png", Point(0F, 0F, 100F))
+        R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg", Point(0F, 0F, 100F), false),
+        R.id.teapot_only_vertex to ModelInfo("model/teapot/only_vertex/teapot.obj", null, Point(0F, 0F, 30F), false),
+        R.id.teapot_without_lid to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
+        R.id.teapot_all to ModelInfo("model/teapot/all/teapot.obj", "model/teapot/all/teapot.png", Point(0F, 0F, 100F), false),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +65,7 @@ class Model3DMainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             glPreviewView.setViewpoint(modelInfo.viewpoint.x, modelInfo.viewpoint.y, modelInfo.viewpoint.z)
             val file = File(filesDir, modelInfo.modelPath)
-            val model3DInfo = Obj3DModelLoader.load(file, textureFlip = true)
+            val model3DInfo = Obj3DModelLoader.load(file, textureFlip = true, isDoubleSideRendering = modelInfo.isDoubleSideRendering)
             if (model3DInfo == null) {
                 Logger.e(TAG, "Obj parser failure. File=${file}")
                 return@launch
@@ -100,4 +100,4 @@ class Model3DMainActivity : AppCompatActivity() {
     }
 }
 
-data class ModelInfo(val modelPath: String, val texturePath: String?, val viewpoint: Point)
+data class ModelInfo(val modelPath: String, val texturePath: String?, val viewpoint: Point, val isDoubleSideRendering: Boolean)

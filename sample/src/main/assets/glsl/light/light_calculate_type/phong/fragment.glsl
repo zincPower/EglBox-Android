@@ -17,7 +17,7 @@ uniform vec3 uCameraPosition;
 
 // 控制三种光是否现实
 uniform int uIsAddAmbientLight;
-uniform int uIsAddScatteredLight;
+uniform int uIsAddDiffuseLight;
 uniform int uIsAddSpecularLight;
 
 // 光源类型 1：定点光 2：定向光
@@ -56,7 +56,7 @@ vec4 calColor() {
 
 
 // 计算该顶点的散射光最终强度
-vec4 calScatteredLight(
+vec4 calDiffuseLight(
     vec3 normal,
     vec3 lightLocation,
     vec4 ligthIntensity
@@ -125,9 +125,9 @@ void main() {
 
     // 散射光
     vec4 diffuseLight = vec4(0);
-    if (uIsAddScatteredLight == 1) {
-        vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-        diffuseLight = calScatteredLight(vNormal, uLightPosition, scatteredLightIntensity);
+    if (uIsAddDiffuseLight == 1) {
+        vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
+        diffuseLight = calDiffuseLight(vNormal, uLightPosition, diffuseLightIntensity);
     }
 
     // 镜面光

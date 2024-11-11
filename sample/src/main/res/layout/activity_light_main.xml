@@ -14,7 +14,7 @@
         android:text="2、环境光" />
 
     <TextView
-        android:id="@+id/scattered_light"
+        android:id="@+id/diffuse_light"
         style="@style/common_button"
         android:text="3、散射光" />
 

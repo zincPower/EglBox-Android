@@ -3,7 +3,7 @@ precision mediump float;
 
 in vec3 vPosition;
 in vec4 vAmbientLight;
-in vec4 vScatteredLight;
+in vec4 vDiffuseLight;
 in vec4 vSpecularLight;
 
 out vec4 fragColor;
@@ -42,5 +42,5 @@ vec4 calColor() {
 
 void main() {
     vec4 orgColor = calColor();
-    fragColor = orgColor * vAmbientLight + orgColor * vScatteredLight + orgColor * vSpecularLight;
+    fragColor = orgColor * vAmbientLight + orgColor * vDiffuseLight + orgColor * vSpecularLight;
 }

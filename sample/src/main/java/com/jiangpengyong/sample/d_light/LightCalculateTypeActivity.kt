@@ -82,9 +82,9 @@ class LightCalculateTypeActivity : AppCompatActivity() {
             })
             mRenderView.requestRender()
         }
-        findViewById<CheckBox>(R.id.scattered_light).setOnCheckedChangeListener { _, isChecked ->
+        findViewById<CheckBox>(R.id.diffuse_light).setOnCheckedChangeListener { _, isChecked ->
             mRenderView.updateFilterData(Bundle().apply {
-                putInt("scatteredLight", if (isChecked) 1 else 0)
+                putInt("diffuseLight", if (isChecked) 1 else 0)
             })
             mRenderView.requestRender()
         }
@@ -430,11 +430,11 @@ class LightCalculateTypeActivity : AppCompatActivity() {
                         mGouraudProgram.isAddAmbientLight(it == 1)
                         mPhongProgram.isAddAmbientLight(it == 1)
                     }
-                updateData.getInt("scatteredLight", -10000)
+                updateData.getInt("diffuseLight", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        mGouraudProgram.isAddScatteredLight(it == 1)
-                        mPhongProgram.isAddScatteredLight(it == 1)
+                        mGouraudProgram.isAddDiffuseLight(it == 1)
+                        mPhongProgram.isAddDiffuseLight(it == 1)
                     }
                 updateData.getInt("specularLight", -10000)
                     .takeIf { it != -10000 }

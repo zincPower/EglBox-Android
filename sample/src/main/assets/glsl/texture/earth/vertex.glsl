@@ -26,7 +26,7 @@ out vec4 vDiffuseLight;
 out vec4 vSpecularLight;
 
 // 计算该顶点的散射光最终强度
-vec4 calScatteredLight(
+vec4 calDiffuseLight(
     vec3 normal,
     vec3 lightLocation,
     vec4 ligthIntensity
@@ -86,8 +86,8 @@ void main() {
     vAmbientLight = vec4(0.3, 0.3, 0.3, 1.0);
 
     // 散射光
-    vec4 scatteredLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
-    vDiffuseLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
+    vec4 diffuseLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
+    vDiffuseLight = calDiffuseLight(aNormal, uLightPosition, diffuseLightIntensity);
 
     // 镜面光
     vec4 specularLightIntensity = vec4(0.6, 0.6, 0.6, 1.0);

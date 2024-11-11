@@ -32,7 +32,7 @@ class GeometryProgram : GLProgram() {
     private var mTextureHandle = 0
     private var mShininessHandle = 0
     private var mIsAddAmbientLightHandle = 0
-    private var mIsAddScatteredLightHandle = 0
+    private var mIsAddDiffuseLightHandle = 0
     private var mIsAddSpecularHandle = 0
 
     private var mMVPMatrix = GLMatrix()
@@ -43,7 +43,7 @@ class GeometryProgram : GLProgram() {
     private var mShininess = 50F
 
     private var mIsAddAmbientLight = true
-    private var mIsAddScatteredLight = true
+    private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
 
     private var mTexture: GLTexture? = null
@@ -93,8 +93,8 @@ class GeometryProgram : GLProgram() {
         mIsAddAmbientLight = value
     }
 
-    fun isAddScatteredLight(value: Boolean) {
-        mIsAddScatteredLight = value
+    fun isAddDiffuseLight(value: Boolean) {
+        mIsAddDiffuseLight = value
     }
 
     fun isAddSpecularLight(value: Boolean) {
@@ -115,7 +115,7 @@ class GeometryProgram : GLProgram() {
         mShininessHandle = getAttribLocation("aShininess")
 
         mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
-        mIsAddScatteredLightHandle = getUniformLocation("uIsAddScatteredLight")
+        mIsAddDiffuseLightHandle = getUniformLocation("uIsAddDiffuseLight")
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
     }
 
@@ -126,7 +126,7 @@ class GeometryProgram : GLProgram() {
         GLES20.glUniform3f(mCameraPositionHandle, mCameraPosition[0], mCameraPosition[1], mCameraPosition[2])
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
-        GLES20.glUniform1i(mIsAddScatteredLightHandle, if (mIsAddScatteredLight) 1 else 0)
+        GLES20.glUniform1i(mIsAddDiffuseLightHandle, if (mIsAddDiffuseLight) 1 else 0)
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)
@@ -155,7 +155,7 @@ class GeometryProgram : GLProgram() {
         mTextureHandle = 0
         mShininessHandle = 0
         mIsAddAmbientLightHandle = 0
-        mIsAddScatteredLightHandle = 0
+        mIsAddDiffuseLightHandle = 0
         mIsAddSpecularHandle = 0
     }
 

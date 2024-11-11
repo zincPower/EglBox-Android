@@ -37,7 +37,7 @@ class LightSourceTypeBallProgram : GLProgram() {
     private var mNormalHandle = 0
     private var mShininessHandle = 0
     private var mIsAddAmbientLightHandle = 0
-    private var mIsAddScatteredLightHandle = 0
+    private var mIsAddDiffuseLightHandle = 0
     private var mIsAddSpecularHandle = 0
     private var mLightSourceTypeHandle = 0
 
@@ -50,7 +50,7 @@ class LightSourceTypeBallProgram : GLProgram() {
     private var mShininess = 50F
 
     private var mIsAddAmbientLight = true
-    private var mIsAddScatteredLight = true
+    private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
 
     private var mLightSourceType = LightSourceType.PointLight
@@ -83,8 +83,8 @@ class LightSourceTypeBallProgram : GLProgram() {
         mIsAddAmbientLight = value
     }
 
-    fun isAddScatteredLight(value: Boolean) {
-        mIsAddScatteredLight = value
+    fun isAddDiffuseLight(value: Boolean) {
+        mIsAddDiffuseLight = value
     }
 
     fun isAddSpecularLight(value: Boolean) {
@@ -109,7 +109,7 @@ class LightSourceTypeBallProgram : GLProgram() {
         mNormalHandle = getAttribLocation("aNormal")
         mShininessHandle = getAttribLocation("aShininess")
         mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
-        mIsAddScatteredLightHandle = getUniformLocation("uIsAddScatteredLight")
+        mIsAddDiffuseLightHandle = getUniformLocation("uIsAddDiffuseLight")
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
         mLightSourceTypeHandle = getUniformLocation("uLightSourceType")
     }
@@ -124,7 +124,7 @@ class LightSourceTypeBallProgram : GLProgram() {
         GLES20.glUniform3f(mCameraPositionHandle, mCameraPosition[0], mCameraPosition[1], mCameraPosition[2])
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
-        GLES20.glUniform1i(mIsAddScatteredLightHandle, if (mIsAddScatteredLight) 1 else 0)
+        GLES20.glUniform1i(mIsAddDiffuseLightHandle, if (mIsAddDiffuseLight) 1 else 0)
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
         // 光源类型
         GLES20.glUniform1i(mLightSourceTypeHandle, mLightSourceType.value)
@@ -147,7 +147,7 @@ class LightSourceTypeBallProgram : GLProgram() {
         mNormalHandle = 0
         mShininessHandle = 0
         mIsAddAmbientLightHandle = 0
-        mIsAddScatteredLightHandle = 0
+        mIsAddDiffuseLightHandle = 0
         mIsAddSpecularHandle = 0
         mLightSourceTypeHandle = 0
     }

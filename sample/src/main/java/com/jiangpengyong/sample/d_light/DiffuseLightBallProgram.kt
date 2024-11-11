@@ -17,7 +17,7 @@ import kotlin.math.sin
  * @email 56002982@qq.com
  * @des 绘制球 —— 散射光
  */
-class ScatteredLightBallProgram : GLProgram() {
+class DiffuseLightBallProgram : GLProgram() {
     enum class DrawMode(val value: Int) {
         Point(1),
         Line(2),
@@ -103,9 +103,9 @@ class ScatteredLightBallProgram : GLProgram() {
         mNormalHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/scattered_light/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/diffuse_light/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/scattered_light/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/diffuse_light/fragment.glsl")
 
     private fun calculateVertex() {
         val vertexList = ArrayList<Float>()

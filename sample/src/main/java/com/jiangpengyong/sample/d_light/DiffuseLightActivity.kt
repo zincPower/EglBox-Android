@@ -26,14 +26,13 @@ import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-
 /**
  * @author jiang peng yong
  * @date 2024/7/25 09:00
  * @email 56002982@qq.com
  * @des 散射光
  */
-class ScatteredLightActivity : AppCompatActivity() {
+class DiffuseLightActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -48,7 +47,7 @@ class ScatteredLightActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_scattered)
+        setContentView(R.layout.activity_light_diffuse)
         mRenderView = findViewById(R.id.surface_view)
 
         findViewById<View>(R.id.reset).setOnClickListener {
@@ -78,10 +77,11 @@ class ScatteredLightActivity : AppCompatActivity() {
         findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
             mRenderView.updateFilterData(Bundle().apply {
                 when (checkedId) {
-                    R.id.gl_points -> putInt("drawingMode", ScatteredLightBallProgram.DrawMode.Point.value)
-                    R.id.gl_lines -> putInt("drawingMode", ScatteredLightBallProgram.DrawMode.Line.value)
-                    R.id.gl_triangles -> putInt("drawingMode", ScatteredLightBallProgram.DrawMode.Face.value)
+                    R.id.gl_points -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Point.value)
+                    R.id.gl_lines -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Line.value)
+                    R.id.gl_triangles -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Face.value)
                 }
+
             })
             mRenderView.requestRender()
         }
@@ -239,7 +239,7 @@ class ScatteredLightActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = ScatteredLightBallProgram()
+        private val mProgram = DiffuseLightBallProgram()
         private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
@@ -317,9 +317,9 @@ class ScatteredLightActivity : AppCompatActivity() {
                 val mode = updateData.getInt("drawingMode", 0)
                 if (mode != 0) {
                     when (mode) {
-                        ScatteredLightBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(ScatteredLightBallProgram.DrawMode.Point)
-                        ScatteredLightBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(ScatteredLightBallProgram.DrawMode.Line)
-                        ScatteredLightBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(ScatteredLightBallProgram.DrawMode.Face)
+                        DiffuseLightBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Point)
+                        DiffuseLightBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Line)
+                        DiffuseLightBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Face)
                     }
                 }
 

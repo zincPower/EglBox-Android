@@ -53,7 +53,7 @@
             android:textSize="12sp" />
 
         <CheckBox
-            android:id="@+id/scattered_light"
+            android:id="@+id/diffuse_light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"

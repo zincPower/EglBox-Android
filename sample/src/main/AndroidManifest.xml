@@ -75,7 +75,7 @@
             android:name="com.jiangpengyong.sample.d_light.AmbientLightActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.ScatteredLightActivity"
+            android:name="com.jiangpengyong.sample.d_light.DiffuseLightActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name="com.jiangpengyong.sample.d_light.SpecularLightActivity"

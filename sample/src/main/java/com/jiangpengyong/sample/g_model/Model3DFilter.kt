@@ -48,7 +48,11 @@ class Model3DFilter : GLFilter() {
             GLES20.glClearColor(0F, 0F, 0F, 1F)
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
-            GLES20.glEnable(GLES20.GL_CULL_FACE)
+//            if (mModel3DInfo?.isDoubleSideRendering == true) {
+//                GLES20.glDisable(GLES20.GL_CULL_FACE)
+//            } else {
+                GLES20.glEnable(GLES20.GL_CULL_FACE)
+//            }
 
             context.texture2DProgram.reset()
             context.texture2DProgram.setTexture(texture)
@@ -65,7 +69,9 @@ class Model3DFilter : GLFilter() {
                 model3DInfo.count,
             )
 
-            GLES20.glFrontFace(model3DInfo.frontFace.value)
+//            if (mModel3DInfo?.isDoubleSideRendering != true) {
+                GLES20.glFrontFace(model3DInfo.frontFace.value)
+//            }
             val modelMatrix = context.space3D.gestureMatrix * mModelMatrix
             mProgram.setTexture(mTexture)
             mProgram.setMVPMatrix(context.space3D.projectionMatrix * context.space3D.viewMatrix * modelMatrix)
@@ -73,7 +79,9 @@ class Model3DFilter : GLFilter() {
             mProgram.draw()
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
-            GLES20.glDisable(GLES20.GL_CULL_FACE)
+//            if (mModel3DInfo?.isDoubleSideRendering != true) {
+                GLES20.glDisable(GLES20.GL_CULL_FACE)
+//            }
         }
         imageInOut.out(fbo)
     }
@@ -89,14 +97,17 @@ class Model3DFilter : GLFilter() {
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
             Model3DMessageType.SET_MODEL_DATA.value -> {
-                mModel3DInfo = message.obj as? Model3DInfo
                 mModelMatrix.reset()
-                mModel3DInfo?.space?.apply {
-                    mModelMatrix.translate(
-                        -(left + right) / 2F,
-                        -(top + bottom) / 2F,
-                        -(near + far) / 2F,
-                    )
+                mModel3DInfo = message.obj as? Model3DInfo
+                mModel3DInfo?.apply {
+                    space.apply {
+                        mModelMatrix.translate(
+                            -(left + right) / 2F,
+                            -(top + bottom) / 2F,
+                            -(near + far) / 2F,
+                        )
+                    }
+                    mProgram.isDoubleSidedRending(isDoubleSideRendering)
                 }
             }
 
@@ -133,13 +144,14 @@ class Model3DProgram : GLProgram() {
     private var mLightPositionHandle = 0
     private var mCameraPositionHandle = 0
     private var mPositionHandle = 0
+    private var mTextureCoordHandle = 0
     private var mNormalHandle = 0
     private var mShininessHandle = 0
     private var mIsAddAmbientLightHandle = 0
-    private var mIsAddScatteredLightHandle = 0
+    private var mIsAddDiffuseLightHandle = 0
     private var mIsAddSpecularHandle = 0
-    private var mTextureCoordHandle = 0
     private var mIsUseTextureHandle = 0
+    private var mIsDoubleSideRendingHandle = 0
 
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mMMatrix: GLMatrix = GLMatrix()
@@ -150,8 +162,9 @@ class Model3DProgram : GLProgram() {
     private var mTexture: GLTexture? = null
 
     private var mIsAddAmbientLight = true
-    private var mIsAddScatteredLight = true
+    private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
+    private var mIsDoubleSidedRending = false
 
     fun setTexture(texture: GLTexture?) {
         mTexture = texture
@@ -181,12 +194,16 @@ class Model3DProgram : GLProgram() {
         mIsAddAmbientLight = value
     }
 
-    fun isAddScatteredLight(value: Boolean) {
-        mIsAddScatteredLight = value
+    fun isAddDiffuseLight(value: Boolean) {
+        mIsAddDiffuseLight = value
     }
 
     fun isAddSpecularLight(value: Boolean) {
         mIsAddSpecularLight = value
+    }
+
+    fun isDoubleSidedRending(value: Boolean) {
+        mIsDoubleSidedRending = value
     }
 
     fun setData(
@@ -211,9 +228,10 @@ class Model3DProgram : GLProgram() {
         mShininessHandle = getAttribLocation("aShininess")
         mTextureCoordHandle = getAttribLocation("aTextureCoord")
         mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
-        mIsAddScatteredLightHandle = getUniformLocation("uIsAddScatteredLight")
+        mIsAddDiffuseLightHandle = getUniformLocation("uIsAddDiffuseLight")
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
         mIsUseTextureHandle = getUniformLocation("uIsUseTexture")
+        mIsDoubleSideRendingHandle = getUniformLocation("uIsDoubleSideRending")
     }
 
     override fun onDraw() {
@@ -221,30 +239,46 @@ class Model3DProgram : GLProgram() {
         mNormalBuffer ?: return
 
         mTexture?.bind()
+
+        // MVP 矩阵
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
+
         // 模型矩阵
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
+
         // 光源位置
         GLES20.glUniform3f(mLightPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
+
         // 相机位置（观察位置）
         GLES20.glUniform3f(mCameraPositionHandle, mCameraPosition[0], mCameraPosition[1], mCameraPosition[2])
+
+        // 光效控制
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
-        GLES20.glUniform1i(mIsAddScatteredLightHandle, if (mIsAddScatteredLight) 1 else 0)
+        GLES20.glUniform1i(mIsAddDiffuseLightHandle, if (mIsAddDiffuseLight) 1 else 0)
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
+
+        // 控制双面渲染
+        GLES20.glUniform1i(mIsDoubleSideRendingHandle, if (mIsDoubleSidedRending) 1 else 0)
+
         // 顶点
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
+        GLES20.glEnableVertexAttribArray(mPositionHandle)
+
         // 法向量
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)
+        GLES20.glEnableVertexAttribArray(mNormalHandle)
+
         // 纹理
         GLES20.glUniform1i(mIsUseTextureHandle, if (mTextureBuffer == null) 0 else 1)
         if (mTextureBuffer != null) {
             GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, mTextureBuffer)
             GLES20.glEnableVertexAttribArray(mTextureCoordHandle)
         }
-        GLES20.glEnableVertexAttribArray(mPositionHandle)
-        GLES20.glEnableVertexAttribArray(mNormalHandle)
+
+        // 渲染方式
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
+
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mNormalHandle)
         if (mTextureBuffer != null) {
@@ -259,13 +293,14 @@ class Model3DProgram : GLProgram() {
         mLightPositionHandle = 0
         mCameraPositionHandle = 0
         mPositionHandle = 0
+        mTextureCoordHandle = 0
         mNormalHandle = 0
         mShininessHandle = 0
         mIsAddAmbientLightHandle = 0
-        mIsAddScatteredLightHandle = 0
+        mIsAddDiffuseLightHandle = 0
         mIsAddSpecularHandle = 0
-        mTextureCoordHandle = 0
         mIsUseTextureHandle = 0
+        mIsDoubleSideRendingHandle = 0
     }
 
     override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/vertex.glsl")

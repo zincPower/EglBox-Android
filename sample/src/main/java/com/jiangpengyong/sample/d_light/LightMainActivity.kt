@@ -26,8 +26,8 @@ class LightMainActivity : AppCompatActivity() {
             startActivity(Intent(this, AmbientLightActivity::class.java))
         }
 
-        findViewById<View>(R.id.scattered_light).setOnClickListener {
-            startActivity(Intent(this, ScatteredLightActivity::class.java))
+        findViewById<View>(R.id.diffuse_light).setOnClickListener {
+            startActivity(Intent(this, DiffuseLightActivity::class.java))
         }
 
         findViewById<View>(R.id.specular_light).setOnClickListener {

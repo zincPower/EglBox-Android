@@ -13,10 +13,10 @@ in vec3 aNormal;
 // 将未转换的顶点位置传递给片元着色器
 out vec3 vPosition;
 // 该顶点散射光最终亮度
-out vec4 vScatteredLight;
+out vec4 vDiffuseLight;
 
 // 计算该顶点的散射光最终强度
-vec4 calScatteredLight(
+vec4 calDiffuseLight(
     vec3 normal,
     vec3 lightLocation,
     vec4 ligthIntensity
@@ -43,8 +43,8 @@ void main() {
     // 将未转换的顶点位置传给片元着色器
     vPosition = aPosition;
 
-    vec4 scatteredLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-    vScatteredLight = calScatteredLight(aNormal, uLightPosition, scatteredLightIntensity);
+    vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
+    vDiffuseLight = calDiffuseLight(aNormal, uLightPosition, diffuseLightIntensity);
 
     // 为了点绘制时，方便查看点绘制
     gl_PointSize = 10.0;

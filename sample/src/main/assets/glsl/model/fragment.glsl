@@ -3,14 +3,20 @@ precision mediump float;
 
 // 顶点位置
 in vec3 vPosition;
-// 环境光强度
-in vec4 vAmbientLight;
-// 散射光强度
-in vec4 vDiffuseLight;
-// 镜面光强度
-in vec4 vSpecularLight;
+// 正面环境光强度
+in vec4 vFrontAmbientLight;
+// 正面散射光强度
+in vec4 vFrontDiffuseLight;
+// 正面镜面光强度
+in vec4 vFrontSpecularLight;
 // 纹理坐标
 in vec2 vTextureCoord;
+// 反面环境光强度
+in vec4 vBackAmbientLight;
+// 反面散射光强度
+in vec4 vBackDiffuseLight;
+// 反面镜面光强度
+in vec4 vBackSpecularLight;
 
 uniform int uIsUseTexture;
 uniform sampler2D sTexture;
@@ -24,5 +30,10 @@ void main() {
     } else {
         orgColor = vec4(1.0);
     }
-    fragColor = orgColor * vAmbientLight + orgColor * vDiffuseLight + orgColor * vSpecularLight;
+
+    if(gl_frontfacing){
+        fragColor = orgColor * vFrontAmbientLight + orgColor * vFrontDiffuseLight + orgColor * vFrontSpecularLight;
+    }else{
+        fragColor = orgColor * vBackAmbientLight + orgColor * vBackDiffuseLight + orgColor * vBackSpecularLight;
+    }
 }

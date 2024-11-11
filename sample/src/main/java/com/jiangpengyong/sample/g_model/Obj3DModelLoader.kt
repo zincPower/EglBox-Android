@@ -73,39 +73,43 @@ object Obj3DModelLoader {
         resources: Resources,
         assetPath: String,
         textureSize: Int = 2,
-        textureFlip: Boolean = false
+        textureFlip: Boolean = false,
+        isDoubleSideRendering: Boolean = false,
     ): Model3DInfo? {
         val bufferedReader = getBufferReader(resources, assetPath)
         bufferedReader ?: return null
         return bufferedReader.use {
-            load(it, textureSize, textureFlip)
+            load(it, textureSize, textureFlip, isDoubleSideRendering)
         }
     }
 
     fun load(
         filePath: String,
         textureSize: Int = 2,
-        textureFlip: Boolean = false
+        textureFlip: Boolean = false,
+        isDoubleSideRendering: Boolean = false,
     ): Model3DInfo? {
         val bufferedReader = getBufferReader(filePath)
         bufferedReader ?: return null
-        return load(bufferedReader, textureSize, textureFlip)
+        return load(bufferedReader, textureSize, textureFlip, isDoubleSideRendering)
     }
 
     fun load(
         file: File,
         textureSize: Int = 2,
-        textureFlip: Boolean = false
+        textureFlip: Boolean = false,
+        isDoubleSideRendering: Boolean = false,
     ): Model3DInfo? {
         val bufferedReader = getBufferReader(file)
         bufferedReader ?: return null
-        return load(bufferedReader, textureSize, textureFlip)
+        return load(bufferedReader, textureSize, textureFlip, isDoubleSideRendering)
     }
 
     private fun load(
         bufferedReader: BufferedReader,
         textureSize: Int,
         textureFlip: Boolean,
+        isDoubleSideRendering: Boolean = false,
     ): Model3DInfo? {
         var line: String?
         val vertexData = arrayListOf<Float>()
@@ -391,7 +395,8 @@ object Obj3DModelLoader {
                 textureStep = textureSize,
                 normalData = if (normalResultData.isEmpty()) null else normalResultData.toFloatArray(),
                 frontFace = FrontFace.CCW,
-                space = Space(top, bottom, left, right, near, far)
+                space = Space(top, bottom, left, right, near, far),
+                isDoubleSideRendering = isDoubleSideRendering
             )
         } else {
             null
@@ -444,6 +449,7 @@ data class Model3DInfo(
     val normalData: FloatArray?,           // 法向量数据
     val frontFace: FrontFace,              // 卷绕方向
     val space: Space,                      // 空间
+    val isDoubleSideRendering: Boolean,    // 是否双面渲染
 ) {
     /**
      * 顶点数据
