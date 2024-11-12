@@ -11,3 +11,7 @@ fun Float.toRadians(): Double {
 fun Double.toRadians(): Double {
     return Math.toRadians(this)
 }
+
+fun Int.toBoolean(): Boolean {
+    return this != 0
+}

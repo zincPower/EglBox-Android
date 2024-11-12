@@ -1,5 +1,6 @@
 package com.jiangpengyong.eglbox_core.filter
 
+import android.os.Handler
 import android.os.Message
 import android.util.Size
 import com.jiangpengyong.eglbox_core.egl.EGL
@@ -66,9 +67,13 @@ class FilterContext(val renderType: RenderType) {
     var surface: EglSurface? = null
         private set
 
-    fun init(egl: EGL, surface: EglSurface, listener: MessageListener) {
+    var eglHandler: Handler? = null
+        private set
+
+    fun init(egl: EGL, surface: EglSurface, eglHandler: Handler, listener: MessageListener) {
         this.egl = egl
         this.surface = surface
+        this.eglHandler = eglHandler
         mListener = listener
         texture2DProgram.init()
     }

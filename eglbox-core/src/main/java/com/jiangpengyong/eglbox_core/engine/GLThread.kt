@@ -129,12 +129,22 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
                 notifyWindowControlFinish()
                 return@post
             }
+            val handler = mHandler
+            if (handler == null) {
+                Logger.e(TAG, "EGLHandler is null【handleWindowCreated】.")
+                return@post
+            }
             mEglSurface?.release()
             mEglSurface = null
-            mEglSurface = egl.createWindow(window, width, height)
-            mEglSurface?.let { egl.makeCurrent(it) }
+            val eglSurface = egl.createWindow(window, width, height)
+            if (eglSurface == null) {
+                Logger.e(TAG, "EGLSurface is null【handleWindowCreated】. width=${width}, height=${height}")
+                return@post
+            }
+            mEglSurface = eglSurface
+            egl.makeCurrent(eglSurface)
             if (!mIsCalledOnEglCreated) {
-                renderer.onEGLCreated(egl, mEglSurface!!)
+                renderer.onEGLCreated(egl, eglSurface, handler)
                 mIsCalledOnEglCreated = true
             }
 
@@ -338,12 +348,22 @@ class GLThread(val config: GLEngineConfig) : Thread(TAG) {
             Logger.e(TAG, "PBuffer size is invalid【createPBuffer】. width=${width}, height=${height}")
             return
         }
+        val handler = mHandler
+        if (handler == null) {
+            Logger.e(TAG, "EGLHandler is null【createPBuffer】. width=${width}, height=${height}")
+            return
+        }
         mEglSurface?.release()
         mEglSurface = null
-        mEglSurface = egl.createPBuffer(width, height)
-        mEglSurface?.let { egl.makeCurrent(it) }
+        val eglSurface = egl.createPBuffer(width, height)
+        if (eglSurface == null) {
+            Logger.e(TAG, "EGLSurface is null【createPBuffer】. width=${width}, height=${height}")
+            return
+        }
+        mEglSurface = eglSurface
+        egl.makeCurrent(eglSurface)
         if (!mIsCalledOnEglCreated) {
-            renderer.onEGLCreated(egl, mEglSurface!!)
+            renderer.onEGLCreated(egl, eglSurface, handler)
             mIsCalledOnEglCreated = true
         }
         mEglSurface?.let { renderer.onSurfaceSizeChanged(it) }

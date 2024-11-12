@@ -1,8 +1,11 @@
 package com.jiangpengyong.eglbox_core.engine
 
+import android.os.Handler
 import com.jiangpengyong.eglbox_core.GLThread
 import com.jiangpengyong.eglbox_core.egl.EGL
 import com.jiangpengyong.eglbox_core.egl.EglSurface
+import com.jiangpengyong.eglbox_core.engine.RenderType.OffScreen
+import com.jiangpengyong.eglbox_core.engine.RenderType.OnScreen
 import com.jiangpengyong.eglbox_core.filter.FilterChain
 
 /**
@@ -13,7 +16,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterChain
  */
 interface GLRenderer {
     @GLThread
-    fun onEGLCreated(egl: EGL, surface: EglSurface)
+    fun onEGLCreated(egl: EGL, surface: EglSurface, eglHandler: Handler)
 
     @GLThread
     fun onSurfaceSizeChanged(surface: EglSurface)
@@ -44,8 +47,8 @@ enum class RenderType { OnScreen, OffScreen }
 class FilterChainRenderer(renderType: RenderType) : GLRenderer {
     val filterChain = FilterChain(renderType)
 
-    override fun onEGLCreated(egl: EGL, surface: EglSurface) {
-        filterChain.init(egl, surface)
+    override fun onEGLCreated(egl: EGL, surface: EglSurface, eglHandler: Handler) {
+        filterChain.init(egl, surface, eglHandler)
     }
 
     override fun onSurfaceSizeChanged(surface: EglSurface) {

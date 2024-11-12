@@ -6,9 +6,9 @@ import android.os.Looper
 import android.os.Message
 import androidx.annotation.MainThread
 import com.jiangpengyong.eglbox_core.GLThread
-import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.egl.EGL
 import com.jiangpengyong.eglbox_core.egl.EglSurface
+import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.logger.Logger
 
 /**
@@ -30,11 +30,11 @@ class FilterChain(renderType: RenderType) {
     private val mListener = FilterChainListenerImpl()
 
     @GLThread
-    fun init(egl: EGL, surface: EglSurface) {
+    fun init(egl: EGL, surface: EglSurface, eglHandler: Handler) {
         if (mIsInit) return
         Logger.i(TAG, "FilterChain init.")
         mIsInit = true;
-        mContext.init(egl, surface, mListener)
+        mContext.init(egl, surface, eglHandler, mListener)
         mFilterSlot.addFilter(mSourceFilter)
         mFilterSlot.addFilter(mProcessFilter)
         mFilterSlot.addFilter(mSinkFilter)

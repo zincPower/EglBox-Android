@@ -31,14 +31,14 @@ class MultimediaSourceFilter : SourceFilter() {
     private var mSurfaceTexture: SurfaceTexture? = null
 
     private val mMatrix = ModelMatrix()
-    private val mPreviewSize = Size(0, 0)
+    private var mPreviewSize = Size(0, 0)
 
     private var mIsNeedCalculate = true
     private var mScaleX = 1F
     private var mScaleY = 1F
     private var mAngle = 0F
-    private var mXMirror = false
-    private var mYMirror = false
+    private var mMirrorX = false
+    private var mMirrorY = false
 
     private var mFrameSizeInfo: FrameSizeInfo? = null
 
@@ -65,7 +65,7 @@ class MultimediaSourceFilter : SourceFilter() {
         if (mIsNeedCalculate) {
             mMatrix.reset()
             mMatrix.scale(mScaleX, mScaleY, 1F)
-            mMatrix.scale(if (mXMirror) -1F else 1F, if (mYMirror) -1F else 1F, 1F)
+            mMatrix.scale(if (mMirrorX) -1F else 1F, if (mMirrorY) -1F else 1F, 1F)
             mMatrix.rotate(mAngle, 0F, 0F, 1F)
             mTexture2DProgram.setVertexMatrix(mMatrix.matrix)
             mIsNeedCalculate = false
@@ -99,25 +99,26 @@ class MultimediaSourceFilter : SourceFilter() {
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-//            PreviewMessageType.SET_FRAME_SIZE -> handleFrameSize(message.obj as? FrameSizeInfo)
-//            CommonMessageType.SURFACE_CREATED -> handlePreviewSize(message.arg1, message.arg2)
-//            CommonMessageType.SURFACE_CHANGED -> handlePreviewSize(message.arg1, message.arg2)
-//            CommonMessageType.SURFACE_DESTROY -> handlePreviewSize(0, 0)
-//            PreviewMessageType.SET_SOURCE_ROTATION -> handleRotation(message.arg1)
-//            PreviewMessageType.SET_SOURCE_MIRROR -> handleMirror(message.arg1, message.arg2)
+            MessageType.SET_FRAME_SIZE -> handleFrameSize(message.obj as? FrameSizeInfo)
+            MessageType.SURFACE_CREATED -> handlePreviewSize(message.arg1, message.arg2)
+            MessageType.SURFACE_CHANGED -> handlePreviewSize(message.arg1, message.arg2)
+            MessageType.SURFACE_DESTROY -> handlePreviewSize(0, 0)
+            MessageType.SET_SOURCE_ROTATION -> handleRotation(message.obj as Float)
+            MessageType.SET_SOURCE_MIRROR -> handleMirror(message.obj as MirrorInfo)
         }
     }
 
     private fun handleFrameAvailable() {
-        // TODO 切换线程
-        val surfaceTexture = mSurfaceTexture ?: return
-        surfaceTexture.updateTexImage()
-        surfaceTexture.getTransformMatrix(mMatrix.matrix)
-        //
+        mContext?.eglHandler?.post{
+            val surfaceTexture = mSurfaceTexture ?: return@post
+            surfaceTexture.updateTexImage()
+            surfaceTexture.getTransformMatrix(mMatrix.matrix)
+            // TODO
+        }
     }
 
     private fun handleFrameSize(frameSizeInfo: FrameSizeInfo?) {
-        if (frameSizeInfo == null || frameSizeInfo.isValid()) {
+        if (frameSizeInfo == null || !frameSizeInfo.isValid()) {
             Logger.e(TAG, "Frame size info is invalid. FrameSizeInfo=${frameSizeInfo}")
             return
         }
@@ -125,6 +126,27 @@ class MultimediaSourceFilter : SourceFilter() {
         mTexture.updateSizeForOES(frameSizeInfo.sourceSize.width, frameSizeInfo.sourceSize.height)
         mFrameSizeInfo = frameSizeInfo
         val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, frameSizeInfo.sourceSize, frameSizeInfo.targetSize)
+        // TODO frame size
+        mScaleX = scaleX
+        mScaleY = scaleY
+        mIsNeedCalculate = true
+        Logger.i(TAG, "handleFrameSize FrameSizeInfo=${frameSizeInfo} scaleX=${mScaleX} scaleY=${mScaleY}")
+    }
+
+    private fun handlePreviewSize(width: Int, height: Int) {
+        mPreviewSize = Size(width, height)
+        mIsNeedCalculate = true
+    }
+
+    private fun handleRotation(angle: Float) {
+        mAngle = angle
+        mIsNeedCalculate = true
+    }
+
+    private fun handleMirror(mirrorInfo: MirrorInfo){
+        mMirrorX = mirrorInfo.mirrorX
+        mMirrorY = mirrorInfo.mirrorY
+        mIsNeedCalculate = true
     }
 
     companion object {
