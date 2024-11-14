@@ -44,9 +44,9 @@ out vec4 vBackSpecularLight;
 
 // 计算该顶点的散射光最终强度
 vec4 calDiffuseLight(
-    vec3 normal,
-    vec3 lightLocation,
-    vec4 ligthIntensity
+    vec3 normal,            // 法向量
+    vec3 lightLocation,     // 光照位置
+    vec4 ligthIntensity     // 光强
 ) {
     // 顶点进行模型转换
     vec3 finalPosition = (uMMatrix * vec4(aPosition, 1.0)).xyz;
@@ -102,30 +102,33 @@ void main() {
     vPosition = aPosition;
     vTextureCoord = aTextureCoord;
 
+    vec3 frontNormal = normalize(aNormal);
+
     // 环境光
-    if (uIsAddAmbientLight == 1) {
+//    if (uIsAddAmbientLight == 1) {
         vFrontAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
-    } else {
-        vFrontAmbientLight = vec4(0);
-    }
+//    } else {
+//        vFrontAmbientLight = vec4(0);
+//    }
 
     // 散射光
-    if (uIsAddDiffuseLight == 1) {
+//    if (uIsAddDiffuseLight == 1) {
         vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-        vFrontDiffuseLight = calDiffuseLight(aNormal, uLightPosition, diffuseLightIntensity);
-    } else {
-        vFrontDiffuseLight = vec4(0);
-    }
+        vFrontDiffuseLight = calDiffuseLight(frontNormal, uLightPosition, diffuseLightIntensity);
+//    } else {
+//        vFrontDiffuseLight = vec4(0);
+//    }
 
     // 镜面光
     if (uIsAddSpecularLight == 1) {
         vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
-        vFrontSpecularLight = calSpecularLight(aNormal, uLightPosition, specularLightIntensity);
+        vFrontSpecularLight = calSpecularLight(frontNormal, uLightPosition, specularLightIntensity);
     } else {
         vFrontSpecularLight = vec4(0);
     }
 
     if (uIsDoubleSideRendering == 1) {
+        vec3 backNormal = normalize(-aNormal);
         // 环境光
         if (uIsAddAmbientLight == 1) {
             vBackAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
@@ -136,7 +139,7 @@ void main() {
         // 散射光
         if (uIsAddDiffuseLight == 1) {
             vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-            vBackDiffuseLight = calDiffuseLight(-aNormal, uLightPosition, diffuseLightIntensity);
+            vBackDiffuseLight = calDiffuseLight(backNormal, uLightPosition, diffuseLightIntensity);
         } else {
             vBackDiffuseLight = vec4(0);
         }
@@ -144,7 +147,7 @@ void main() {
         // 镜面光
         if (uIsAddSpecularLight == 1) {
             vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
-            vBackSpecularLight = calSpecularLight(-aNormal, uLightPosition, specularLightIntensity);
+            vBackSpecularLight = calSpecularLight(backNormal, uLightPosition, specularLightIntensity);
         } else {
             vBackSpecularLight = vec4(0);
         }

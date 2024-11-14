@@ -30,7 +30,7 @@ class Model3DFilter : GLFilter() {
 
     private val mModelMatrix = ModelMatrix()
 
-    private var mLightPosition = floatArrayOf(0F, 0F, 100F)
+    private var mLightPosition = floatArrayOf(10F, 10F, 10F)
 
     override fun onInit() {
         mProgram.init()
@@ -71,9 +71,9 @@ class Model3DFilter : GLFilter() {
                 model3DInfo.count,
             )
 
-            if (mModel3DInfo?.isDoubleSideRendering != true) {
+//            if (mModel3DInfo?.isDoubleSideRendering != true) {
                 GLES20.glFrontFace(model3DInfo.frontFace.value)
-            }
+//            }
 
             mProgram.setTexture(mTexture)
             mProgram.setMVPMatrix(mvpMatrix)
@@ -81,9 +81,9 @@ class Model3DFilter : GLFilter() {
             mProgram.draw()
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
-            if (mModel3DInfo?.isDoubleSideRendering != true) {
+//            if (mModel3DInfo?.isDoubleSideRendering != true) {
                 GLES20.glDisable(GLES20.GL_CULL_FACE)
-            }
+//            }
         }
         imageInOut.out(fbo)
     }
