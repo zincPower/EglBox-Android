@@ -40,7 +40,7 @@ class Model3DMainActivity : AppCompatActivity() {
             texturePath = null,
             isDoubleSideRendering = false,
             viewpoint = Point(0F, 0F, 30F),
-            lightPoint = Point(30F, 30F, 30F),
+            lightPoint = Point(-30F, 30F, 30F),
         ),
         R.id.teapot_without_lid to ModelInfo(
             modelPath = "model/teapot/without_lid/teapot.obj",
