@@ -6,13 +6,11 @@ import android.os.Message
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
-import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
-import javax.microedition.khronos.opengles.GL
 
 /**
  * @author jiang peng yong
@@ -29,23 +27,13 @@ class TriangleFilter : GLFilter() {
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         imageInOut.texture?.let { texture ->
-            val fbo = context.getTexFBO(texture.width, texture.height)
+            val fbo = context.getTexFBO(texture.width, texture.height, depthType = DepthType.Texture)
             fbo.use {
-                GLES20.glClearColor(0F, 0F, 0F, 1F)
-                GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
-                GLES20.glEnable(GLES20.GL_CULL_FACE)
-
                 context.texture2DProgram.reset()
                 context.texture2DProgram.setTexture(texture)
                 context.texture2DProgram.draw()
-
-                GLES20.glFrontFace(GLES20.GL_CCW)
-
                 mTriangleProgram.setMatrix(context.space3D.projectionMatrix * context.space3D.viewMatrix * context.space3D.gestureMatrix)
                 mTriangleProgram.draw()
-
-                GLES20.glDisable(GLES20.GL_CULL_FACE)
-                GLES20.glDisable(GLES20.GL_DEPTH_TEST)
             }
             imageInOut.out(fbo)
         }
@@ -84,16 +72,16 @@ class TriangleFilter : GLFilter() {
 class TriangleProgram : GLProgram() {
     private val mVertexBuffer = allocateFloatBuffer(
         floatArrayOf(
-            -0.5F, 0.5F, 0.0F,
-            0.5F, 0.5F, 0.0F,
-            0.0F, -0.5F, 0.0F
+            -1F, 1F, 0.0F,
+            1F, 1F, 0.0F,
+            0.0F, -1F, 0.0F,
         )
     )
     private val mColorBuffer = allocateFloatBuffer(
         floatArrayOf(
             1F, 0F, 0F, 1F,
             0F, 1F, 0F, 1F,
-            0F, 0F, 1F, 1F
+            0F, 0F, 1F, 1F,
         )
     )
 

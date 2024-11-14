@@ -30,6 +30,7 @@ void main() {
     if (gl_FrontFacing) {
         fragColor = orgColor * vFrontAmbientLight + orgColor * vFrontDiffuseLight + orgColor * vFrontSpecularLight;
     } else {
-        fragColor = vec4(1.0);//orgColor * vBackAmbientLight + orgColor * vBackDiffuseLight + orgColor * vBackSpecularLight;
+        fragColor = orgColor * vFrontAmbientLight + orgColor * vFrontDiffuseLight + orgColor * vFrontSpecularLight;
+//        fragColor = orgColor * vBackAmbientLight + orgColor * vBackDiffuseLight + orgColor * vBackSpecularLight;
     }
 }

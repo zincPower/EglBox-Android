@@ -4,14 +4,11 @@ import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
-import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
-import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
-import com.jiangpengyong.eglbox_core.gles.GLRenderBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
@@ -46,21 +43,22 @@ class Model3DFilter : GLFilter() {
         val textureBuffer = model3DInfo.textureBuffer
         val normalBuffer = model3DInfo.normalBuffer ?: return
 
-        val fbo = context.getTexFBO(texture.width, texture.height, DepthType.None)
+        val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
         fbo.use {
-            var mRenderBuffer = GLRenderBuffer()
-            mRenderBuffer.setSize(Size(texture.width,texture.height))
-            mRenderBuffer.bind()
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
-//            if (mModel3DInfo?.isDoubleSideRendering == true) {
-//            GLES20.glDisable(GLES20.GL_CULL_FACE)
-//            } else {
-//            GLES20.glEnable(GLES20.GL_CULL_FACE)
-//            }
+            if (mModel3DInfo?.isDoubleSideRendering == true) {
+                GLES20.glDisable(GLES20.GL_CULL_FACE)
+            } else {
+                GLES20.glEnable(GLES20.GL_CULL_FACE)
+            }
 
-            context.texture2DProgram.reset()
-            context.texture2DProgram.setTexture(texture)
-            context.texture2DProgram.draw()
+            val modelMatrix = context.space3D.gestureMatrix * mModelMatrix
+            val mvpMatrix = context.space3D.projectionMatrix * context.space3D.viewMatrix * modelMatrix
+
+//            context.texture2DProgram.reset()
+//            context.texture2DProgram.setVertexMatrix(mvpMatrix.matrix)
+//            context.texture2DProgram.setTexture(texture)
+//            context.texture2DProgram.draw()
 
             mProgram.setLightPosition(mLightPosition)
             mProgram.setCameraPosition(context.space3D.viewPoint.let {
@@ -73,23 +71,20 @@ class Model3DFilter : GLFilter() {
                 model3DInfo.count,
             )
 
-//            if (mModel3DInfo?.isDoubleSideRendering != true) {
-            GLES20.glFrontFace(model3DInfo.frontFace.value)
-//            }
+            if (mModel3DInfo?.isDoubleSideRendering != true) {
+                GLES20.glFrontFace(model3DInfo.frontFace.value)
+            }
 
-            val modelMatrix = context.space3D.gestureMatrix * mModelMatrix
             mProgram.setTexture(mTexture)
-            mProgram.setMVPMatrix(context.space3D.projectionMatrix * context.space3D.viewMatrix * modelMatrix)
+            mProgram.setMVPMatrix(mvpMatrix)
             mProgram.setMMatrix(modelMatrix)
             mProgram.draw()
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
-//            if (mModel3DInfo?.isDoubleSideRendering != true) {
-            GLES20.glDisable(GLES20.GL_CULL_FACE)
-//            }
-            mRenderBuffer.unbind()
+            if (mModel3DInfo?.isDoubleSideRendering != true) {
+                GLES20.glDisable(GLES20.GL_CULL_FACE)
+            }
         }
-        EGLBox.checkError("jian")
         imageInOut.out(fbo)
     }
 

@@ -165,8 +165,8 @@ class GLFrameBuffer : GLObject {
             return
         }
         // 绑定的多个纹理应该是相同尺寸的，所以获取第一个做尺寸
-        val colorTexture = mColorTextures.values.firstOrNull()
-        if (colorTexture == null) {
+        val texture = mColorTextures.values.firstOrNull() ?: mDepthTexture
+        if (texture == null) {
             Logger.e(TAG, "Texture is nullptr. id=$id")
             return
         }
@@ -174,7 +174,7 @@ class GLFrameBuffer : GLObject {
         if (beforeFBO != id) {
             bind()
         }
-        GLES20.glViewport(0, 0, colorTexture.width, colorTexture.height)
+        GLES20.glViewport(0, 0, texture.width, texture.height)
         block()
         if (beforeFBO != id) {
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, beforeFBO)
