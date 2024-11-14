@@ -82,7 +82,11 @@ class GLFrameBuffer : GLObject {
             return
         }
         if (!colorTexture.isInit()) {
-            Logger.e(TAG, "Texture isn't initialized【bindTexture】. id=${id}, texture=${colorTexture}")
+            Logger.e(TAG, "Color texture isn't initialized【bindTexture】. id=${id}, texture=${colorTexture}")
+            return
+        }
+        if (!depthTexture.isInit()) {
+            Logger.e(TAG, "Depth texture isn't initialized【bindTexture】. id=${id}, texture=${depthTexture}")
             return
         }
         bindColorTexture(colorTexture, colorAttachment)
@@ -226,7 +230,7 @@ class GLFrameBuffer : GLObject {
             GLES20.glFramebufferTexture2D(
                 GLES20.GL_FRAMEBUFFER,
                 attachment,
-                GLES20.GL_TEXTURE_2D,
+                texture.target.value,
                 texture.id,
                 0
             )

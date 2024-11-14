@@ -71,15 +71,15 @@ class GLRenderBuffer(
             return
         }
         // TODO 是否需要兼容其他类型
-        val currentDepthInfo = EGLBox.getCurrentDepthInfo()
-        if (currentDepthInfo.depthType == DepthType.RenderBuffer && currentDepthInfo.id == id) {
-            GLES20.glFramebufferRenderbuffer(
-                GLES20.GL_FRAMEBUFFER,
-                attachment,
-                GLES20.GL_RENDERBUFFER,
-                0
-            )
-        }
+//        val currentDepthInfo = EGLBox.getCurrentDepthInfo()
+//        if (currentDepthInfo.depthType == DepthType.RenderBuffer && currentDepthInfo.id == id) {
+        GLES20.glFramebufferRenderbuffer(
+            GLES20.GL_FRAMEBUFFER,
+            attachment,
+            GLES20.GL_RENDERBUFFER,
+            0
+        )
+//        }
     }
 
     companion object {

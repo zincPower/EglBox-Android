@@ -4,11 +4,14 @@ import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
+import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
+import com.jiangpengyong.eglbox_core.gles.EGLBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
+import com.jiangpengyong.eglbox_core.gles.GLRenderBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
@@ -43,15 +46,16 @@ class Model3DFilter : GLFilter() {
         val textureBuffer = model3DInfo.textureBuffer
         val normalBuffer = model3DInfo.normalBuffer ?: return
 
-        val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
+        val fbo = context.getTexFBO(texture.width, texture.height, DepthType.None)
         fbo.use {
-            GLES20.glClearColor(0F, 0F, 0F, 1F)
-            GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
+            var mRenderBuffer = GLRenderBuffer()
+            mRenderBuffer.setSize(Size(texture.width,texture.height))
+            mRenderBuffer.bind()
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
 //            if (mModel3DInfo?.isDoubleSideRendering == true) {
-//                GLES20.glDisable(GLES20.GL_CULL_FACE)
+//            GLES20.glDisable(GLES20.GL_CULL_FACE)
 //            } else {
-                GLES20.glEnable(GLES20.GL_CULL_FACE)
+//            GLES20.glEnable(GLES20.GL_CULL_FACE)
 //            }
 
             context.texture2DProgram.reset()
@@ -70,8 +74,9 @@ class Model3DFilter : GLFilter() {
             )
 
 //            if (mModel3DInfo?.isDoubleSideRendering != true) {
-                GLES20.glFrontFace(model3DInfo.frontFace.value)
+            GLES20.glFrontFace(model3DInfo.frontFace.value)
 //            }
+
             val modelMatrix = context.space3D.gestureMatrix * mModelMatrix
             mProgram.setTexture(mTexture)
             mProgram.setMVPMatrix(context.space3D.projectionMatrix * context.space3D.viewMatrix * modelMatrix)
@@ -80,9 +85,11 @@ class Model3DFilter : GLFilter() {
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
 //            if (mModel3DInfo?.isDoubleSideRendering != true) {
-                GLES20.glDisable(GLES20.GL_CULL_FACE)
+            GLES20.glDisable(GLES20.GL_CULL_FACE)
 //            }
+            mRenderBuffer.unbind()
         }
+        EGLBox.checkError("jian")
         imageInOut.out(fbo)
     }
 
@@ -107,7 +114,7 @@ class Model3DFilter : GLFilter() {
                             -(near + far) / 2F,
                         )
                     }
-                    mProgram.isDoubleSidedRending(isDoubleSideRendering)
+                    mProgram.isDoubleSidedRendering(isDoubleSideRendering)
                 }
             }
 
@@ -151,7 +158,7 @@ class Model3DProgram : GLProgram() {
     private var mIsAddDiffuseLightHandle = 0
     private var mIsAddSpecularHandle = 0
     private var mIsUseTextureHandle = 0
-    private var mIsDoubleSideRendingHandle = 0
+    private var mIsDoubleSideRenderingHandle = 0
 
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mMMatrix: GLMatrix = GLMatrix()
@@ -164,7 +171,7 @@ class Model3DProgram : GLProgram() {
     private var mIsAddAmbientLight = true
     private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
-    private var mIsDoubleSidedRending = false
+    private var mIsDoubleSidedRendering = false
 
     fun setTexture(texture: GLTexture?) {
         mTexture = texture
@@ -202,8 +209,8 @@ class Model3DProgram : GLProgram() {
         mIsAddSpecularLight = value
     }
 
-    fun isDoubleSidedRending(value: Boolean) {
-        mIsDoubleSidedRending = value
+    fun isDoubleSidedRendering(value: Boolean) {
+        mIsDoubleSidedRendering = value
     }
 
     fun setData(
@@ -231,7 +238,7 @@ class Model3DProgram : GLProgram() {
         mIsAddDiffuseLightHandle = getUniformLocation("uIsAddDiffuseLight")
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
         mIsUseTextureHandle = getUniformLocation("uIsUseTexture")
-        mIsDoubleSideRendingHandle = getUniformLocation("uIsDoubleSideRending")
+        mIsDoubleSideRenderingHandle = getUniformLocation("uIsDoubleSideRendering")
     }
 
     override fun onDraw() {
@@ -259,7 +266,7 @@ class Model3DProgram : GLProgram() {
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
 
         // 控制双面渲染
-        GLES20.glUniform1i(mIsDoubleSideRendingHandle, if (mIsDoubleSidedRending) 1 else 0)
+        GLES20.glUniform1i(mIsDoubleSideRenderingHandle, if (mIsDoubleSidedRendering) 1 else 0)
 
         // 顶点
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
@@ -300,7 +307,7 @@ class Model3DProgram : GLProgram() {
         mIsAddDiffuseLightHandle = 0
         mIsAddSpecularHandle = 0
         mIsUseTextureHandle = 0
-        mIsDoubleSideRendingHandle = 0
+        mIsDoubleSideRenderingHandle = 0
     }
 
     override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/vertex.glsl")

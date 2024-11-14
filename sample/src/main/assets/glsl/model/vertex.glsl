@@ -21,18 +21,20 @@ in float aShininess;
 uniform int uIsAddAmbientLight;
 uniform int uIsAddDiffuseLight;
 uniform int uIsAddSpecularLight;
-uniform int uIsDoubleSideRending;
+uniform int uIsDoubleSideRendering;
 
 // 将未转换的顶点位置传递给片元着色器
 out vec3 vPosition;
+// 输出纹理坐标
+out vec2 vTextureCoord;
+
 // 正面环境光亮度
 out vec4 vFrontAmbientLight;
 // 正面散射光亮度
 out vec4 vFrontDiffuseLight;
 // 正面镜面光亮度
 out vec4 vFrontSpecularLight;
-// 输出纹理坐标
-out vec2 vTextureCoord;
+
 // 反面环境光亮度
 out vec4 vBackAmbientLight;
 // 反面散射光亮度
@@ -123,7 +125,7 @@ void main() {
         vFrontSpecularLight = vec4(0);
     }
 
-    if(uisdoublesiderending && gl_FrontFacing){
+    if (uIsDoubleSideRendering == 1) {
         // 环境光
         if (uIsAddAmbientLight == 1) {
             vBackAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);

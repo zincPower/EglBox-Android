@@ -12,6 +12,7 @@ import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
+import com.jiangpengyong.eglbox_filter.TriangleFilter
 import com.jiangpengyong.eglbox_sample.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,10 +29,14 @@ class Model3DMainActivity : AppCompatActivity() {
     private lateinit var glPreviewView: GLPreviewView
     private var filterId: String? = null
     private var modelInfos: Map<Int, ModelInfo> = hashMapOf(
-        R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg", Point(0F, 0F, 100F), false),
-        R.id.teapot_only_vertex to ModelInfo("model/teapot/only_vertex/teapot.obj", null, Point(0F, 0F, 30F), false),
+//        R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg", Point(0F, 0F, 100F), false),
+//        R.id.teapot_only_vertex to ModelInfo("model/teapot/only_vertex/teapot.obj", null, Point(0F, 0F, 30F), false),
+//        R.id.teapot_without_lid to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
+//        R.id.teapot_all to ModelInfo("model/teapot/all/teapot.obj", "model/teapot/all/teapot.png", Point(0F, 0F, 100F), false),
+        R.id.film to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
+        R.id.teapot_only_vertex to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
         R.id.teapot_without_lid to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
-        R.id.teapot_all to ModelInfo("model/teapot/all/teapot.obj", "model/teapot/all/teapot.png", Point(0F, 0F, 100F), false),
+        R.id.teapot_all to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,12 +44,14 @@ class Model3DMainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_model_3d_main)
 
         FilterCenter.registerFilter(Model3DFilter.TAG, Model3DFilter::class.java)
+        FilterCenter.registerFilter(TriangleFilter.TAG, TriangleFilter::class.java)
 
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
             glPreviewView.setBlank()
             filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, Model3DFilter.TAG, 0)
 
+//            glPreviewView.setViewpoint(0F,0F,10F)
             filterId?.let { filterId ->
                 modelInfos[R.id.film]?.let { modelInfo ->
                     loadModel(filterId, modelInfo)

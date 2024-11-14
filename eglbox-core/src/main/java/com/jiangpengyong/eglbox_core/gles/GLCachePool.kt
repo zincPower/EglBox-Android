@@ -49,7 +49,7 @@ class GLCachePool(
         return if (mFBOCache.isEmpty()) {
             GLFrameBuffer().apply { init() }
         } else {
-            var fbo = mFBOCache.removeFirst()
+            var fbo = mFBOCache.removeAt(0)
             if (!fbo.isInit()) {
                 fbo = GLFrameBuffer().apply { init() }
             }

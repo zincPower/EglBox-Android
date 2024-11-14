@@ -12,6 +12,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
+import javax.microedition.khronos.opengles.GL
 
 /**
  * @author jiang peng yong
@@ -21,49 +22,30 @@ import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
  */
 class TriangleFilter : GLFilter() {
     private val mTriangleProgram = TriangleProgram()
-    private val mModelMatrix = ModelMatrix().apply {
-        rotate(60F, 1F, 0F, 0F)
-    }
-
-    private val mProjectMatrix = ProjectionMatrix()
-    private val mViewMatrix = ViewMatrix()
 
     override fun onInit() {
         mTriangleProgram.init()
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-
-        mViewMatrix.setLookAtM(
-            0F, 0F, 3F,
-            0F, 0F, 0F,
-            0F, 1F, 0F
-        )
-        val previewSize = context.previewSize
-        if (previewSize.width > previewSize.height) {
-            val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
-            mProjectMatrix.setFrustumM(
-                -ratio, ratio,
-                -1F, 1F,
-                2F, 10F
-            )
-        } else {
-            val ratio = previewSize.height.toFloat() / previewSize.width.toFloat()
-            mProjectMatrix.setFrustumM(
-                -1F, 1F,
-                -ratio, ratio,
-                2F, 10F
-            )
-        }
-
         imageInOut.texture?.let { texture ->
             val fbo = context.getTexFBO(texture.width, texture.height)
             fbo.use {
+                GLES20.glClearColor(0F, 0F, 0F, 1F)
+                GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
+                GLES20.glEnable(GLES20.GL_CULL_FACE)
+
                 context.texture2DProgram.reset()
                 context.texture2DProgram.setTexture(texture)
                 context.texture2DProgram.draw()
-                mTriangleProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix * context.space3D.gestureMatrix)
+
+                GLES20.glFrontFace(GLES20.GL_CCW)
+
+                mTriangleProgram.setMatrix(context.space3D.projectionMatrix * context.space3D.viewMatrix * context.space3D.gestureMatrix)
                 mTriangleProgram.draw()
+
+                GLES20.glDisable(GLES20.GL_CULL_FACE)
+                GLES20.glDisable(GLES20.GL_DEPTH_TEST)
             }
             imageInOut.out(fbo)
         }
