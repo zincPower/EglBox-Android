@@ -105,19 +105,19 @@ void main() {
     vec3 frontNormal = normalize(aNormal);
 
     // 环境光
-//    if (uIsAddAmbientLight == 1) {
+    if (uIsAddAmbientLight == 1) {
         vFrontAmbientLight = vec4(0.15, 0.15, 0.15, 1.0);
-//    } else {
-//        vFrontAmbientLight = vec4(0);
-//    }
+    } else {
+        vFrontAmbientLight = vec4(0);
+    }
 
     // 散射光
-//    if (uIsAddDiffuseLight == 1) {
+    if (uIsAddDiffuseLight == 1) {
         vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
         vFrontDiffuseLight = calDiffuseLight(frontNormal, uLightPosition, diffuseLightIntensity);
-//    } else {
-//        vFrontDiffuseLight = vec4(0);
-//    }
+    } else {
+        vFrontDiffuseLight = vec4(0);
+    }
 
     // 镜面光
     if (uIsAddSpecularLight == 1) {
