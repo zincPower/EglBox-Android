@@ -30,8 +30,6 @@ class Model3DFilter : GLFilter() {
 
     private val mModelMatrix = ModelMatrix()
 
-    private var mLightPosition = floatArrayOf(10F, 10F, 10F)
-
     override fun onInit() {
         mProgram.init()
     }
@@ -60,19 +58,15 @@ class Model3DFilter : GLFilter() {
 //            context.texture2DProgram.setTexture(texture)
 //            context.texture2DProgram.draw()
 
-            mProgram.setLightPosition(mLightPosition)
-            mProgram.setCameraPosition(context.space3D.viewPoint.let {
-                floatArrayOf(it.x, it.y, it.z)
-            })
-            mProgram.setData(
-                vertexBuffer,
-                textureBuffer,
-                normalBuffer,
-                model3DInfo.count,
-            )
-
             GLES20.glFrontFace(model3DInfo.frontFace.value)
-
+            mProgram.setLightPosition(context.space3D.lightPoint.let { floatArrayOf(it.x, it.y, it.z) })
+            mProgram.setCameraPosition(context.space3D.viewPoint.let { floatArrayOf(it.x, it.y, it.z) })
+            mProgram.setData(
+                vertexBuffer = vertexBuffer,
+                textureBuffer = textureBuffer,
+                normalBuffer = normalBuffer,
+                vertexCount = model3DInfo.count,
+            )
             mProgram.setTexture(mTexture)
             mProgram.setMVPMatrix(mvpMatrix)
             mProgram.setMMatrix(modelMatrix)

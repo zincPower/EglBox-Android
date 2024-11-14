@@ -33,6 +33,10 @@ class Space3DHandler {
             Space3DMessageType.UPDATE_PROJECTION -> {
                 space3D.projection = message.obj as? Projection ?: return
             }
+
+            Space3DMessageType.UPDATE_LIGHT_POINT -> {
+                space3D.lightPoint = message.obj as? Point ?: return
+            }
         }
     }
 
@@ -54,6 +58,7 @@ object Space3DMessageType {
     const val UPDATE_CENTER_POINT = -20004 // 更新被观察点
     const val UPDATE_UP_VECTOR = -20005 // 更新观察点向上向量
     const val UPDATE_PROJECTION = -20006 // 更新投影
+    const val UPDATE_LIGHT_POINT = -20007 // 更新光照
 
     fun obtainUpdateRotationMessage(angleX: Float, angleY: Float, angleZ: Float) = Message.obtain().apply {
         what = UPDATE_ROTATION
@@ -83,5 +88,10 @@ object Space3DMessageType {
     fun obtainUpdateProjectionMessage(type: ProjectionType, near: Float, far: Float, ratio: Float) = Message.obtain().apply {
         what = UPDATE_PROJECTION
         obj = Projection(type = type, near = near, far = far, ratio = ratio)
+    }
+
+    fun obtainUpdateLightPointMessage(x: Float, y: Float, z: Float) = Message.obtain().apply {
+        what = UPDATE_LIGHT_POINT
+        obj = Point(x = x, y = y, z = z)
     }
 }

@@ -14,12 +14,12 @@ import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
 import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.processor.GLProcessor.Companion.SOURCE_FILTER_ID
-import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ImageError
 import com.jiangpengyong.eglbox_core.processor.image.ImageParams
-import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
 import com.jiangpengyong.eglbox_core.processor.image.ImageProcessor
 import com.jiangpengyong.eglbox_core.processor.image.ProcessFinishCallback
+import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
+import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.space3d.ProjectionType
 import com.jiangpengyong.eglbox_core.space3d.Space3DMessageType
 import java.nio.ByteBuffer
@@ -170,6 +170,13 @@ class GLPreviewView : FrameLayout {
         Space3DMessageType.obtainUpdateProjectionMessage(type, near, far, ratio).apply {
             sendMessageToFilter(SOURCE_FILTER_ID, this)
         }
+    }
+
+    fun setLightPoint(x: Float, y: Float, z: Float) {
+        Space3DMessageType.obtainUpdateLightPointMessage(x, y, z).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
     }
 
     fun exportImage(bitmap: Bitmap, data: HashMap<String, Any>, callback: (result: Bitmap?) -> Unit) {

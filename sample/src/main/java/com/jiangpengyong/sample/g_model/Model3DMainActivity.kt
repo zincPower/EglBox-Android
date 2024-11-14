@@ -29,14 +29,33 @@ class Model3DMainActivity : AppCompatActivity() {
     private lateinit var glPreviewView: GLPreviewView
     private var filterId: String? = null
     private var modelInfos: Map<Int, ModelInfo> = hashMapOf(
-//        R.id.film to ModelInfo("model/film/film.obj", "model/film/film.jpg", Point(0F, 0F, 100F), false),
-//        R.id.teapot_only_vertex to ModelInfo("model/teapot/only_vertex/teapot.obj", null, Point(0F, 0F, 30F), false),
-//        R.id.teapot_without_lid to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
-//        R.id.teapot_all to ModelInfo("model/teapot/all/teapot.obj", "model/teapot/all/teapot.png", Point(0F, 0F, 100F), false),
-        R.id.film to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
-        R.id.teapot_only_vertex to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
-        R.id.teapot_without_lid to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
-        R.id.teapot_all to ModelInfo("model/teapot/without_lid/teapot.obj", null, Point(0F, 0F, 30F), true),
+        R.id.film to ModelInfo(
+            modelPath = "model/film/film.obj",
+            texturePath = "model/film/film.jpg", isDoubleSideRendering = false,
+            viewpoint = Point(0F, 0F, 100F),
+            lightPoint = Point(0F, 0F, 100F),
+        ),
+        R.id.teapot_only_vertex to ModelInfo(
+            modelPath = "model/teapot/only_vertex/teapot.obj",
+            texturePath = null,
+            isDoubleSideRendering = false,
+            viewpoint = Point(0F, 0F, 30F),
+            lightPoint = Point(30F, 30F, 30F),
+        ),
+        R.id.teapot_without_lid to ModelInfo(
+            modelPath = "model/teapot/without_lid/teapot.obj",
+            texturePath = null,
+            isDoubleSideRendering = true,
+            viewpoint = Point(0F, 0F, 30F),
+            lightPoint = Point(30F, 30F, 30F),
+        ),
+        R.id.teapot_all to ModelInfo(
+            modelPath = "model/teapot/all/teapot.obj",
+            texturePath = "model/teapot/all/teapot.png",
+            isDoubleSideRendering = false,
+            viewpoint = Point(0F, 0F, 100F),
+            lightPoint = Point(0F, 0F, 100F),
+        ),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +69,6 @@ class Model3DMainActivity : AppCompatActivity() {
         glPreviewView.post {
             glPreviewView.setBlank()
             filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, Model3DFilter.TAG, 0)
-
-//            glPreviewView.setViewpoint(0F,0F,10F)
             filterId?.let { filterId ->
                 modelInfos[R.id.film]?.let { modelInfo ->
                     loadModel(filterId, modelInfo)
@@ -69,8 +86,10 @@ class Model3DMainActivity : AppCompatActivity() {
     }
 
     private fun loadModel(filterId: String, modelInfo: ModelInfo) {
+        glPreviewView.setViewpoint(modelInfo.viewpoint.x, modelInfo.viewpoint.y, modelInfo.viewpoint.z)
+        glPreviewView.setLightPoint(modelInfo.lightPoint.x, modelInfo.lightPoint.y, modelInfo.lightPoint.z)
+
         lifecycleScope.launch(Dispatchers.IO) {
-            glPreviewView.setViewpoint(modelInfo.viewpoint.x, modelInfo.viewpoint.y, modelInfo.viewpoint.z)
             val file = File(filesDir, modelInfo.modelPath)
             val model3DInfo = Obj3DModelLoader.load(file, textureFlip = true, isDoubleSideRendering = modelInfo.isDoubleSideRendering)
             if (model3DInfo == null) {
@@ -107,4 +126,10 @@ class Model3DMainActivity : AppCompatActivity() {
     }
 }
 
-data class ModelInfo(val modelPath: String, val texturePath: String?, val viewpoint: Point, val isDoubleSideRendering: Boolean)
+data class ModelInfo(
+    val modelPath: String,
+    val texturePath: String?,
+    val isDoubleSideRendering: Boolean,
+    val viewpoint: Point,
+    val lightPoint: Point,
+)
