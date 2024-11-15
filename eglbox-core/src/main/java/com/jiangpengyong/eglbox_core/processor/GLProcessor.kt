@@ -11,7 +11,7 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterChain
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.MessageListener
-import com.jiangpengyong.eglbox_core.gles.EGLBox
+import com.jiangpengyong.eglbox_core.gles.EglBox
 import com.jiangpengyong.eglbox_core.logger.Logger
 
 /**
@@ -117,7 +117,7 @@ abstract class GLProcessor : MessageListener {
 
     fun getMaxTextureSize(): Int? {
         return invokeInGLEngine(1000) {
-            EGLBox.getMaxTextureSize()
+            EglBox.getMaxTextureSize()
         }
     }
 

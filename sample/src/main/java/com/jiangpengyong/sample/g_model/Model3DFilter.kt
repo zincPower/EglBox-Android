@@ -13,7 +13,7 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_filter.EGLBoxRuntime
+import com.jiangpengyong.eglbox_filter.EglBoxRuntime
 import java.nio.FloatBuffer
 
 /**
@@ -127,7 +127,7 @@ class Model3DFilter : GLFilter() {
  * @email 56002982@qq.com
  * @des 模型 3D，支持顶点、法向量、纹理
  */
-class Model3DProgram : GLProgram() {
+class Model3DProgram() : GLProgram() {
     private var mVertexBuffer: FloatBuffer? = null
     private var mTextureBuffer: FloatBuffer? = null
     private var mNormalBuffer: FloatBuffer? = null
@@ -146,6 +146,7 @@ class Model3DProgram : GLProgram() {
     private var mIsAddSpecularHandle = 0
     private var mIsUseTextureHandle = 0
     private var mIsDoubleSideRenderingHandle = 0
+    private var mIsVertexCalculateLightingHandle = 0
 
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mMMatrix: GLMatrix = GLMatrix()
@@ -159,6 +160,7 @@ class Model3DProgram : GLProgram() {
     private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
     private var mIsDoubleSidedRendering = false
+    private var mIsVertexCalculateLighting = false
 
     fun setTexture(texture: GLTexture?) {
         mTexture = texture
@@ -226,6 +228,7 @@ class Model3DProgram : GLProgram() {
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
         mIsUseTextureHandle = getUniformLocation("uIsUseTexture")
         mIsDoubleSideRenderingHandle = getUniformLocation("uIsDoubleSideRendering")
+        mIsVertexCalculateLightingHandle = getUniformLocation("uIsVertexCalculateLighting")
     }
 
     override fun onDraw() {
@@ -254,6 +257,9 @@ class Model3DProgram : GLProgram() {
 
         // 控制双面渲染
         GLES20.glUniform1i(mIsDoubleSideRenderingHandle, if (mIsDoubleSidedRendering) 1 else 0)
+
+        // 控制光照计算方式
+        GLES20.glUniform1i(mIsVertexCalculateLightingHandle, if (mIsVertexCalculateLighting) 1 else 0)
 
         // 顶点
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
@@ -295,11 +301,12 @@ class Model3DProgram : GLProgram() {
         mIsAddSpecularHandle = 0
         mIsUseTextureHandle = 0
         mIsDoubleSideRenderingHandle = 0
+        mIsVertexCalculateLightingHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "glsl/model/vert/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/model/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "glsl/model/vert/fragment.glsl")
 }
 
 enum class Model3DMessageType(val value: Int) {

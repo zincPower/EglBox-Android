@@ -175,7 +175,7 @@ class GLTexture(
             Logger.e(TAG, "GLTexture isn't initialized.【unbind】")
             return
         }
-        val currentTexture = EGLBox.getCurrentTexture()
+        val currentTexture = EglBox.getCurrentTexture()
         if (currentTexture == id) {
             GLES20.glActiveTexture(mTextureUnit)
             GLES20.glBindTexture(target.value, 0)

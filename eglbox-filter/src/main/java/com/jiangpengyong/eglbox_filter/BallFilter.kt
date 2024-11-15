@@ -226,9 +226,9 @@ class BallProgram : GLProgram() {
         mIsAddSpecularHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/light/full_light/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "glsl/light/full_light/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EGLBoxRuntime.context.resources, "glsl/light/full_light/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "glsl/light/full_light/fragment.glsl")
 
     private fun calculateVertex() {
         val vertexList = ArrayList<Float>()

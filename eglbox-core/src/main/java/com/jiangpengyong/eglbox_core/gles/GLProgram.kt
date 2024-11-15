@@ -39,7 +39,7 @@ abstract class GLProgram : GLObject {
     override fun release() {
         if (isInit()) {
             onRelease()
-            val currentProgram = EGLBox.getCurrentProgram()
+            val currentProgram = EglBox.getCurrentProgram()
             if (currentProgram == id) GLES20.glUseProgram(0)
             releaseResource()
         }

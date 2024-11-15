@@ -40,7 +40,7 @@ class GLFrameBuffer : GLObject {
         val texture = unbindTexture()
         texture?.release()
 
-        val currentFBO = EGLBox.getCurrentFBO()
+        val currentFBO = EglBox.getCurrentFBO()
         if (currentFBO == id) {
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
         }
@@ -99,7 +99,7 @@ class GLFrameBuffer : GLObject {
             Logger.e(TAG, "GLFrameBuffer isn't initialized【unbindTexture】. id=${id}")
             return null
         }
-        val beforeFBO = EGLBox.getCurrentFBO()
+        val beforeFBO = EglBox.getCurrentFBO()
         if (beforeFBO != id) bind()
         GLES20.glFramebufferTexture2D(
             GLES20.GL_FRAMEBUFFER,
@@ -125,7 +125,7 @@ class GLFrameBuffer : GLObject {
             Logger.e(TAG, "GLFrameBuffer isn't initialized【unbindTexture】. id=${id}")
             return null
         }
-        val beforeFBO = EGLBox.getCurrentFBO()
+        val beforeFBO = EglBox.getCurrentFBO()
         if (beforeFBO != id) bind()
         for (item in mColorTextures) {
             GLES20.glFramebufferTexture2D(
@@ -153,7 +153,7 @@ class GLFrameBuffer : GLObject {
     }
 
     fun unbind() {
-        val currentFBO = EGLBox.getCurrentFBO()
+        val currentFBO = EglBox.getCurrentFBO()
         if (currentFBO == id) {
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
         }
@@ -170,7 +170,7 @@ class GLFrameBuffer : GLObject {
             Logger.e(TAG, "Texture is nullptr. id=$id")
             return
         }
-        val beforeFBO = EGLBox.getCurrentFBO()
+        val beforeFBO = EglBox.getCurrentFBO()
         if (beforeFBO != id) {
             bind()
         }

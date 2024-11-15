@@ -16,7 +16,7 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
-import com.jiangpengyong.eglbox_core.gles.EGLBox
+import com.jiangpengyong.eglbox_core.gles.EglBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
@@ -129,17 +129,17 @@ class PointSpriteArrayActivity : AppCompatActivity() {
                     }
                 }
                 byteBuffer.position(0)
-                EGLBox.checkError("jiang6")
+                EglBox.checkError("jiang6")
 
                 GLES30.glBindTexture(GLES30.GL_TEXTURE_2D_ARRAY, mTexture.id)
-                EGLBox.checkError("jiang5")
+                EglBox.checkError("jiang5")
                 GLES20.glTexParameteri(GLES30.GL_TEXTURE_2D_ARRAY, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
                 GLES20.glTexParameteri(GLES30.GL_TEXTURE_2D_ARRAY, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
                 GLES20.glTexParameteri(GLES30.GL_TEXTURE_2D_ARRAY, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
                 GLES20.glTexParameteri(GLES30.GL_TEXTURE_2D_ARRAY, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
                 GLES20.glTexParameteri(GLES30.GL_TEXTURE_2D_ARRAY, GLES30.GL_TEXTURE_WRAP_R, GLES20.GL_CLAMP_TO_EDGE)
 
-                EGLBox.checkError("jiang4")
+                EglBox.checkError("jiang4")
                 GLES30.glTexImage3D(
                     GLES30.GL_TEXTURE_2D_ARRAY,
                     0,
@@ -152,9 +152,9 @@ class PointSpriteArrayActivity : AppCompatActivity() {
                     GLES20.GL_UNSIGNED_BYTE,
                     byteBuffer
                 )
-                EGLBox.checkError("jiang2")
+                EglBox.checkError("jiang2")
                 GLES20.glBindTexture(GLES30.GL_TEXTURE_2D_ARRAY, 0)
-                EGLBox.checkError("jiang3")
+                EglBox.checkError("jiang3")
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -296,7 +296,7 @@ class PointSpriteArrayActivity : AppCompatActivity() {
         override fun onDraw() {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
             GLES20.glBindTexture(GLES30.GL_TEXTURE_2D_ARRAY, mTexture.id)
-            EGLBox.checkError("jiang1")
+            EglBox.checkError("jiang1")
 
             GLES20.glVertexAttrib1f(mPointSizeHandle, mPointSize)
             GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMatrix.matrix, 0)

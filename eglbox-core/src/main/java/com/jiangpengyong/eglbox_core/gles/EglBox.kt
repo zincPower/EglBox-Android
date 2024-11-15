@@ -3,8 +3,8 @@ package com.jiangpengyong.eglbox_core.gles
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.logger.Logger
 
-object EGLBox {
-    private val TAG = "EGLBox"
+object EglBox {
+    private const val TAG = "EglBox"
 
     fun getCurrentProgram(): Int {
         val currentProgram = IntArray(1)

@@ -3,7 +3,7 @@ package com.jiangpengyong.sample
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import com.jiangpengyong.eglbox_filter.EGLBoxRuntime
+import com.jiangpengyong.eglbox_filter.EglBoxRuntime
 import com.jiangpengyong.sample.utils.FileUtils
 
 class App : Application() {
@@ -15,7 +15,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         context = this
-        EGLBoxRuntime.init(this)
+        EglBoxRuntime.init(this)
         FileUtils.copyFiles(
             assetManager = assets,
             assetDir = "fonts",

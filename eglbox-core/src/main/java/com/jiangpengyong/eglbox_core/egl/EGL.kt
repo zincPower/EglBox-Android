@@ -6,8 +6,7 @@ import android.opengl.EGLContext
 import android.opengl.EGLDisplay
 import android.opengl.EGLExt
 import android.util.Log
-import android.view.Surface
-import com.jiangpengyong.eglbox_core.gles.EGLBox
+import com.jiangpengyong.eglbox_core.gles.EglBox
 import com.jiangpengyong.eglbox_core.logger.Logger
 
 data class GLVersion(val major: Int, val minor: Int) {
@@ -64,7 +63,7 @@ class EGL {
         val display = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
         if (display == EGL14.EGL_NO_DISPLAY) {
             Logger.e(TAG, "EglGetDisplay failure.【EGL_NO_DISPLAY】")
-            EGLBox.checkError(TAG)
+            EglBox.checkError(TAG)
             return
         } else {
             Logger.i(TAG, "EglGetDisplay success.")
@@ -75,7 +74,7 @@ class EGL {
         val initializedResult = EGL14.eglInitialize(display, eglVersion, 0, eglVersion, 1)
         if (!initializedResult) {
             Logger.e(TAG, "EglInitialize failure. result=${initializedResult}")
-            EGLBox.checkError(TAG)
+            EglBox.checkError(TAG)
             EGL14.eglTerminate(display)
             return
         } else {
@@ -158,7 +157,7 @@ class EGL {
         );
         if (!result) {
             Logger.e(TAG, "EglMakeCurrent failure.【makeCurrent】");
-            EGLBox.checkError(TAG)
+            EglBox.checkError(TAG)
         }
     }
 
@@ -173,7 +172,7 @@ class EGL {
         )
         if (!result) {
             Logger.e(TAG, "EglMakeCurrent failure.【makeNothingCurrent】")
-            EGLBox.checkError(TAG)
+            EglBox.checkError(TAG)
         }
     }
 
@@ -194,7 +193,7 @@ class EGL {
         val context = EGL14.eglCreateContext(display, config, shareContext, attribList, 0)
         return if (context == EGL14.EGL_NO_CONTEXT) {
             Logger.e(TAG, "EglCreateContext failure.【EGL_NO_CONTEXT】")
-            EGLBox.checkError(TAG)
+            EglBox.checkError(TAG)
             Triple(null, null, glVersion)
         } else {
             Triple(context, config, glVersion)
@@ -223,7 +222,7 @@ class EGL {
             configs[0]
         } else {
             Logger.e(TAG, "EglChooseConfig failure. renderType=${renderType}, rgba format=8888")
-            EGLBox.checkError(TAG)
+            EglBox.checkError(TAG)
             null
         }
     }
