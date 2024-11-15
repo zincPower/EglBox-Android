@@ -23,15 +23,18 @@ import java.nio.FloatBuffer
  * @des 3D 模型滤镜，支持顶点、法向量、纹理
  */
 class Model3DFilter : GLFilter() {
-    private val mProgram = Model3DProgram()
+    private val mVertProgram = Model3DProgram(true)
+    private val mFragProgram = Model3DProgram(false)
 
     private var mModel3DInfo: Model3DInfo? = null
     private var mTexture: GLTexture? = null
+    private var mIsVertexCalculateLighting = true
 
     private val mModelMatrix = ModelMatrix()
 
     override fun onInit() {
-        mProgram.init()
+        mVertProgram.init()
+        mFragProgram.init()
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
@@ -59,18 +62,21 @@ class Model3DFilter : GLFilter() {
 //            context.texture2DProgram.draw()
 
             GLES20.glFrontFace(model3DInfo.frontFace.value)
-            mProgram.setLightPosition(context.space3D.lightPoint.let { floatArrayOf(it.x, it.y, it.z) })
-            mProgram.setCameraPosition(context.space3D.viewPoint.let { floatArrayOf(it.x, it.y, it.z) })
-            mProgram.setData(
+
+            val program = if (mIsVertexCalculateLighting) mVertProgram else mFragProgram
+            program.setLightPosition(context.space3D.lightPoint.let { floatArrayOf(it.x, it.y, it.z) })
+            program.setCameraPosition(context.space3D.viewPoint.let { floatArrayOf(it.x, it.y, it.z) })
+            program.setData(
                 vertexBuffer = vertexBuffer,
                 textureBuffer = textureBuffer,
                 normalBuffer = normalBuffer,
                 vertexCount = model3DInfo.count,
             )
-            mProgram.setTexture(mTexture)
-            mProgram.setMVPMatrix(mvpMatrix)
-            mProgram.setMMatrix(modelMatrix)
-            mProgram.draw()
+            program.setTexture(mTexture)
+            program.setMVPMatrix(mvpMatrix)
+            program.setMMatrix(modelMatrix)
+            program.isDoubleSidedRendering(mModel3DInfo?.isDoubleSideRendering ?: false)
+            program.draw()
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
             if (mModel3DInfo?.isDoubleSideRendering != true) {
@@ -81,7 +87,8 @@ class Model3DFilter : GLFilter() {
     }
 
     override fun onRelease() {
-        mProgram.release()
+        mVertProgram.release()
+        mFragProgram.release()
         mTexture?.release()
     }
 
@@ -101,7 +108,6 @@ class Model3DFilter : GLFilter() {
                             -(near + far) / 2F,
                         )
                     }
-                    mProgram.isDoubleSidedRendering(isDoubleSideRendering)
                 }
             }
 
@@ -127,7 +133,7 @@ class Model3DFilter : GLFilter() {
  * @email 56002982@qq.com
  * @des 模型 3D，支持顶点、法向量、纹理
  */
-class Model3DProgram() : GLProgram() {
+class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
     private var mVertexBuffer: FloatBuffer? = null
     private var mTextureBuffer: FloatBuffer? = null
     private var mNormalBuffer: FloatBuffer? = null
@@ -146,7 +152,6 @@ class Model3DProgram() : GLProgram() {
     private var mIsAddSpecularHandle = 0
     private var mIsUseTextureHandle = 0
     private var mIsDoubleSideRenderingHandle = 0
-    private var mIsVertexCalculateLightingHandle = 0
 
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mMMatrix: GLMatrix = GLMatrix()
@@ -160,7 +165,6 @@ class Model3DProgram() : GLProgram() {
     private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
     private var mIsDoubleSidedRendering = false
-    private var mIsVertexCalculateLighting = false
 
     fun setTexture(texture: GLTexture?) {
         mTexture = texture
@@ -228,7 +232,6 @@ class Model3DProgram() : GLProgram() {
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
         mIsUseTextureHandle = getUniformLocation("uIsUseTexture")
         mIsDoubleSideRenderingHandle = getUniformLocation("uIsDoubleSideRendering")
-        mIsVertexCalculateLightingHandle = getUniformLocation("uIsVertexCalculateLighting")
     }
 
     override fun onDraw() {
@@ -257,9 +260,6 @@ class Model3DProgram() : GLProgram() {
 
         // 控制双面渲染
         GLES20.glUniform1i(mIsDoubleSideRenderingHandle, if (mIsDoubleSidedRendering) 1 else 0)
-
-        // 控制光照计算方式
-        GLES20.glUniform1i(mIsVertexCalculateLightingHandle, if (mIsVertexCalculateLighting) 1 else 0)
 
         // 顶点
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
@@ -301,15 +301,21 @@ class Model3DProgram() : GLProgram() {
         mIsAddSpecularHandle = 0
         mIsUseTextureHandle = 0
         mIsDoubleSideRenderingHandle = 0
-        mIsVertexCalculateLightingHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "glsl/model/vert/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(
+        EglBoxRuntime.context.resources,
+        if (isVertexCalculateLighting) "glsl/model/vert/vertex.glsl" else "glsl/model/frag/vertex.glsl",
+    )
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "glsl/model/vert/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(
+        EglBoxRuntime.context.resources,
+        if (isVertexCalculateLighting) "glsl/model/vert/fragment.glsl" else "glsl/model/frag/fragment.glsl",
+    )
 }
 
 enum class Model3DMessageType(val value: Int) {
-    SET_MODEL_DATA(10000),          // 设置模型数据
-    SET_MODEL_TEXTURE_IMAGE(10001), // 设置模型纹理数据
+    SET_MODEL_DATA(10000),               // 设置模型数据
+    SET_MODEL_TEXTURE_IMAGE(10001),      // 设置模型纹理数据
+    SET_CALCULATE_LIGHTING_TYPE(10002),  // 设置光照计算方式
 }

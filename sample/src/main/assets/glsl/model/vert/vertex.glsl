@@ -14,13 +14,14 @@ in vec3 aPosition;
 in vec3 aNormal;
 // 纹理坐标
 in vec2 aTextureCoord;
+
 // 光滑度
 in float aShininess;
-
 // 控制三种光是否使用
 uniform int uIsAddAmbientLight;
 uniform int uIsAddDiffuseLight;
 uniform int uIsAddSpecularLight;
+// 是否双面光照
 uniform int uIsDoubleSideRendering;
 
 // 将未转换的顶点位置传递给片元着色器

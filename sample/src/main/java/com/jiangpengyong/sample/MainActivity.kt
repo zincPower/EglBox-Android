@@ -13,7 +13,8 @@ import com.jiangpengyong.sample.e_texture.TextureMainActivity
 import com.jiangpengyong.sample.f_geometry.GeometryMainActivity
 import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.g_model.Model3DMainActivity
-import com.jiangpengyong.sample.view.GLPreviewViewActivity
+import com.jiangpengyong.sample.h_blend.BlendMainActivity
+import com.jiangpengyong.sample.i_scene.Scene3DMainActivity
 
 /**
  * @author jiang peng yong
@@ -54,12 +55,20 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, Model3DMainActivity::class.java))
         }
 
+        findViewById<View>(R.id.blend).setOnClickListener {
+            startActivity(Intent(this, BlendMainActivity::class.java))
+        }
+
+        findViewById<View>(R.id.scene).setOnClickListener {
+            startActivity(Intent(this, Scene3DMainActivity::class.java))
+        }
+
         findViewById<View>(R.id.font).setOnClickListener {
             startActivity(Intent(this, FontActivity::class.java))
         }
 
-        findViewById<View>(R.id.preview_view).setOnClickListener {
-            startActivity(Intent(this, GLPreviewViewActivity::class.java))
-        }
+//        findViewById<View>(R.id.preview_view).setOnClickListener {
+//            startActivity(Intent(this, GLPreviewViewActivity::class.java))
+//        }
     }
 }

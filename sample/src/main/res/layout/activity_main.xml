@@ -171,6 +171,101 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/blend"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="8、混合"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_blend" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/scene"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="9、3D 场景"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_3d_scene" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/stencil"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10、裁剪与模版测试"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_stencil" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sensor"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="11、传感器"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_sensor" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/buffer"
+                style="@style/common_button"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12、缓冲"
+                    android:textColor="@android:color/white" />
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@mipmap/ic_buffer" />
+
+            </LinearLayout>
+
         </com.jiangpengyong.sample.widget.FlowLayout>
 
         <LinearLayout
@@ -225,134 +320,134 @@
 
         </com.jiangpengyong.sample.widget.FlowLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:background="@color/primary_orange"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="10dp">
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="45dp"-->
+<!--            android:background="@color/primary_orange"-->
+<!--            android:gravity="center_vertical"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:paddingStart="10dp">-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="库"
-                android:textColor="@android:color/white"
-                android:textSize="15dp"
-                android:textStyle="bold" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="库"-->
+<!--                android:textColor="@android:color/white"-->
+<!--                android:textSize="15dp"-->
+<!--                android:textStyle="bold" />-->
 
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginStart="8dp"
-                android:src="@mipmap/ic_lib" />
+<!--            <ImageView-->
+<!--                android:layout_width="22dp"-->
+<!--                android:layout_height="22dp"-->
+<!--                android:layout_marginStart="8dp"-->
+<!--                android:src="@mipmap/ic_lib" />-->
 
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
-        <com.jiangpengyong.sample.widget.FlowLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
+<!--        <com.jiangpengyong.sample.widget.FlowLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingTop="5dp"-->
+<!--            android:paddingBottom="5dp">-->
 
-            <LinearLayout
-                android:id="@+id/preview_view"
-                style="@style/common_button"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:id="@+id/preview_view"-->
+<!--                style="@style/common_button"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1、PreviewView"
-                    android:textColor="@android:color/white" />
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="1、PreviewView"-->
+<!--                    android:textColor="@android:color/white" />-->
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@mipmap/ic_crop" />
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:src="@mipmap/ic_crop" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-            <LinearLayout
-                android:id="@+id/ocrop"
-                style="@style/common_button"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:id="@+id/ocrop"-->
+<!--                style="@style/common_button"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="2、OCrop"
-                    android:textColor="@android:color/white" />
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="2、OCrop"-->
+<!--                    android:textColor="@android:color/white" />-->
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@mipmap/ic_crop" />
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:src="@mipmap/ic_crop" />-->
 
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/camera"
-                style="@style/common_button"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="3、相机"
-                    android:textColor="@android:color/white" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@mipmap/ic_camera" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/player"
-                style="@style/common_button"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="4、播放器"
-                    android:textColor="@android:color/white" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@mipmap/ic_player" />
-
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
 
-            <LinearLayout
-                android:id="@+id/editor"
-                style="@style/common_button"
-                android:orientation="horizontal">
+<!--            <LinearLayout-->
+<!--                android:id="@+id/camera"-->
+<!--                style="@style/common_button"-->
+<!--                android:orientation="horizontal">-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5、编辑器"
-                    android:textColor="@android:color/white" />
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="3、相机"-->
+<!--                    android:textColor="@android:color/white" />-->
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@mipmap/ic_video_editor" />
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:src="@mipmap/ic_camera" />-->
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-        </com.jiangpengyong.sample.widget.FlowLayout>
+<!--            <LinearLayout-->
+<!--                android:id="@+id/player"-->
+<!--                style="@style/common_button"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="4、播放器"-->
+<!--                    android:textColor="@android:color/white" />-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:src="@mipmap/ic_player" />-->
+
+<!--            </LinearLayout>-->
+
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/editor"-->
+<!--                style="@style/common_button"-->
+<!--                android:orientation="horizontal">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="5、编辑器"-->
+<!--                    android:textColor="@android:color/white" />-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:src="@mipmap/ic_video_editor" />-->
+
+<!--            </LinearLayout>-->
+
+<!--        </com.jiangpengyong.sample.widget.FlowLayout>-->
 
     </LinearLayout>
 

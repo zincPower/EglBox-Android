@@ -1,6 +1,15 @@
 #version 300 es
 precision mediump float;
 
+// 物体变换矩阵，只包括物体的旋转、平移、缩放
+uniform mat4 uMMatrix;
+// 光源位置
+uniform vec3 uLightPosition;
+// 相机位置
+uniform vec3 uCameraPosition;
+// 光滑度
+//uniform float aShininess;
+
 // 顶点位置
 in vec3 vPosition;
 // 纹理坐标
@@ -8,35 +17,16 @@ in vec2 vTextureCoord;
 // 法向量
 in vec3 vNormal;
 
-// 正面环境光强度
-in vec4 vFrontAmbientLight;
-// 正面散射光强度
-in vec4 vFrontDiffuseLight;
-// 正面镜面光强度
-in vec4 vFrontSpecularLight;
-
-// 反面环境光亮度
-in vec4 vBackAmbientLight;
-// 反面散射光亮度
-in vec4 vBackDiffuseLight;
-// 反面镜面光亮度
-in vec4 vBackSpecularLight;
-// 光照计算方式
-in int vIsVertexCalculateLighting;
-// 双面绘制
-in int vIsDoubleSideRendering;
-
-// 总的变换矩阵
-in mat4 vMVPMatrix;
-// 物体变换矩阵，只包括物体的旋转、平移、缩放
-in mat4 vMMatrix;
-// 光源位置
-in vec3 vLightPosition;
-// 相机位置
-in vec3 vCameraPosition;
-
+// 控制三种光是否使用
+uniform int uIsAddAmbientLight;
+uniform int uIsAddDiffuseLight;
+uniform int uIsAddSpecularLight;
+// 是否使用纹理
 uniform int uIsUseTexture;
+// 纹理
 uniform sampler2D sTexture;
+// 是否进行双面渲染
+uniform int uIsDoubleSideRendering;
 
 out vec4 fragColor;
 
@@ -47,16 +37,16 @@ vec4 calDiffuseLight(
     vec4 ligthIntensity     // 光强
 ) {
     // 顶点进行模型转换
-    vec3 finalPosition = (vMMatrix * vec4(vPosition, 1.0)).xyz;
+    vec3 finalPosition = (uMMatrix * vec4(vPosition, 1.0)).xyz;
 
     // 对法向量进行矩阵转换处理，最终归一化
     // realNormal 才是跟随模型矩阵处理后的向量
     vec3 tempNormal = vPosition + normal;
-    vec3 realNormal = (vMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
+    vec3 realNormal = (uMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
     realNormal = normalize(realNormal);
 
     // 计算顶点到光源的向量
-    vec3 lightVector = normalize(lightLocation - (vMMatrix * vec4(vPosition, 1)).xyz);
+    vec3 lightVector = normalize(lightLocation - (uMMatrix * vec4(vPosition, 1)).xyz);
     // 利用点积，计算 cos 的值，并限制在 [0, 1] 之间
     float dotResult = max(0.0, dot(realNormal, lightVector));
     return ligthIntensity * dotResult;
@@ -69,12 +59,12 @@ vec4 calSpecularLight(
     vec4 ligthIntensity
 ) {
     // 顶点进行模型转换
-    vec3 finalPosition = (vMMatrix * vec4(vPosition, 1.0)).xyz;
+    vec3 finalPosition = (uMMatrix * vec4(vPosition, 1.0)).xyz;
 
     // 对法向量进行矩阵转换处理，最终归一化
     // realNormal 才是跟随模型矩阵处理后的向量
     vec3 tempNormal = vPosition + normal;
-    vec3 realNormal = (vMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
+    vec3 realNormal = (uMMatrix * vec4(tempNormal, 1)).xyz - finalPosition;
     realNormal = normalize(normalize(realNormal));
 
     // 顶点到相机的向量
@@ -89,7 +79,7 @@ vec4 calSpecularLight(
     if (dotResult <= 0.0) {
         return vec4(0);
     }
-    float powerResult = max(0.0, pow(dotResult, aShininess));
+    float powerResult = max(0.0, pow(dotResult, 50.0));
     return ligthIntensity * powerResult;
 }
 
@@ -97,13 +87,10 @@ void calculateLighting(vec3 normal, out vec4 ambientLight, out vec4 diffuseLight
     // 环境光
     ambientLight = (uIsAddAmbientLight == 1) ? vec4(0.15, 0.15, 0.15, 1.0) : vec4(0);
     // 散射光
-    diffuseLight = (uIsAddDiffuseLight == 1) ? calDiffuseLight(normal, vLightPosition, vec4(0.8, 0.8, 0.8, 1.0)) : vec4(0);
+    diffuseLight = (uIsAddDiffuseLight == 1) ? calDiffuseLight(normal, uLightPosition, vec4(0.8, 0.8, 0.8, 1.0)) : vec4(0);
     // 镜面光
-    specularLight = (uIsAddSpecularLight == 1) ? calSpecularLight(normal, vLightPosition, vec4(0.7, 0.7, 0.7, 1.0)) : vec4(0);
+    specularLight = (uIsAddSpecularLight == 1) ? calSpecularLight(normal, uLightPosition, vec4(0.7, 0.7, 0.7, 1.0)) : vec4(0);
 }
-
-
-
 
 void main() {
     vec4 orgColor = (uIsUseTexture == 1) ? texture(sTexture, vTextureCoord) : vec4(1.0);
@@ -116,24 +103,14 @@ void main() {
     vec4 backDiffuseLight;
     vec4 backSpecularLight;
 
-    if (vIsVertexCalculateLighting == 1) {
-        frontAmbientLight = vFrontAmbientLight;
-        frontDiffuseLight = vFrontDiffuseLight;
-        frontSpecularLight = vFrontSpecularLight;
+    calculateLighting(vNormal, frontAmbientLight, frontDiffuseLight, frontSpecularLight);
 
-        backAmbientLight = vBackAmbientLight;
-        backDiffuseLight = vBackDiffuseLight;
-        backSpecularLight = vBackSpecularLight;
+    if (uIsDoubleSideRendering == 1) {
+        calculateLighting(-vNormal, backAmbientLight, backDiffuseLight, backSpecularLight);
     } else {
-        calculateLighting(normalize(vNormal), frontAmbientLight, frontDiffuseLight, frontSpecularLight);
-
-        if (vIsDoubleSideRendering == 1) {
-            calculateLighting(normalize(-vNormal), backAmbientLight, backDiffuseLight, backSpecularLight);
-        } else {
-            backAmbientLight = vec4(0);
-            backDiffuseLight = vec4(0);
-            backSpecularLight = vec4(0);
-        }
+        backAmbientLight = vec4(0);
+        backDiffuseLight = vec4(0);
+        backSpecularLight = vec4(0);
     }
 
     if (gl_FrontFacing) {

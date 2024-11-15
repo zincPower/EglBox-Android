@@ -151,6 +151,14 @@
             android:screenOrientation="landscape" />
 
         <activity
+            android:name="com.jiangpengyong.sample.h_blend.BlendMainActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name="com.jiangpengyong.sample.i_scene.Scene3DMainActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
             android:screenOrientation="landscape" />
 
