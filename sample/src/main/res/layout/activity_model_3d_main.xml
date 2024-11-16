@@ -76,6 +76,42 @@
 
         </RadioGroup>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="法向量类型：" />
+
+        <RadioGroup
+            android:id="@+id/vertex_normal_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/vertex"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="点法向量"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toStartOf="@id/film"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <RadioButton
+                android:id="@+id/surface"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="面法向量"
+                android:textColor="@color/primary_black"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toStartOf="@id/film"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </RadioGroup>
+
     </LinearLayout>
 
     <com.jiangpengyong.eglbox_core.view.GLPreviewView

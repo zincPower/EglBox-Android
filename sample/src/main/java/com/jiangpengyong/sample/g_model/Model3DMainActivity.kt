@@ -31,28 +31,29 @@ class Model3DMainActivity : AppCompatActivity() {
     private var modelInfos: Map<Int, ModelInfo> = hashMapOf(
         R.id.film to ModelInfo(
             modelPath = "model/film/film.obj",
-            texturePath = "model/film/film.jpg", isDoubleSideRendering = false,
+            texturePath = "model/film/film.jpg",
+            sideRenderingType = SideRenderingType.Single,
             viewpoint = Point(0F, 0F, 100F),
             lightPoint = Point(0F, 0F, 100F),
         ),
         R.id.teapot_only_vertex to ModelInfo(
             modelPath = "model/teapot/only_vertex/teapot.obj",
             texturePath = null,
-            isDoubleSideRendering = false,
+            sideRenderingType = SideRenderingType.Single,
             viewpoint = Point(0F, 0F, 30F),
             lightPoint = Point(-30F, 30F, 30F),
         ),
         R.id.teapot_without_lid to ModelInfo(
             modelPath = "model/teapot/without_lid/teapot.obj",
             texturePath = null,
-            isDoubleSideRendering = true,
+            sideRenderingType = SideRenderingType.Double,
             viewpoint = Point(0F, 0F, 30F),
             lightPoint = Point(30F, 30F, 30F),
         ),
         R.id.teapot_all to ModelInfo(
             modelPath = "model/teapot/all/teapot.obj",
             texturePath = "model/teapot/all/teapot.png",
-            isDoubleSideRendering = false,
+            sideRenderingType = SideRenderingType.Single,
             viewpoint = Point(0F, 0F, 100F),
             lightPoint = Point(0F, 0F, 100F),
         ),
@@ -69,11 +70,7 @@ class Model3DMainActivity : AppCompatActivity() {
         glPreviewView.post {
             glPreviewView.setBlank()
             filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, Model3DFilter.TAG, 0)
-            filterId?.let { filterId ->
-                modelInfos[R.id.film]?.let { modelInfo ->
-                    loadModel(filterId, modelInfo)
-                }
-            }
+            loadModel()
         }
 
         findViewById<TextView>(R.id.reset_rotation).setOnClickListener {
@@ -81,17 +78,39 @@ class Model3DMainActivity : AppCompatActivity() {
         }
 
         findViewById<RadioGroup>(R.id.model_type).setOnCheckedChangeListener { group, checkedId ->
-            loadModel(filterId ?: return@setOnCheckedChangeListener, modelInfos[checkedId] ?: return@setOnCheckedChangeListener)
+            loadModel()
+        }
+
+        findViewById<RadioGroup>(R.id.vertex_normal_type).setOnCheckedChangeListener { group, checkedId ->
+            loadModel()
         }
     }
 
-    private fun loadModel(filterId: String, modelInfo: ModelInfo) {
+    private fun loadModel() {
+        loadModel(
+            filterId = filterId ?: return,
+            modelInfo = modelInfos[findViewById<RadioGroup>(R.id.model_type).checkedRadioButtonId] ?: return,
+            normalVectorType = if (findViewById<RadioGroup>(R.id.vertex_normal_type).checkedRadioButtonId == R.id.vertex) NormalVectorType.Vertex else NormalVectorType.Surface
+        )
+    }
+
+    private fun loadModel(filterId: String, modelInfo: ModelInfo, normalVectorType: NormalVectorType) {
+        glPreviewView.sendMessageToFilter(filterId, Message.obtain().apply {
+            what = Model3DMessageType.RESET_ALL_DATA.value
+        })
+        glPreviewView.requestRender()
+        
         glPreviewView.setViewpoint(modelInfo.viewpoint.x, modelInfo.viewpoint.y, modelInfo.viewpoint.z)
         glPreviewView.setLightPoint(modelInfo.lightPoint.x, modelInfo.lightPoint.y, modelInfo.lightPoint.z)
 
         lifecycleScope.launch(Dispatchers.IO) {
             val file = File(filesDir, modelInfo.modelPath)
-            val model3DInfo = Obj3DModelLoader.load(file, textureFlip = true, isDoubleSideRendering = modelInfo.isDoubleSideRendering)
+            val model3DInfo = Obj3DModelLoader.load(
+                file = file,
+                textureFlip = true,
+                sideRenderingType = modelInfo.sideRenderingType,
+                normalVectorType = normalVectorType,
+            )
             if (model3DInfo == null) {
                 Logger.e(TAG, "Obj parser failure. File=${file}")
                 return@launch
@@ -129,7 +148,7 @@ class Model3DMainActivity : AppCompatActivity() {
 data class ModelInfo(
     val modelPath: String,
     val texturePath: String?,
-    val isDoubleSideRendering: Boolean,
+    val sideRenderingType: SideRenderingType,
     val viewpoint: Point,
     val lightPoint: Point,
 )

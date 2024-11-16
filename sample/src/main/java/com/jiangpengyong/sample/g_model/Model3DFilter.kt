@@ -47,7 +47,7 @@ class Model3DFilter : GLFilter() {
         val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
         fbo.use {
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
-            if (mModel3DInfo?.isDoubleSideRendering == true) {
+            if (mModel3DInfo?.sideRenderingType == SideRenderingType.Double) {
                 GLES20.glDisable(GLES20.GL_CULL_FACE)
             } else {
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
@@ -75,11 +75,11 @@ class Model3DFilter : GLFilter() {
             program.setTexture(mTexture)
             program.setMVPMatrix(mvpMatrix)
             program.setMMatrix(modelMatrix)
-            program.isDoubleSidedRendering(mModel3DInfo?.isDoubleSideRendering ?: false)
+            program.setSideRendering(mModel3DInfo?.sideRenderingType ?: SideRenderingType.Single)
             program.draw()
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
-            if (mModel3DInfo?.isDoubleSideRendering != true) {
+            if (mModel3DInfo?.sideRenderingType != SideRenderingType.Double) {
                 GLES20.glDisable(GLES20.GL_CULL_FACE)
             }
         }
@@ -90,6 +90,7 @@ class Model3DFilter : GLFilter() {
         mVertProgram.release()
         mFragProgram.release()
         mTexture?.release()
+        mTexture = null
     }
 
     override fun onUpdateData(updateData: Bundle) {}
@@ -118,6 +119,13 @@ class Model3DFilter : GLFilter() {
                     mTexture?.init()
                     mTexture?.setData(this)
                 }
+            }
+
+            Model3DMessageType.RESET_ALL_DATA.value -> {
+                mModel3DInfo = null
+                mTexture?.release()
+                mTexture = null
+                mIsVertexCalculateLighting = false
             }
         }
     }
@@ -164,7 +172,7 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
     private var mIsAddAmbientLight = true
     private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
-    private var mIsDoubleSidedRendering = false
+    private var mSideRenderingType = SideRenderingType.Single
 
     fun setTexture(texture: GLTexture?) {
         mTexture = texture
@@ -202,8 +210,8 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
         mIsAddSpecularLight = value
     }
 
-    fun isDoubleSidedRendering(value: Boolean) {
-        mIsDoubleSidedRendering = value
+    fun setSideRendering(value: SideRenderingType) {
+        mSideRenderingType = value
     }
 
     fun setData(
@@ -259,7 +267,7 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
         GLES20.glUniform1i(mIsAddSpecularHandle, if (mIsAddSpecularLight) 1 else 0)
 
         // 控制双面渲染
-        GLES20.glUniform1i(mIsDoubleSideRenderingHandle, if (mIsDoubleSidedRendering) 1 else 0)
+        GLES20.glUniform1i(mIsDoubleSideRenderingHandle, if (mSideRenderingType == SideRenderingType.Single) 0 else 1)
 
         // 顶点
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
@@ -317,5 +325,5 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
 enum class Model3DMessageType(val value: Int) {
     SET_MODEL_DATA(10000),               // 设置模型数据
     SET_MODEL_TEXTURE_IMAGE(10001),      // 设置模型纹理数据
-    SET_CALCULATE_LIGHTING_TYPE(10002),  // 设置光照计算方式
+    RESET_ALL_DATA(10002),               // 重置
 }
