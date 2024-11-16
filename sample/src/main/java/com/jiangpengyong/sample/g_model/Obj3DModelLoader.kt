@@ -2,11 +2,10 @@ package com.jiangpengyong.sample.g_model
 
 import android.content.res.Resources
 import android.opengl.GLES20
-import android.util.Log
 import com.jiangpengyong.eglbox_core.logger.Logger
+import com.jiangpengyong.eglbox_core.space3d.Vector
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
-import com.jiangpengyong.sample.utils.Math3D
-import com.jiangpengyong.sample.utils.Vector
+import com.jiangpengyong.eglbox_core.utils.Math3D
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader

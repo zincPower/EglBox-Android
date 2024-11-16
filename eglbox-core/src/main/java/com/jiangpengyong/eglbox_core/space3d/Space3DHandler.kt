@@ -27,7 +27,7 @@ class Space3DHandler {
             }
 
             Space3DMessageType.UPDATE_UP_VECTOR -> {
-                space3D.upVector = message.obj as? Point ?: return
+                space3D.upVector = message.obj as? Vector ?: return
             }
 
             Space3DMessageType.UPDATE_PROJECTION -> {
@@ -60,37 +60,37 @@ object Space3DMessageType {
     const val UPDATE_PROJECTION = -20006 // 更新投影
     const val UPDATE_LIGHT_POINT = -20007 // 更新光照
 
-    fun obtainUpdateRotationMessage(angleX: Float, angleY: Float, angleZ: Float) = Message.obtain().apply {
+    fun obtainUpdateRotationMessage(angleX: Float, angleY: Float, angleZ: Float): Message = Message.obtain().apply {
         what = UPDATE_ROTATION
         obj = Rotation(angleX = angleX, angleY = angleY, angleZ = angleZ)
     }
 
-    fun obtainResetRotationMessage() = Message.obtain().apply {
+    fun obtainResetRotationMessage(): Message = Message.obtain().apply {
         what = RESET_ROTATION
         obj = Rotation(angleX = 0F, angleY = 0F, angleZ = 0F)
     }
 
-    fun obtainUpdateViewpointMessage(x: Float, y: Float, z: Float) = Message.obtain().apply {
+    fun obtainUpdateViewpointMessage(x: Float, y: Float, z: Float): Message = Message.obtain().apply {
         what = UPDATE_VIEWPOINT
         obj = Point(x = x, y = y, z = z)
     }
 
-    fun obtainUpdateCenterPointMessage(x: Float, y: Float, z: Float) = Message.obtain().apply {
+    fun obtainUpdateCenterPointMessage(x: Float, y: Float, z: Float): Message = Message.obtain().apply {
         what = UPDATE_CENTER_POINT
         obj = Point(x = x, y = y, z = z)
     }
 
-    fun obtainUpdateUpVectorMessage(x: Float, y: Float, z: Float) = Message.obtain().apply {
+    fun obtainUpdateUpVectorMessage(x: Float, y: Float, z: Float): Message = Message.obtain().apply {
         what = UPDATE_UP_VECTOR
-        obj = Point(x = x, y = y, z = z)
+        obj = Vector(x = x, y = y, z = z)
     }
 
-    fun obtainUpdateProjectionMessage(type: ProjectionType, near: Float, far: Float, ratio: Float) = Message.obtain().apply {
+    fun obtainUpdateProjectionMessage(type: ProjectionType, near: Float, far: Float, ratio: Float): Message = Message.obtain().apply {
         what = UPDATE_PROJECTION
         obj = Projection(type = type, near = near, far = far, ratio = ratio)
     }
 
-    fun obtainUpdateLightPointMessage(x: Float, y: Float, z: Float) = Message.obtain().apply {
+    fun obtainUpdateLightPointMessage(x: Float, y: Float, z: Float): Message = Message.obtain().apply {
         what = UPDATE_LIGHT_POINT
         obj = Point(x = x, y = y, z = z)
     }

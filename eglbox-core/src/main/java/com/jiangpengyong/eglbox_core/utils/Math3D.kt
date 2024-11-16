@@ -1,8 +1,7 @@
-package com.jiangpengyong.sample.utils
+package com.jiangpengyong.eglbox_core.utils
 
+import com.jiangpengyong.eglbox_core.space3d.Vector
 import kotlin.math.sqrt
-
-data class Vector(val x: Float, val y: Float, val z: Float)
 
 object Math3D {
     fun crossProduct(v1: Vector, v2: Vector): Vector {

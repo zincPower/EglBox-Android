@@ -35,7 +35,7 @@ class Space3D {
         }
 
     // 观察点向上向量
-    var upVector = Point(0F, 1F, 0F)
+    var upVector = Vector(0F, 1F, 0F)
         set(value) {
             field = value
             updateViewMatrix()
@@ -132,35 +132,13 @@ class Space3D {
     }
 }
 
-/**
- * @author jiang peng yong
- * @date 2024/10/20 18:00
- * @email 56002982@qq.com
- * @des 旋转角度
- */
-data class Rotation(
-    val angleX: Float,
-    val angleY: Float,
-    val angleZ: Float,
-)
+// 投影方式
+enum class ProjectionType {
+    Orthographic,   // 正交投影
+    Perspective,    // 透视投影
+}
 
-/**
- * @author jiang peng yong
- * @date 2024/10/21 08:32
- * @email 56002982@qq.com
- * @des 缩放
- */
-data class Scale(
-    val scaleX: Float,
-    val scaleY: Float,
-)
-
-/**
- * @author jiang peng yong
- * @date 2024/11/4 21:23
- * @email 56002982@qq.com
- * @des 投影信息
- */
+// 投影信息
 data class Projection(
     val type: ProjectionType,
     val near: Float,
@@ -168,25 +146,14 @@ data class Projection(
     val ratio: Float,
 )
 
-/**
- * @author jiang peng yong
- * @date 2024/11/4 21:22
- * @email 56002982@qq.com
- * @des 投影方式
- */
-enum class ProjectionType {
-    Orthographic,   // 正交投影
-    Perspective,    // 透视投影
-}
+// 旋转角度
+data class Rotation(val angleX: Float, val angleY: Float, val angleZ: Float)
 
-/**
- * @author jiang peng yong
- * @date 2024/11/4 21:30
- * @email 56002982@qq.com
- * @des 点
- */
-data class Point(
-    val x: Float,
-    val y: Float,
-    val z: Float,
-)
+// 缩放
+data class Scale(val scaleX: Float, val scaleY: Float)
+
+// 点
+data class Point(val x: Float, val y: Float, val z: Float)
+
+// 向量
+data class Vector(val x: Float, val y: Float, val z: Float)
