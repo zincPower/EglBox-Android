@@ -253,7 +253,7 @@ class DiffuseLightActivity : AppCompatActivity() {
 
         private var mLightPosition = floatArrayOf(0F, 0F, 5F)
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mProgram.init()
             mLightPointProgram.init()
             mViewMatrix.setLookAtM(
@@ -280,7 +280,7 @@ class DiffuseLightActivity : AppCompatActivity() {
             }
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mProgram.release()
             mLightPointProgram.release()
         }

@@ -317,7 +317,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
 
         private var mLightCalculateType = LightCalculateTypeBallProgram.LightCalculateType.Vertex
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mGouraudProgram.init()
             mPhongProgram.init()
             mLightPointProgram.init()
@@ -354,7 +354,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
             }
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mGouraudProgram.release()
             mPhongProgram.release()
             mLightPointProgram.release()

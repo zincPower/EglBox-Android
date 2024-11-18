@@ -26,7 +26,7 @@ class StarFilter : GLFilter() {
     private val mModelMatrix = ModelMatrix()
     private var mPreviewSize = Size(0, 0)
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mStarProgram.init()
         mViewMatrix.setLookAtM(
             0F, 0F, 5F,
@@ -50,7 +50,7 @@ class StarFilter : GLFilter() {
         }
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mStarProgram.release()
     }
 

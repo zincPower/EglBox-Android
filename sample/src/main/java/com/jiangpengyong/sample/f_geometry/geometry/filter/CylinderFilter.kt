@@ -67,7 +67,7 @@ class CylinderFilter(
         this.mBottomTexture = bottomTexture
     }
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mProgram.init()
         updateViewMatrix()
     }
@@ -79,7 +79,7 @@ class CylinderFilter(
         drawCircle(mBottomMatrix)
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mProgram.release()
     }
 

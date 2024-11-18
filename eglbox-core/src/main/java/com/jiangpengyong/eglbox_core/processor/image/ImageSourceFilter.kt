@@ -18,7 +18,7 @@ class ImageSourceFilter : SourceFilter() {
     private val mMatrix = ModelMatrix()
     private var mImageParams: ImageParams? = null
 
-    override fun onInit() {}
+    override fun onInit(context: FilterContext) {}
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val imageParams = mImageParams ?: return
@@ -69,7 +69,7 @@ class ImageSourceFilter : SourceFilter() {
         }
     }
 
-    override fun onRelease() {}
+    override fun onRelease(context: FilterContext) {}
     override fun onUpdateData(updateData: Bundle) {}
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}

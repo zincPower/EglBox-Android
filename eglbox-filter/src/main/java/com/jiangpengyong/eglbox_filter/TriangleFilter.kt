@@ -21,7 +21,7 @@ import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 class TriangleFilter : GLFilter() {
     private val mTriangleProgram = TriangleProgram()
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mTriangleProgram.init()
     }
 
@@ -39,7 +39,7 @@ class TriangleFilter : GLFilter() {
         }
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mTriangleProgram.release()
     }
 

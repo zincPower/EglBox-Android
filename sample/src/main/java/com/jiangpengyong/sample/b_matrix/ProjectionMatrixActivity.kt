@@ -133,7 +133,7 @@ class ProjectionActivity : AppCompatActivity() {
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mCubeProgram.init()
             mProjectMatrix.setFrustumM(
                 -1F, 1F,
@@ -163,7 +163,7 @@ class ProjectionActivity : AppCompatActivity() {
             mCubeProgram.draw()
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mCubeProgram.release()
         }
 

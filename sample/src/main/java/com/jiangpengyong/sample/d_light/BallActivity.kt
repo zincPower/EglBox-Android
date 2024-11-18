@@ -187,7 +187,7 @@ class BallActivity : AppCompatActivity() {
 
         private var mPreviewSize = Size(0, 0)
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mProgram.init()
             mViewMatrix.setLookAtM(
                 0F, 0F, 3F,
@@ -206,7 +206,7 @@ class BallActivity : AppCompatActivity() {
             }
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mProgram.release()
         }
 

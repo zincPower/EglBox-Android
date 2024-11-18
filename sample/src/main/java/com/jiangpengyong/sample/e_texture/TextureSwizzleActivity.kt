@@ -151,7 +151,7 @@ class TextureSwizzleActivity : AppCompatActivity() {
         private val mMatrix = ModelMatrix()
         private var mScaleType = ScaleType.CENTER_INSIDE
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mTexture2DProgram.init()
             mMatrix.reset()
             mMatrix.scale(-1F, -1F, 1F)
@@ -170,7 +170,7 @@ class TextureSwizzleActivity : AppCompatActivity() {
             mTexture2DProgram.draw()
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mTexture2DProgram.release()
         }
 

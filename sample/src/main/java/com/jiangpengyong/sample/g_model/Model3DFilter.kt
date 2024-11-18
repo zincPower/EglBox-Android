@@ -32,7 +32,7 @@ class Model3DFilter : GLFilter() {
 
     private val mModelMatrix = ModelMatrix()
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mVertProgram.init()
         mFragProgram.init()
     }
@@ -86,7 +86,7 @@ class Model3DFilter : GLFilter() {
         imageInOut.out(fbo)
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mVertProgram.release()
         mFragProgram.release()
         mTexture?.release()

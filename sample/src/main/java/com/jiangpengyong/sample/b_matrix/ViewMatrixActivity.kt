@@ -168,7 +168,7 @@ class ViewMatrixActivity : AppCompatActivity() {
         // 预览尺寸
         private var mPreviewSize = Size(0, 0)
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mCubeProgram.init()
         }
 
@@ -270,7 +270,7 @@ class ViewMatrixActivity : AppCompatActivity() {
             )
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mCubeProgram.release()
         }
 

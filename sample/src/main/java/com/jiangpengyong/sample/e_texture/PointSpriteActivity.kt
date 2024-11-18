@@ -135,7 +135,7 @@ class PointSpriteActivity : AppCompatActivity() {
 
         private var mPointSize = 0F
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mProgram.init()
             mViewMatrix.setLookAtM(
                 0F, 0F, 10F,
@@ -160,7 +160,7 @@ class PointSpriteActivity : AppCompatActivity() {
             mProgram.draw()
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mProgram.release()
         }
 

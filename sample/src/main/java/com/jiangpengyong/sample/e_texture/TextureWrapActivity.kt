@@ -150,7 +150,7 @@ class TextureWrapActivity : AppCompatActivity() {
 
         private var mTextureCoordinates: FloatArray? = null
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mTexture2DProgram.init()
         }
 
@@ -163,7 +163,7 @@ class TextureWrapActivity : AppCompatActivity() {
             mTexture2DProgram.draw()
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mTexture2DProgram.release()
         }
 

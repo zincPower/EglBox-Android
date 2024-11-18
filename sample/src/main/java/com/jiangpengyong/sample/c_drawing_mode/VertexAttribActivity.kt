@@ -93,7 +93,7 @@ class VertexAttribActivity : AppCompatActivity() {
         private val mStarProgram = StarProgram()
         private var mPreviewSize = Size(0, 0)
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mStarProgram.init()
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
@@ -107,7 +107,7 @@ class VertexAttribActivity : AppCompatActivity() {
             drawStar()
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mStarProgram.release()
         }
 

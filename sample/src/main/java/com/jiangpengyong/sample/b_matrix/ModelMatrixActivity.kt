@@ -156,7 +156,7 @@ class ModelMatrixActivity : AppCompatActivity() {
         private val mViewMatrix = ViewMatrix()
         private var mModelMatrix = ModelMatrix()
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mCubeProgram.init()
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
@@ -214,7 +214,7 @@ class ModelMatrixActivity : AppCompatActivity() {
             }
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mCubeProgram.release()
         }
 

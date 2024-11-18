@@ -1,5 +1,6 @@
 package com.jiangpengyong.sample.h_blend
 
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
 /**
@@ -8,5 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
  * @email 56002982@qq.com
  * @des 混合模式首页
  */
-class BlendMainActivity:AppCompatActivity() {
+class BlendMainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
 }

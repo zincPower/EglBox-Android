@@ -30,7 +30,7 @@ class BallFilter : GLFilter() {
     private var mLightPosition = floatArrayOf(0F, 0F, 5F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mProgram.init()
         mViewMatrix.setLookAtM(
             mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
@@ -64,7 +64,7 @@ class BallFilter : GLFilter() {
         }
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mProgram.release()
     }
 

@@ -70,7 +70,7 @@ class TriangleActivity : AppCompatActivity() {
     class TriangleFilter : GLFilter() {
         private val mTriangleProgram = TriangleProgram()
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mTriangleProgram.init()
         }
 
@@ -78,7 +78,7 @@ class TriangleActivity : AppCompatActivity() {
             mTriangleProgram.draw()
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mTriangleProgram.release()
         }
 

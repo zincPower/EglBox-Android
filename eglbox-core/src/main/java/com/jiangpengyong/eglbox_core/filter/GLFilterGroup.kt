@@ -127,7 +127,7 @@ class GLFilterGroup : GLFilter() {
         }
     }
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         Logger.i(TAG, "onInit")
     }
 
@@ -135,7 +135,7 @@ class GLFilterGroup : GLFilter() {
         Logger.i(TAG, "onDraw")
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         Logger.i(TAG, "onRelease")
     }
 

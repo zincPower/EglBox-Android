@@ -23,7 +23,7 @@ abstract class GLFilter : Comparable<GLFilter> {
             return
         }
         this.mContext = context
-        onInit()
+        onInit(context)
     }
 
     open fun draw(image: ImageInOut) {
@@ -36,7 +36,7 @@ abstract class GLFilter : Comparable<GLFilter> {
 
     open fun release() {
         if (!isInit()) return
-        onRelease()
+        mContext?.let { onRelease(it) }
         mContext = null
     }
 
@@ -67,9 +67,9 @@ abstract class GLFilter : Comparable<GLFilter> {
 
     fun isInit(): Boolean = mContext != null
 
-    protected abstract fun onInit()
+    protected abstract fun onInit(context: FilterContext)
     protected abstract fun onDraw(context: FilterContext, imageInOut: ImageInOut)
-    protected abstract fun onRelease()
+    protected abstract fun onRelease(context: FilterContext)
     protected abstract fun onUpdateData(updateData: Bundle)
     protected abstract fun onRestoreData(inputData: Bundle)
     protected abstract fun onStoreData(outputData: Bundle)

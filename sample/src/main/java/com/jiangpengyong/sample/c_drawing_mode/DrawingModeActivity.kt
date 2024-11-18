@@ -206,7 +206,7 @@ private class StarFilter : GLFilter() {
     private var mPreviewSize = Size(0, 0)
     private var mDrawingMode = DrawingMode.Points.value
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mStarProgram.init()
         mViewMatrix.setLookAtM(
             0F, 0F, 5F,
@@ -221,7 +221,7 @@ private class StarFilter : GLFilter() {
         drawStar()
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mStarProgram.release()
     }
 

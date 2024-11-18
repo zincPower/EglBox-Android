@@ -159,7 +159,7 @@ class TextureSampleActivity : AppCompatActivity() {
             magFilter = MagFilter.LINEAR,
         )
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mTexture2DProgram.init()
 
             mMinNearestTexture.init()
@@ -230,7 +230,7 @@ class TextureSampleActivity : AppCompatActivity() {
             }
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mTexture2DProgram.release()
         }
 

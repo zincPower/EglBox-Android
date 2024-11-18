@@ -84,7 +84,7 @@ class CubeActivity : AppCompatActivity() {
         private val mCubeProgram = CubeProgram()
         private var mPreviewSize = Size(0, 0)
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mCubeProgram.init()
             mViewMatrix.setLookAtM(
                 0F, 0F, 5F,
@@ -99,7 +99,7 @@ class CubeActivity : AppCompatActivity() {
             drawCube()
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mCubeProgram.release()
         }
 

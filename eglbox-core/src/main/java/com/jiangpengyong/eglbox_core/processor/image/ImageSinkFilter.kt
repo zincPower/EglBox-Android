@@ -17,7 +17,7 @@ class ImageSinkFilter : SinkFilter() {
     private var mProcessId: Int = 0
     private var mProcessFinishCallback: ProcessFinishCallback? = null
 
-    override fun onInit() {}
+    override fun onInit(context: FilterContext) {}
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val texture = imageInOut.texture ?: return
@@ -79,7 +79,7 @@ class ImageSinkFilter : SinkFilter() {
         context.sendMessage(GLProcessor.SINK_FILTER_ID, message)
     }
 
-    override fun onRelease() {}
+    override fun onRelease(context: FilterContext) {}
     override fun onUpdateData(updateData: Bundle) {}
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}

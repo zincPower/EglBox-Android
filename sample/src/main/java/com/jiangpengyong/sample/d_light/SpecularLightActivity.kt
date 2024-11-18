@@ -272,7 +272,7 @@ class SpecularLightActivity : AppCompatActivity() {
         private var mLightPosition = floatArrayOf(0F, 0F, 5F)
         private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
-        override fun onInit() {
+        override fun onInit(context: FilterContext) {
             mProgram.init()
             mLightPointProgram.init()
             mViewMatrix.setLookAtM(
@@ -299,7 +299,7 @@ class SpecularLightActivity : AppCompatActivity() {
             }
         }
 
-        override fun onRelease() {
+        override fun onRelease(context: FilterContext) {
             mProgram.release()
             mLightPointProgram.release()
         }

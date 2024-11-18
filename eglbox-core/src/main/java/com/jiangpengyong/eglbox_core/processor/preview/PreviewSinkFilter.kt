@@ -30,7 +30,7 @@ open class PreviewSinkFilter : SinkFilter() {
     private var mSurface: Any? = null
     private var mWindowSurface: WindowSurface? = null
 
-    override fun onInit() {}
+    override fun onInit(context: FilterContext) {}
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val surface = mWindowSurface
@@ -77,7 +77,7 @@ open class PreviewSinkFilter : SinkFilter() {
         context.surface?.let { context.egl?.makeCurrent(it) }
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mWindowSurface?.release()
         mWindowSurface = null
         mPreviewSize = Size(0, 0)

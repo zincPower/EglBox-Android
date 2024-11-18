@@ -80,7 +80,7 @@ class SolarSystemFilter : GLFilter() {
         CelestialBody.Neptune to CelestialBodyInfo(CelestialBody.Neptune, 25F, -28.32F, mEarthRatio * 1.6F, mEarthOrbitSpeed / 164.79F * 5F, mEarthRotationSpeed * 0.67F),
     )
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mSunProgram.init()
         mPlanetProgram.init()
         mEarthProgram.init()
@@ -113,7 +113,7 @@ class SolarSystemFilter : GLFilter() {
         drawPlanet()
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mSunProgram.release()
         mPlanetProgram.release()
         mRingProgram.release()

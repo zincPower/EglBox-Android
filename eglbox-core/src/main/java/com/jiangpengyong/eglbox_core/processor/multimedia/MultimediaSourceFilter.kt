@@ -42,7 +42,7 @@ class MultimediaSourceFilter : SourceFilter() {
 
     private var mFrameSizeInfo: FrameSizeInfo? = null
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mTexture.init()
         mTexture2DProgram.init()
         mTexture2DProgram.setTexture(mTexture)
@@ -77,7 +77,7 @@ class MultimediaSourceFilter : SourceFilter() {
         imageInOut.texture?.let { mStreamSnapshot.maybeSnapshot(context, it) }
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         val surfaceTexture = mSurfaceTexture
         mSurfaceTexture = null
         if (surfaceTexture != null) {

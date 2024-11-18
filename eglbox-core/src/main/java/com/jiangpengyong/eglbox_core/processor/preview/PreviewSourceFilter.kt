@@ -32,7 +32,7 @@ class PreviewSourceFilter : SourceFilter() {
     private var mIsNeedBlank = false
     private val mSpace3DHandler = Space3DHandler()
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mContext?.space3D?.let {
             mSpace3DHandler.space3D = it
             it.init()
@@ -62,7 +62,7 @@ class PreviewSourceFilter : SourceFilter() {
         imageInOut.out(fbo, false)
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mTexture.release()
     }
 

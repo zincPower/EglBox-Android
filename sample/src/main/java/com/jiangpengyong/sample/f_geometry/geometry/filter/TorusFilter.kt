@@ -61,7 +61,7 @@ class TorusFilter(
         this.mBottomTexture = bottomTexture
     }
 
-    override fun onInit() {
+    override fun onInit(context: FilterContext) {
         mProgram.init()
         updateViewMatrix()
     }
@@ -71,7 +71,7 @@ class TorusFilter(
         drawTorus()
     }
 
-    override fun onRelease() {
+    override fun onRelease(context: FilterContext) {
         mProgram.release()
     }
 
