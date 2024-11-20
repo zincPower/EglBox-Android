@@ -109,7 +109,7 @@ class MultimediaSourceFilter : SourceFilter() {
     }
 
     private fun handleFrameAvailable() {
-        mContext?.eglHandler?.post{
+        mContext?.glHandler?.post{
             val surfaceTexture = mSurfaceTexture ?: return@post
             surfaceTexture.updateTexImage()
             surfaceTexture.getTransformMatrix(mMatrix.matrix)

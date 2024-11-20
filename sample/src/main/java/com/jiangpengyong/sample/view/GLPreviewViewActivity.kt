@@ -56,17 +56,17 @@ class GLPreviewViewActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.add_filter_triangle).setOnClickListener {
             if (triangleFilter != null) return@setOnClickListener
-            triangleFilter = previewView.addFilter(PreviewProcessor.FilterType.Process, "TriangleFilter", 0)
+            triangleFilter = previewView.addFilter("TriangleFilter")
         }
 
         findViewById<View>(R.id.add_filter_ball).setOnClickListener {
             if (ballFilter != null) return@setOnClickListener
-            ballFilter = previewView.addFilter(PreviewProcessor.FilterType.Process, "BallFilter", 0)
+            ballFilter = previewView.addFilter("BallFilter")
         }
 
         findViewById<View>(R.id.add_filter_star).setOnClickListener {
             if (starFilter != null) return@setOnClickListener
-            starFilter = previewView.addFilter(PreviewProcessor.FilterType.Process, "StarFilter", 1)
+            starFilter = previewView.addFilter("StarFilter", order = 1)
         }
 
         findViewById<View>(R.id.remove_filter_triangle).setOnClickListener {

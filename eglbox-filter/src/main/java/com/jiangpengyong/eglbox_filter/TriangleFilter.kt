@@ -72,9 +72,9 @@ class TriangleFilter : GLFilter() {
 class TriangleProgram : GLProgram() {
     private val mVertexBuffer = allocateFloatBuffer(
         floatArrayOf(
-            -1F, 1F, 0.0F,
-            1F, 1F, 0.0F,
-            0.0F, -1F, 0.0F,
+            -1F, 1F, 0F,
+            1F, 1F, 0F,
+            0F, -1F, 0F,
         )
     )
     private val mColorBuffer = allocateFloatBuffer(

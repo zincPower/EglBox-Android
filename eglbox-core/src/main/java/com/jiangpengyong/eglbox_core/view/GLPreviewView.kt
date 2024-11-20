@@ -11,6 +11,7 @@ import android.util.Size
 import android.view.MotionEvent
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
+import android.widget.Filter
 import android.widget.FrameLayout
 import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.processor.GLProcessor.Companion.SOURCE_FILTER_ID
@@ -89,7 +90,7 @@ class GLPreviewView : FrameLayout {
         requestRender()
     }
 
-    fun addFilter(filterType: PreviewProcessor.FilterType, name: String, order: Int): String? {
+    fun addFilter(name: String, filterType: PreviewProcessor.FilterType = PreviewProcessor.FilterType.Process, order: Int = 0): String? {
         val filter = FilterCenter.createFilter(name)
         if (filter == null) {
             Log.e(TAG, "Filter create failure.")

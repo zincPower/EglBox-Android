@@ -8,6 +8,7 @@ import androidx.annotation.MainThread
 import com.jiangpengyong.eglbox_core.GLThread
 import com.jiangpengyong.eglbox_core.egl.EGL
 import com.jiangpengyong.eglbox_core.egl.EglSurface
+import com.jiangpengyong.eglbox_core.engine.GLHandler
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.logger.Logger
 
@@ -30,11 +31,11 @@ class FilterChain(renderType: RenderType) {
     private val mListener = FilterChainListenerImpl()
 
     @GLThread
-    fun init(egl: EGL, surface: EglSurface, eglHandler: Handler) {
+    fun init(egl: EGL, surface: EglSurface, glHandler: GLHandler) {
         if (mIsInit) return
         Logger.i(TAG, "FilterChain init.")
         mIsInit = true;
-        mContext.init(egl, surface, eglHandler, mListener)
+        mContext.init(egl, surface, glHandler, mListener)
         mFilterSlot.addFilter(mSourceFilter)
         mFilterSlot.addFilter(mProcessFilter)
         mFilterSlot.addFilter(mSinkFilter)
@@ -178,9 +179,13 @@ class FilterChainListenerImpl : FilterChainListener {
     }
 
     @GLThread
-    override fun onReceiveMessage(filterId: String, message: Message) = synchronized(this) {
-        for (listener in mListeners) {
-            listener.onReceiveMessage(filterId, message)
+    override fun onReceiveMessage(filterId: String, message: Message) {
+        mMainHandler.post {
+            synchronized(this) {
+                for (listener in mListeners) {
+                    listener.onReceiveMessage(filterId, message)
+                }
+            }
         }
     }
 }

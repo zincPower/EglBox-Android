@@ -7,6 +7,7 @@ import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
@@ -52,12 +53,12 @@ class SolarSystemFilter : GLFilter() {
     private var mEarthRotationSpeed = 1F
 
     // 光源
-    private var mSunPosition = floatArrayOf(0F, 0F, 0F)
+    private var mSunPoint = Point(0F, 0F, 0F)
 
     // 观察位置和转换过程
-    private var mEyePosition = floatArrayOf(0F, 0F, 30F)
-    private var mEyeTargetPosition = mEyePosition
-    private var mEyeSourcePosition = mEyePosition
+    private var mEyePoint = Point(0F, 0F, 30F)
+    private var mEyeTargetPoint = mEyePoint
+    private var mEyeSourcePoint = mEyePoint
     private var mProgress = 0F
 
     // 观察目标
@@ -156,28 +157,28 @@ class SolarSystemFilter : GLFilter() {
     private fun updateViewMatrix() {
         when (mEyeTarget) {
             Target.SolarSystem -> defaultEyePosition
-            Target.Mercury -> (mPlanetInfo[CelestialBody.Mercury]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
-            Target.Venus -> (mPlanetInfo[CelestialBody.Venus]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
-            Target.Earth -> (mPlanetInfo[CelestialBody.Earth]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
-            Target.Mars -> (mPlanetInfo[CelestialBody.Mars]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
-            Target.Jupiter -> (mPlanetInfo[CelestialBody.Jupiter]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
-            Target.Saturn -> (mPlanetInfo[CelestialBody.Saturn]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
-            Target.Uranus -> (mPlanetInfo[CelestialBody.Uranus]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
-            Target.Neptune -> (mPlanetInfo[CelestialBody.Neptune]?.position ?: mEyePosition).let { floatArrayOf(it[0], it[1], it[2] + DEFAULT_DISTANCE) }
+            Target.Mercury -> (mPlanetInfo[CelestialBody.Mercury]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
+            Target.Venus -> (mPlanetInfo[CelestialBody.Venus]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
+            Target.Earth -> (mPlanetInfo[CelestialBody.Earth]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
+            Target.Mars -> (mPlanetInfo[CelestialBody.Mars]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
+            Target.Jupiter -> (mPlanetInfo[CelestialBody.Jupiter]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
+            Target.Saturn -> (mPlanetInfo[CelestialBody.Saturn]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
+            Target.Uranus -> (mPlanetInfo[CelestialBody.Uranus]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
+            Target.Neptune -> (mPlanetInfo[CelestialBody.Neptune]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
         }.let { eyeTargetPosition ->
-            mEyeTargetPosition = eyeTargetPosition
+            mEyeTargetPoint = eyeTargetPosition
             if (mProgress < 0F || mProgress >= 1F) {
-                mEyeTargetPosition
+                mEyeTargetPoint
             } else {
-                val x = (mEyeTargetPosition[0] - mEyeSourcePosition[0]) * mProgress + mEyeSourcePosition[0]
-                val y = (mEyeTargetPosition[1] - mEyeSourcePosition[1]) * mProgress + mEyeSourcePosition[1]
-                val z = (mEyeTargetPosition[2] - mEyeSourcePosition[2]) * mProgress + mEyeSourcePosition[2]
-                floatArrayOf(x, y, z)
+                val x = (mEyeTargetPoint.x - mEyeSourcePoint.x) * mProgress + mEyeSourcePoint.x
+                val y = (mEyeTargetPoint.y - mEyeSourcePoint.y) * mProgress + mEyeSourcePoint.y
+                val z = (mEyeTargetPoint.z - mEyeSourcePoint.z) * mProgress + mEyeSourcePoint.z
+                Point(x, y, z)
             }.let { eyePosition ->
-                mEyePosition = eyePosition
+                mEyePoint = eyePosition
                 mViewMatrix.setLookAtM(
-                    eyePosition[0], eyePosition[1], eyePosition[2],
-                    eyePosition[0], eyePosition[1], eyePosition[2] - DEFAULT_DISTANCE,
+                    eyePosition.x, eyePosition.y, eyePosition.z,
+                    eyePosition.x, eyePosition.y, eyePosition.z - DEFAULT_DISTANCE,
                     0F, 1F, 0F
                 )
             }
@@ -230,7 +231,7 @@ class SolarSystemFilter : GLFilter() {
             } else {
                 GLES20.glFrontFace(GLES20.GL_CW)
                 mPlanetProgram.setTexture(planetInfo.texture)
-                mPlanetProgram.setLightPosition(mSunPosition)
+                mPlanetProgram.setLightPoint(mSunPoint)
                 mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
                 (mGestureMatrix * planetInfo.matrix).let { modelMatrix ->
                     mPlanetProgram.setMMatrix(modelMatrix)
@@ -263,7 +264,7 @@ class SolarSystemFilter : GLFilter() {
      */
     private fun drawMoon(matrix: GLMatrix) {
         mPlanetProgram.setTexture(mMoonInfo.texture)
-        mPlanetProgram.setLightPosition(mSunPosition)
+        mPlanetProgram.setLightPoint(mSunPoint)
         mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * matrix * mMoonInfo.matrix)
         (mGestureMatrix * matrix * mMoonInfo.matrix).let { modelMatrix ->
             mPlanetProgram.setMMatrix(modelMatrix)
@@ -279,10 +280,10 @@ class SolarSystemFilter : GLFilter() {
     private fun drawSaturnRing(matrix: GLMatrix) {
         GLES20.glFrontFace(GLES20.GL_CCW)
         mRingProgram.setTexture(mSaturnRingInfo.texture)
-        mRingProgram.setLightPosition(mSunPosition)
+        mRingProgram.setLightPoint(mSunPoint)
         mRingProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * matrix * mSaturnRingInfo.matrix)
         (mGestureMatrix * matrix * mSaturnRingInfo.matrix).let { modelMatrix ->
-            mRingProgram.setMMatrix(modelMatrix)
+            mRingProgram.setModelMatrix(modelMatrix)
             mSaturnRingInfo.updatePosition(modelMatrix)
         }
         mRingProgram.setShininess(1F)
@@ -294,7 +295,7 @@ class SolarSystemFilter : GLFilter() {
      */
     private fun drawEarth(planetInfo: CelestialBodyInfo) {
         mEarthProgram.setDayTexture(planetInfo.texture)
-        mEarthProgram.setLightPosition(mSunPosition)
+        mEarthProgram.setLightPoint(mSunPoint)
         mEarthProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
         (mGestureMatrix * planetInfo.matrix).let { modelMatrix ->
             mEarthProgram.setMMatrix(modelMatrix)
@@ -315,7 +316,7 @@ class SolarSystemFilter : GLFilter() {
         when (message.what) {
             MESSAGE_TARGET -> synchronized(this) {
                 mProgress = message.obj as? Float ?: return@synchronized
-                mEyeSourcePosition = mEyePosition
+                mEyeSourcePoint = mEyePoint
                 mEyeTarget = when (message.arg1) {
                     Target.SolarSystem.value -> Target.SolarSystem
                     Target.Mercury.value -> Target.Mercury
@@ -335,6 +336,6 @@ class SolarSystemFilter : GLFilter() {
 
     companion object {
         private const val DEFAULT_DISTANCE = 8F
-        private val defaultEyePosition = floatArrayOf(0F, 0F, 30F)
+        private val defaultEyePosition = Point(0F, 0F, 30F)
     }
 }

@@ -59,7 +59,7 @@
 
     <view
         android:id="@+id/surface_view"
-        class="com.jiangpengyong.sample.f_geometry.TorusActivity$RenderView"
+        class="com.jiangpengyong.sample.f_geometry.RingActivity$RenderView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/light_x_position"

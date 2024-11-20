@@ -137,7 +137,7 @@
             android:name="com.jiangpengyong.sample.f_geometry.ConeActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.f_geometry.TorusActivity"
+            android:name="com.jiangpengyong.sample.f_geometry.RingActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name="com.jiangpengyong.sample.f_geometry.SpringActivity"
@@ -152,6 +152,9 @@
 
         <activity
             android:name="com.jiangpengyong.sample.h_blend.BlendMainActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.h_blend.BlendActivity"
             android:screenOrientation="landscape" />
 
         <activity

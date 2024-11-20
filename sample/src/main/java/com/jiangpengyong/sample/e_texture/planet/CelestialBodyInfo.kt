@@ -1,8 +1,8 @@
 package com.jiangpengyong.sample.e_texture.planet
 
 import android.graphics.BitmapFactory
-import android.util.Log
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.sample.App
@@ -45,7 +45,7 @@ data class CelestialBodyInfo(
     val matrix = ModelMatrix()
     val texture = GLTexture()
 
-    var position = originalPosition
+    var position = originalPoint
         private set
 
     // 公转
@@ -74,7 +74,7 @@ data class CelestialBodyInfo(
     }
 
     fun updatePosition(matrix: GLMatrix) {
-        position = matrix * originalPosition
+        position = matrix * originalPoint
     }
 
     private fun updateMatrix() {
@@ -89,6 +89,6 @@ data class CelestialBodyInfo(
     }
 
     companion object {
-        private val originalPosition = floatArrayOf(0F, 0F, 0F)
+        private val originalPoint = Point(0F, 0F, 0F)
     }
 }

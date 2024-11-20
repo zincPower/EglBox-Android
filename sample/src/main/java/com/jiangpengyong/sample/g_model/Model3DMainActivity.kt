@@ -69,7 +69,7 @@ class Model3DMainActivity : AppCompatActivity() {
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
             glPreviewView.setBlank()
-            filterId = glPreviewView.addFilter(PreviewProcessor.FilterType.Process, Model3DFilter.TAG, 0)
+            filterId = glPreviewView.addFilter(Model3DFilter.TAG)
             loadModel()
         }
 

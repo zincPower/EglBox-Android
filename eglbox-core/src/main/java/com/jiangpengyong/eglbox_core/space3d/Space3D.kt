@@ -21,7 +21,7 @@ class Space3D {
             field = value
             updateGestureMatrix()
         }
-    var scale = Scale(scaleX = 1F, scaleY = 1F)
+    var scale = Scale(scaleX = 1F, scaleY = 1F, scaleZ = 1F)
     val gestureMatrix = ModelMatrix()
 
     // ===================================================================================================
@@ -150,10 +150,14 @@ data class Projection(
 data class Rotation(val angleX: Float, val angleY: Float, val angleZ: Float)
 
 // 缩放
-data class Scale(val scaleX: Float, val scaleY: Float)
+data class Scale(val scaleX: Float, val scaleY: Float, val scaleZ: Float)
 
 // 点
-data class Point(val x: Float, val y: Float, val z: Float)
+data class Point(val x: Float, val y: Float, val z: Float) {
+    fun toFloatArray(): FloatArray {
+        return floatArrayOf(x, y, z)
+    }
+}
 
 // 向量
 data class Vector(val x: Float, val y: Float, val z: Float)

@@ -2,6 +2,7 @@ package com.jiangpengyong.eglbox_core.utils
 
 import android.opengl.Matrix
 import android.util.Log
+import com.jiangpengyong.eglbox_core.space3d.Point
 import java.nio.FloatBuffer
 
 // 矩阵长度
@@ -371,16 +372,11 @@ open class GLMatrix {
      * 四维矩阵 与 长度为 4 的列向量相乘
      * @param other 为 3 维的列向量
      */
-    operator fun times(other: FloatArray): FloatArray {
-        if (other.size != 3) {
-            Log.e(TAG, "The parameter requires an array of length three.")
-            return floatArrayOf(0F, 0F, 0F)
-        }
-
-        val vector = floatArrayOf(other[0], other[1], other[2], 1F)
+    operator fun times(other: Point): Point {
+        val vector = floatArrayOf(other.x, other.y, other.z, 1F)
         val resultVector = FloatArray(4) // 存储结果的数组
         Matrix.multiplyMV(resultVector, 0, matrix, 0, vector, 0)
-        return resultVector
+        return Point(resultVector[0], resultVector[1], resultVector[2])
     }
 
     companion object {

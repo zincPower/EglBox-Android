@@ -10,6 +10,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -23,8 +24,8 @@ import java.nio.FloatBuffer
  * @des 3D 模型滤镜，支持顶点、法向量、纹理
  */
 class Model3DFilter : GLFilter() {
-    private val mVertProgram = Model3DProgram(true)
-    private val mFragProgram = Model3DProgram(false)
+    private val mVertProgram = Model3DProgram(CalculateLightingType.Vertex)
+    private val mFragProgram = Model3DProgram(CalculateLightingType.Fragment)
 
     private var mModel3DInfo: Model3DInfo? = null
     private var mTexture: GLTexture? = null
@@ -64,8 +65,8 @@ class Model3DFilter : GLFilter() {
             GLES20.glFrontFace(model3DInfo.frontFace.value)
 
             val program = if (mIsVertexCalculateLighting) mVertProgram else mFragProgram
-            program.setLightPosition(context.space3D.lightPoint.let { floatArrayOf(it.x, it.y, it.z) })
-            program.setCameraPosition(context.space3D.viewPoint.let { floatArrayOf(it.x, it.y, it.z) })
+            program.setLightPoint(context.space3D.lightPoint)
+            program.setViewPoint(context.space3D.viewPoint)
             program.setData(
                 vertexBuffer = vertexBuffer,
                 textureBuffer = textureBuffer,
@@ -74,7 +75,7 @@ class Model3DFilter : GLFilter() {
             )
             program.setTexture(mTexture)
             program.setMVPMatrix(mvpMatrix)
-            program.setMMatrix(modelMatrix)
+            program.setModelMatrix(modelMatrix)
             program.setSideRendering(mModel3DInfo?.sideRenderingType ?: SideRenderingType.Single)
             program.draw()
 
@@ -141,7 +142,7 @@ class Model3DFilter : GLFilter() {
  * @email 56002982@qq.com
  * @des 模型 3D，支持顶点、法向量、纹理
  */
-class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
+class Model3DProgram(private val calculateLightingType: CalculateLightingType = CalculateLightingType.Vertex) : GLProgram() {
     private var mVertexBuffer: FloatBuffer? = null
     private var mTextureBuffer: FloatBuffer? = null
     private var mNormalBuffer: FloatBuffer? = null
@@ -162,10 +163,10 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
     private var mIsDoubleSideRenderingHandle = 0
 
     private var mMVPMatrix: GLMatrix = GLMatrix()
-    private var mMMatrix: GLMatrix = GLMatrix()
+    private var mModelMatrix: GLMatrix = GLMatrix()
 
-    private var mLightPosition = floatArrayOf(0F, 0F, 5F)
-    private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
+    private var mLightPoint = Point(0F, 0F, 5F)
+    private var mViewPoint = Point(0F, 0F, 10F)
     private var mShininess = 50F
     private var mTexture: GLTexture? = null
 
@@ -182,16 +183,16 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
         mMVPMatrix = matrix
     }
 
-    fun setMMatrix(matrix: GLMatrix) {
-        mMMatrix = matrix
+    fun setModelMatrix(matrix: GLMatrix) {
+        mModelMatrix = matrix
     }
 
-    fun setLightPosition(lightPosition: FloatArray) {
-        mLightPosition = lightPosition
+    fun setLightPoint(lightPoint: Point) {
+        mLightPoint = lightPoint
     }
 
-    fun setCameraPosition(cameraPosition: FloatArray) {
-        mCameraPosition = cameraPosition
+    fun setViewPoint(viewPoint: Point) {
+        mViewPoint = viewPoint
     }
 
     fun setShininess(shininess: Float) {
@@ -252,13 +253,13 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
 
         // 模型矩阵
-        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
+        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mModelMatrix.matrix, 0)
 
         // 光源位置
-        GLES20.glUniform3f(mLightPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
+        GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
 
         // 相机位置（观察位置）
-        GLES20.glUniform3f(mCameraPositionHandle, mCameraPosition[0], mCameraPosition[1], mCameraPosition[2])
+        GLES20.glUniform3f(mCameraPositionHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
 
         // 光效控制
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
@@ -313,13 +314,24 @@ class Model3DProgram(val isVertexCalculateLighting: Boolean) : GLProgram() {
 
     override fun getVertexShaderSource(): String = loadFromAssetsFile(
         EglBoxRuntime.context.resources,
-        if (isVertexCalculateLighting) "glsl/model/vert/vertex.glsl" else "glsl/model/frag/vertex.glsl",
+        when (calculateLightingType) {
+            CalculateLightingType.Vertex -> "glsl/model/vert/vertex.glsl"
+            CalculateLightingType.Fragment -> "glsl/model/frag/vertex.glsl"
+        },
     )
 
     override fun getFragmentShaderSource(): String = loadFromAssetsFile(
         EglBoxRuntime.context.resources,
-        if (isVertexCalculateLighting) "glsl/model/vert/fragment.glsl" else "glsl/model/frag/fragment.glsl",
+        when (calculateLightingType) {
+            CalculateLightingType.Vertex -> "glsl/model/vert/fragment.glsl"
+            CalculateLightingType.Fragment -> "glsl/model/frag/fragment.glsl"
+        },
     )
+}
+
+enum class CalculateLightingType {
+    Vertex,
+    Fragment,
 }
 
 enum class Model3DMessageType(val value: Int) {

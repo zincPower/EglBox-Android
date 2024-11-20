@@ -7,6 +7,7 @@ import com.jiangpengyong.eglbox_core.egl.EGL
 import com.jiangpengyong.eglbox_core.egl.EglSurface
 import com.jiangpengyong.eglbox_core.egl.PBufferSurface
 import com.jiangpengyong.eglbox_core.egl.WindowSurface
+import com.jiangpengyong.eglbox_core.engine.GLHandler
 import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLCachePool
@@ -67,13 +68,13 @@ class FilterContext(val renderType: RenderType) {
     var surface: EglSurface? = null
         private set
 
-    var eglHandler: Handler? = null
+    var glHandler: GLHandler? = null
         private set
 
-    fun init(egl: EGL, surface: EglSurface, eglHandler: Handler, listener: MessageListener) {
+    fun init(egl: EGL, surface: EglSurface, glHandler: GLHandler, listener: MessageListener) {
         this.egl = egl
         this.surface = surface
-        this.eglHandler = eglHandler
+        this.glHandler = glHandler
         mListener = listener
         texture2DProgram.init()
     }
@@ -86,6 +87,14 @@ class FilterContext(val renderType: RenderType) {
         contextData.clear()
         texture2DProgram.release()
         this.egl = null
+    }
+
+    /**
+     * 进行绘制请求，会重新压一次任务进入
+     * TODO 可以优化，去除过多的绘制请求
+     */
+    fun requestRender() {
+        glHandler?.sendRequestRenderMessage()
     }
 
     fun recycle(fbo: GLFrameBuffer) {

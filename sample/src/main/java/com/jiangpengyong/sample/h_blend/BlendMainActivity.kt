@@ -1,7 +1,10 @@
 package com.jiangpengyong.sample.h_blend
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox_sample.R
 
 /**
  * @author jiang peng yong
@@ -10,10 +13,12 @@ import androidx.appcompat.app.AppCompatActivity
  * @des 混合模式首页
  */
 class BlendMainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_blend_main)
 
+        findViewById<TextView>(R.id.blend).setOnClickListener {
+            startActivity(Intent(this, BlendActivity::class.java))
+        }
     }
-
 }

@@ -21,7 +21,7 @@ import com.jiangpengyong.sample.f_geometry.geometry.shape.Torus
  * @email 56002982@qq.com
  * @des 圆环
  */
-class TorusFilter(
+class RingFilter(
     majorRadius: Float = 0.7F,
     minorRadius: Float = 0.3F,
     majorSegment: Int = 72,

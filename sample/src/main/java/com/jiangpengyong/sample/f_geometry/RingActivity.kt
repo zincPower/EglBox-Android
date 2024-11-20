@@ -22,7 +22,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.f_geometry.geometry.filter.TorusFilter
+import com.jiangpengyong.sample.f_geometry.geometry.filter.RingFilter
 import java.io.File
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -33,7 +33,7 @@ import javax.microedition.khronos.opengles.GL10
  * @email 56002982@qq.com
  * @des 圆环
  */
-class TorusActivity : AppCompatActivity() {
+class RingActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -183,8 +183,8 @@ class TorusActivity : AppCompatActivity() {
         }
 
         private class Renderer : GLSurfaceView.Renderer {
-            private val mFilterId = "TorusFilter"
-            private val mFilter = TorusFilter(
+            private val mFilterId = "RingFilter"
+            private val mFilter = RingFilter(
                 majorSegment = 120,
                 minorSegment = 60,
             ).apply { id = mFilterId }
