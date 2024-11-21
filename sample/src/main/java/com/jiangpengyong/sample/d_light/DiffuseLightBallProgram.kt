@@ -2,6 +2,7 @@ package com.jiangpengyong.sample.d_light
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
@@ -41,7 +42,7 @@ class DiffuseLightBallProgram : GLProgram() {
     private var mMMatrix: GLMatrix = GLMatrix()
     private var mDrawMode: DrawMode = DrawMode.Face
 
-    private var mLightPosition = FloatArray(3)
+    private var mLightPoint = Point(0F, 0F, 0F)
 
     init {
         calculateVertex()
@@ -55,8 +56,8 @@ class DiffuseLightBallProgram : GLProgram() {
         mMMatrix = matrix
     }
 
-    fun setLightPosition(lightPosition: FloatArray) {
-        mLightPosition = lightPosition
+    fun setLightPoint(lightPoint: Point) {
+        mLightPoint = lightPoint
     }
 
     fun setDrawMode(mode: DrawMode) {
@@ -80,7 +81,7 @@ class DiffuseLightBallProgram : GLProgram() {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         // 模型矩阵
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
-        GLES20.glUniform3f(mLightPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
+        GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         // 法向量
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)

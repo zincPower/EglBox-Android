@@ -2,6 +2,7 @@ package com.jiangpengyong.sample.d_light
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
@@ -45,8 +46,8 @@ class LightSourceTypeBallProgram : GLProgram() {
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mMMatrix: GLMatrix = GLMatrix()
 
-    private var mLightPosition = FloatArray(3)
-    private var mCameraPosition = FloatArray(3)
+    private var mLightPoint = Point(0F, 0F, 0F)
+    private var mViewPoint = Point(0F, 0F, 0F)
     private var mShininess = 50F
 
     private var mIsAddAmbientLight = true
@@ -67,12 +68,12 @@ class LightSourceTypeBallProgram : GLProgram() {
         mMMatrix = matrix
     }
 
-    fun setLightPosition(lightPosition: FloatArray) {
-        mLightPosition = lightPosition
+    fun setLightPoint(lightPoint: Point) {
+        mLightPoint = lightPoint
     }
 
-    fun setCameraPosition(cameraPosition: FloatArray) {
-        mCameraPosition = cameraPosition
+    fun setViewPoint(viewPoint: Point) {
+        mViewPoint = viewPoint
     }
 
     fun setShininess(shininess: Float) {
@@ -119,9 +120,9 @@ class LightSourceTypeBallProgram : GLProgram() {
         // 模型矩阵
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
         // 光源位置
-        GLES20.glUniform3f(mLightPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
+        GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         // 相机位置（观察位置）
-        GLES20.glUniform3f(mCameraPositionHandle, mCameraPosition[0], mCameraPosition[1], mCameraPosition[2])
+        GLES20.glUniform3f(mCameraPositionHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
         GLES20.glUniform1i(mIsAddDiffuseLightHandle, if (mIsAddDiffuseLight) 1 else 0)

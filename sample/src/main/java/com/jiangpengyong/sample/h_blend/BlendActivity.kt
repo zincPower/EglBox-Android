@@ -26,6 +26,8 @@ class BlendActivity : AppCompatActivity() {
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
             glPreviewView.setBlank()
+            glPreviewView.setLightPoint(0F, 10F, 10F)
+            glPreviewView.setViewpoint(0F, 10F, 10F)
             filterId = glPreviewView.addFilter(BlendFilter.TAG)
             glPreviewView.requestRender()
         }

@@ -9,11 +9,10 @@ import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLTexture
-import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.space3d.Scale
-import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.sample.d_light.NormalTypeCubeProgram
 import com.jiangpengyong.sample.e_texture.planet.RingProgram
 import com.jiangpengyong.sample.g_model.Model3DInfo
 import com.jiangpengyong.sample.g_model.Model3DProgram
@@ -83,9 +82,13 @@ private class BlendSceneFilter : GLFilter() {
     private val mRingTexture = GLTexture()
     private val mRingModelMatrix = ModelMatrix()
 
+    private val mTableProgram = NormalTypeCubeProgram()
+    private val mTableModelMatrix = ModelMatrix()
+
     override fun onInit(context: FilterContext) {
         model3DProgram.init()
         mRingProgram.init()
+        mTableProgram.init()
 
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
             mRingTexture.init()
@@ -100,7 +103,7 @@ private class BlendSceneFilter : GLFilter() {
                 val x = model3DInfo.space.right - model3DInfo.space.left
                 val y = model3DInfo.space.top - model3DInfo.space.bottom
                 val z = model3DInfo.space.far - model3DInfo.space.near
-                val max = Math.max(Math.max(x, y), z) / 4
+                val max = Math.max(Math.max(x, y), z) / 2
                 mFilmScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
         BitmapFactory.decodeFile(File(App.context.filesDir, "model/film/film.jpg").absolutePath).let { bitmap ->
@@ -116,7 +119,7 @@ private class BlendSceneFilter : GLFilter() {
                 val x = model3DInfo.space.right - model3DInfo.space.left
                 val y = model3DInfo.space.top - model3DInfo.space.bottom
                 val z = model3DInfo.space.far - model3DInfo.space.near
-                val max = Math.max(Math.max(x, y), z) / 4
+                val max = Math.max(Math.max(x, y), z) / 5
                 mTeapotScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
         BitmapFactory.decodeFile(File(App.context.filesDir, "model/teapot/all/teapot.png").absolutePath).let { bitmap ->
@@ -135,8 +138,8 @@ private class BlendSceneFilter : GLFilter() {
         val viewPoint = space3D.viewPoint
 
         mRingModelMatrix.reset()
-        mRingModelMatrix.translate(0F,0.5F,-2F)
-        val modelMatrix = gestureMatrix*mRingModelMatrix
+        mRingModelMatrix.translate(0F, 0.5F, -2F)
+        val modelMatrix = gestureMatrix * mRingModelMatrix
         mRingProgram.setModelMatrix(modelMatrix)
         mRingProgram.setMVPMatrix(vpMatrix * modelMatrix)
         mRingProgram.setLightPoint(lightPoint)
@@ -184,11 +187,23 @@ private class BlendSceneFilter : GLFilter() {
             model3DProgram.draw()
         }
 
+        mTableModelMatrix.reset()
+        mTableModelMatrix.scale(13F, 0.25F, 7F)
+        mTableModelMatrix.translate(0F, -0.125F, 0F)
+        val tempModelMatrix = gestureMatrix * mTableModelMatrix
+        mTableProgram.setModelMatrix(tempModelMatrix)
+        mTableProgram.setLightPoint(lightPoint)
+        mTableProgram.setViewPoint(viewPoint)
+        mTableProgram.setMVPMatrix(vpMatrix * tempModelMatrix)
+        mTableProgram.draw()
     }
 
     override fun onRelease(context: FilterContext) {
         model3DProgram.release()
         mRingProgram.release()
+        mTableProgram.release()
+        mTeapotTexture.release()
+        mFilmTexture.release()
         mRingTexture.release()
     }
 

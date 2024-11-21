@@ -20,6 +20,7 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
@@ -312,8 +313,8 @@ class LightCalculateTypeActivity : AppCompatActivity() {
 
         private var mPreviewSize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
-        private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
+        private var mLightPoint = Point(0F, 0F, 5F)
+        private var mViewPoint = Point(0F, 0F, 10F)
 
         private var mLightCalculateType = LightCalculateTypeBallProgram.LightCalculateType.Vertex
 
@@ -322,7 +323,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
             mPhongProgram.init()
             mLightPointProgram.init()
             mViewMatrix.setLookAtM(
-                mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
+                mViewPoint.x, mViewPoint.y, mViewPoint.z,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -337,8 +338,8 @@ class LightCalculateTypeActivity : AppCompatActivity() {
                 LightCalculateTypeBallProgram.LightCalculateType.Fragment -> mPhongProgram
             }
             synchronized(this) {
-                program.setLightPosition(mLightPosition)
-                program.setCameraPosition(mCameraPosition)
+                program.setLightPoint(mLightPoint)
+                program.setViewPoint(mViewPoint)
 
 //                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mLeftModelMatrix)
 //                mProgram.setMMatrix(mRotateMatrix * mLeftModelMatrix)
@@ -349,7 +350,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
                 program.draw()
 
                 mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
-                mLightPointProgram.setLightPosition(mLightPosition)
+                mLightPointProgram.setLightPoint(mLightPoint)
                 mLightPointProgram.draw()
             }
         }
@@ -398,23 +399,23 @@ class LightCalculateTypeActivity : AppCompatActivity() {
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[0] = it
-                        mGouraudProgram.setLightPosition(mLightPosition)
-                        mPhongProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(x = it)
+                        mGouraudProgram.setLightPoint(mLightPoint)
+                        mPhongProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[1] = it
-                        mGouraudProgram.setLightPosition(mLightPosition)
-                        mPhongProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(y = it)
+                        mGouraudProgram.setLightPoint(mLightPoint)
+                        mPhongProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[2] = it
-                        mGouraudProgram.setLightPosition(mLightPosition)
-                        mPhongProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(z = it)
+                        mGouraudProgram.setLightPoint(mLightPoint)
+                        mPhongProgram.setLightPoint(mLightPoint)
                     }
 
                 updateData.getFloat("shininess", -10000F)

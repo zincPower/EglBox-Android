@@ -20,6 +20,7 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
@@ -272,14 +273,14 @@ class NormalTypeActivity : AppCompatActivity() {
 
         private var mPreviewSize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
-        private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
+        private var mLightPoint = Point(0F, 0F, 5F)
+        private var mViewPoint = Point(0F, 0F, 10F)
 
         override fun onInit(context: FilterContext) {
             mProgram.init()
             mLightPointProgram.init()
             mViewMatrix.setLookAtM(
-                mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
+                mViewPoint.x, mViewPoint.y, mViewPoint.z,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -290,19 +291,19 @@ class NormalTypeActivity : AppCompatActivity() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
             synchronized(this) {
-                mProgram.setLightPosition(mLightPosition)
-                mProgram.setCameraPosition(mCameraPosition)
+                mProgram.setLightPoint(mLightPoint)
+                mProgram.setViewPoint(mViewPoint)
 
                 mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mLeftModelMatrix)
-                mProgram.setMMatrix(mRotateMatrix * mLeftModelMatrix)
+                mProgram.setModelMatrix(mRotateMatrix * mLeftModelMatrix)
                 mProgram.draw()
 
                 mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
-                mProgram.setMMatrix(mRotateMatrix * mRightModelMatrix)
+                mProgram.setModelMatrix(mRotateMatrix * mRightModelMatrix)
                 mProgram.draw()
 
                 mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
-                mLightPointProgram.setLightPosition(mLightPosition)
+                mLightPointProgram.setLightPoint(mLightPoint)
                 mLightPointProgram.draw()
             }
         }
@@ -344,20 +345,20 @@ class NormalTypeActivity : AppCompatActivity() {
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[0] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(x = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[1] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(y = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[2] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(z = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
 
                 updateData.getFloat("shininess", -10000F)

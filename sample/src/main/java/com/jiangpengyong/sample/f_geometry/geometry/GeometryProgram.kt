@@ -5,11 +5,8 @@ import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
-import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.d_light.NormalTypeCubeProgram.NormalType
 import java.nio.FloatBuffer
-import javax.microedition.khronos.opengles.GL
 
 /**
  * @author jiang peng yong

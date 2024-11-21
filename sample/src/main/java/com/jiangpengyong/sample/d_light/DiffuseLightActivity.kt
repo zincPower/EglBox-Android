@@ -19,6 +19,7 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
@@ -251,7 +252,7 @@ class DiffuseLightActivity : AppCompatActivity() {
 
         private var mPreviewSize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
+        private var mLightPoint = Point(0F, 0F, 5F)
 
         override fun onInit(context: FilterContext) {
             mProgram.init()
@@ -270,12 +271,12 @@ class DiffuseLightActivity : AppCompatActivity() {
             synchronized(this) {
                 mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
                 mProgram.setMMatrix(mModelMatrix)
-                mProgram.setLightPosition(mLightPosition)
+                mProgram.setLightPoint(mLightPoint)
                 mProgram.draw()
 
                 // 模型矩阵为单位矩阵，不用进行
                 mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
-                mLightPointProgram.setLightPosition(mLightPosition)
+                mLightPointProgram.setLightPoint(mLightPoint)
                 mLightPointProgram.draw()
             }
         }
@@ -331,20 +332,20 @@ class DiffuseLightActivity : AppCompatActivity() {
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[0] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(x = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[1] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(y = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[2] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(z = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
             }
         }

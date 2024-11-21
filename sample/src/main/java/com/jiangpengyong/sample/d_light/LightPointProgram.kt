@@ -2,6 +2,7 @@ package com.jiangpengyong.sample.d_light
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 
 class LightPointProgram : GLProgram() {
@@ -9,14 +10,14 @@ class LightPointProgram : GLProgram() {
     private var mPositionHandle = 0
 
     private var mMatrix: GLMatrix = GLMatrix()
-    private var mLightPosition = floatArrayOf(0F, 0F, 0F)
+    private var mLightPoint = Point(0F, 0F, 0F)
 
     fun setMatrix(matrix: GLMatrix) {
         mMatrix = matrix
     }
 
-    fun setLightPosition(lightPosition: FloatArray) {
-        mLightPosition = lightPosition
+    fun setLightPoint(lightPoint: Point) {
+        mLightPoint = lightPoint
     }
 
     override fun onInit() {
@@ -26,7 +27,7 @@ class LightPointProgram : GLProgram() {
 
     override fun onDraw() {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMatrix.matrix, 0)
-        GLES20.glVertexAttrib3f(mPositionHandle, mLightPosition[0], mLightPosition[1], mLightPosition[2])
+        GLES20.glVertexAttrib3f(mPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 1)
     }
 

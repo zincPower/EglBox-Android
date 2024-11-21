@@ -8,11 +8,4 @@
         style="@style/common_button"
         android:text="混合" />
 
-
-    <com.jiangpengyong.eglbox_core.view.GLPreviewView
-        android:id="@+id/gl_preview_view"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
-
-
 </com.jiangpengyong.sample.widget.FlowLayout>
