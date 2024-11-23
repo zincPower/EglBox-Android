@@ -11,9 +11,9 @@ import com.jiangpengyong.eglbox_sample.R
  * @author jiang peng yong
  * @date 2024/11/19 08:15
  * @email 56002982@qq.com
- * @des 混合
+ * @des 带透明狙击镜混合
  */
-class BlendActivity : AppCompatActivity() {
+class AlphaSniperScopeActivity : AppCompatActivity() {
 
     private lateinit var glPreviewView: GLPreviewView
     private var filterId: String? = null
@@ -22,7 +22,7 @@ class BlendActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_blend)
 
-        FilterCenter.registerFilter(BlendFilter.TAG, BlendFilter::class.java)
+        FilterCenter.registerFilter(AlphaSniperScopeFilter.TAG, AlphaSniperScopeFilter::class.java)
 
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
@@ -30,7 +30,7 @@ class BlendActivity : AppCompatActivity() {
             glPreviewView.setLightPoint(0F, 15F, 40F)
             glPreviewView.setViewpoint(0F, 15F, 40F)
             glPreviewView.setProjection(ProjectionType.Perspective, 10F, 1000F, 1F)
-            filterId = glPreviewView.addFilter(BlendFilter.TAG)
+            filterId = glPreviewView.addFilter(AlphaSniperScopeFilter.TAG)
             glPreviewView.requestRender()
         }
     }

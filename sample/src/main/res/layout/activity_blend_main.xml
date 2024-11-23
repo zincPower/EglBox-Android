@@ -4,8 +4,13 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/blend"
+        android:id="@+id/blend_no_alpha"
         style="@style/common_button"
-        android:text="混合" />
+        android:text="狙击镜混合（无透明）" />
+
+    <TextView
+        android:id="@+id/blend_alpha"
+        style="@style/common_button"
+        android:text="狙击镜混合（有透明）" />
 
 </com.jiangpengyong.sample.widget.FlowLayout>

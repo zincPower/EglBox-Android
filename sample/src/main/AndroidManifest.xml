@@ -154,7 +154,10 @@
             android:name="com.jiangpengyong.sample.h_blend.BlendMainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.h_blend.BlendActivity"
+            android:name="com.jiangpengyong.sample.h_blend.SniperScopeActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.h_blend.AlphaSniperScopeActivity"
             android:screenOrientation="landscape" />
 
         <activity

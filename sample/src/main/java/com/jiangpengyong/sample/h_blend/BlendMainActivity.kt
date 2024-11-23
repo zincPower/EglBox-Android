@@ -17,8 +17,12 @@ class BlendMainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_blend_main)
 
-        findViewById<TextView>(R.id.blend).setOnClickListener {
-            startActivity(Intent(this, BlendActivity::class.java))
+        findViewById<TextView>(R.id.blend_no_alpha).setOnClickListener {
+            startActivity(Intent(this, SniperScopeActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.blend_alpha).setOnClickListener {
+            startActivity(Intent(this, AlphaSniperScopeActivity::class.java))
         }
     }
 }
