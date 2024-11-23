@@ -2,22 +2,35 @@ package com.jiangpengyong.sample.h_blend
 
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
+import android.opengl.Matrix
 import android.os.Bundle
 import android.os.Message
+import android.util.Log
+import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.gles.Target
+import com.jiangpengyong.eglbox_core.program.ScaleAlgorithm
+import com.jiangpengyong.eglbox_core.program.ScaleType
+import com.jiangpengyong.eglbox_core.program.Texture2DProgram
+import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.space3d.Scale
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
+import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.NormalTypeCubeProgram
 import com.jiangpengyong.sample.e_texture.planet.RingProgram
 import com.jiangpengyong.sample.g_model.Model3DInfo
 import com.jiangpengyong.sample.g_model.Model3DProgram
 import com.jiangpengyong.sample.g_model.Obj3DModelLoader
+import com.jiangpengyong.sample.utils.toRadians
 import java.io.File
+import javax.microedition.khronos.opengles.GL
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * @author jiang peng yong
@@ -28,8 +41,18 @@ import java.io.File
 class BlendFilter : GLFilter() {
     private val mSceneFilter = BlendSceneFilter()
 
+    private val mTexture2DProgram = Texture2DProgram(target = Target.TEXTURE_2D)
+    private val mSniperScopeTexture = GLTexture()
+    private val mSniperScopeMatrix = ModelMatrix()
+
     override fun onInit(context: FilterContext) {
         mContext?.let { mSceneFilter.init(it) }
+        mTexture2DProgram.init()
+        BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/sniper_scope_1.png").absolutePath).let { bitmap ->
+            mSniperScopeTexture.init()
+            mSniperScopeTexture.setData(bitmap)
+            bitmap.recycle()
+        }
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
@@ -38,15 +61,37 @@ class BlendFilter : GLFilter() {
         fbo.use {
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
             GLES20.glEnable(GLES20.GL_CULL_FACE)
+
             mSceneFilter.draw(imageInOut)
-            GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+
             GLES20.glDisable(GLES20.GL_CULL_FACE)
+            GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+
+            GLES20.glEnable(GLES20.GL_BLEND)
+            GLES20.glBlendFunc(GLES20.GL_SRC_COLOR, GLES20.GL_ONE_MINUS_SRC_COLOR)
+
+            val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
+                ScaleType.CENTER_INSIDE,
+                Size(mSniperScopeTexture.width, mSniperScopeTexture.height),
+                Size(imageInOut.texture?.width ?: 0, imageInOut.texture?.height ?: 0),
+            )
+            Log.i(TAG, "scaleX=${scaleX} scaleY=${scaleY}")
+            mSniperScopeMatrix.reset()
+            mSniperScopeMatrix.scale(0.3F, 0.3F, 1F)
+            mSniperScopeMatrix.scale(scaleX, scaleY, 1F)
+            mTexture2DProgram.setVertexMatrix(mSniperScopeMatrix.matrix)
+            mTexture2DProgram.setTexture(mSniperScopeTexture)
+            mTexture2DProgram.draw()
+
+            GLES20.glDisable(GLES20.GL_BLEND)
         }
         imageInOut.out(fbo)
     }
 
     override fun onRelease(context: FilterContext) {
         mSceneFilter.release()
+        mTexture2DProgram.release()
+        mSniperScopeTexture.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}
@@ -84,6 +129,8 @@ private class BlendSceneFilter : GLFilter() {
 
     private val mTableProgram = NormalTypeCubeProgram()
     private val mTableModelMatrix = ModelMatrix()
+
+    private val mViewMatrix = ViewMatrix()
 
     override fun onInit(context: FilterContext) {
         model3DProgram.init()
@@ -132,16 +179,29 @@ private class BlendSceneFilter : GLFilter() {
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val space3D = context.space3D
-        val gestureMatrix = space3D.gestureMatrix
-        val vpMatrix = space3D.projectionMatrix * space3D.viewMatrix
         val lightPoint = space3D.lightPoint
+        val centerPoint = space3D.centerPoint
         val viewPoint = space3D.viewPoint
+
+        val radius = Math.sqrt((viewPoint.z - centerPoint.z) * (viewPoint.z - centerPoint.z) + (viewPoint.x - centerPoint.x) * (viewPoint.x - centerPoint.x).toDouble())
+        val angle = space3D.rotation.angleX
+        val x = viewPoint.x + sin(angle.toRadians()) * radius
+        val z = viewPoint.z - cos(angle.toRadians()) * radius
+
+        Log.i(TAG, "rotation ${space3D.rotation} viewPoint=${viewPoint} centerPoint=${x},${centerPoint.y},${z} upVector=${space3D.upVector}")
+        mViewMatrix.reset()
+        mViewMatrix.setLookAtM(
+            eyeX = viewPoint.x, eyeY = viewPoint.y, eyeZ = viewPoint.z,
+            centerX = x.toFloat(), centerY = centerPoint.y, centerZ = z.toFloat(),
+            upx = space3D.upVector.x, upy = space3D.upVector.y, upz = space3D.upVector.z,
+        )
+
+        val vpMatrix = space3D.projectionMatrix * mViewMatrix
 
         mRingModelMatrix.reset()
         mRingModelMatrix.translate(0F, 0.5F, -2F)
-        val modelMatrix = gestureMatrix * mRingModelMatrix
-        mRingProgram.setModelMatrix(modelMatrix)
-        mRingProgram.setMVPMatrix(vpMatrix * modelMatrix)
+        mRingProgram.setModelMatrix(mRingModelMatrix)
+        mRingProgram.setMVPMatrix(vpMatrix * mRingModelMatrix)
         mRingProgram.setLightPoint(lightPoint)
         mRingProgram.setViewPoint(viewPoint)
         mRingProgram.setTexture(mRingTexture)
@@ -152,9 +212,8 @@ private class BlendSceneFilter : GLFilter() {
             mFilmModelMatrix.translate(3.5F, 0F, 2F)
             mFilmModelMatrix.scale(mFilmScaleInfo.scaleX, mFilmScaleInfo.scaleY, mFilmScaleInfo.scaleZ)
             mFilmModelMatrix.rotate(-90F, 1F, 0F, 0F)
-            val modelMatrix = gestureMatrix * mFilmModelMatrix
-            model3DProgram.setModelMatrix(modelMatrix)
-            model3DProgram.setMVPMatrix(vpMatrix * modelMatrix)
+            model3DProgram.setModelMatrix(mFilmModelMatrix)
+            model3DProgram.setMVPMatrix(vpMatrix * mFilmModelMatrix)
             model3DProgram.setLightPoint(lightPoint)
             model3DProgram.setViewPoint(viewPoint)
             model3DProgram.setTexture(mFilmTexture)
@@ -172,9 +231,8 @@ private class BlendSceneFilter : GLFilter() {
             mTeapotModelMatrix.reset()
             mTeapotModelMatrix.translate(-5F, 0F, 0F)
             mTeapotModelMatrix.scale(mTeapotScaleInfo.scaleX, mTeapotScaleInfo.scaleY, mTeapotScaleInfo.scaleZ)
-            val modelMatrix = gestureMatrix * mTeapotModelMatrix
-            model3DProgram.setModelMatrix(modelMatrix)
-            model3DProgram.setMVPMatrix(vpMatrix * modelMatrix)
+            model3DProgram.setModelMatrix(mTeapotModelMatrix)
+            model3DProgram.setMVPMatrix(vpMatrix * mTeapotModelMatrix)
             model3DProgram.setLightPoint(lightPoint)
             model3DProgram.setViewPoint(viewPoint)
             model3DProgram.setTexture(mTeapotTexture)
@@ -190,11 +248,10 @@ private class BlendSceneFilter : GLFilter() {
         mTableModelMatrix.reset()
         mTableModelMatrix.scale(13F, 0.25F, 7F)
         mTableModelMatrix.translate(0F, -0.125F, 0F)
-        val tempModelMatrix = gestureMatrix * mTableModelMatrix
-        mTableProgram.setModelMatrix(tempModelMatrix)
+        mTableProgram.setModelMatrix(mTableModelMatrix)
+        mTableProgram.setMVPMatrix(vpMatrix * mTableModelMatrix)
         mTableProgram.setLightPoint(lightPoint)
         mTableProgram.setViewPoint(viewPoint)
-        mTableProgram.setMVPMatrix(vpMatrix * tempModelMatrix)
         mTableProgram.draw()
     }
 

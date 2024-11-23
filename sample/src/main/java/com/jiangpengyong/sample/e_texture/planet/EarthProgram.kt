@@ -46,7 +46,7 @@ class EarthProgram : GLProgram() {
     private lateinit var mTextureBuffer: FloatBuffer
 
     private var mLightPoint = Point(0F,0F,0F)
-    private var mCameraPoint = Point(0F,0F,0F)
+    private var mViewPoint = Point(0F,0F,0F)
     private var mShininess = 50F
 
     private var mDayTexture: GLTexture? = null
@@ -68,8 +68,8 @@ class EarthProgram : GLProgram() {
         mLightPoint = lightPoint
     }
 
-    fun setCameraPoint(cameraPoint: Point) {
-        mCameraPoint = cameraPoint
+    fun setViewPoint(viewPoint: Point) {
+        mViewPoint = viewPoint
     }
 
     fun setShininess(shininess: Float) {
@@ -114,7 +114,7 @@ class EarthProgram : GLProgram() {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
         GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
-        GLES20.glUniform3f(mCameraPositionHandle, mCameraPoint.x, mCameraPoint.y, mCameraPoint.z)
+        GLES20.glUniform3f(mCameraPositionHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)

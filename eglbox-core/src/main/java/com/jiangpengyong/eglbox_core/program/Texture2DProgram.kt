@@ -236,18 +236,18 @@ class Texture2DProgram(val target: Target) : GLProgram() {
 
         val defaultVertexCoordinates = allocateFloatBuffer(
             floatArrayOf(
-                -1.0f, -1.0f,   // 左下
-                -1.0f, 1.0f,    // 左上
-                1.0f, -1.0f,    // 右下
-                1.0f, 1.0f      // 右上
+                -1F, -1F,   // 左下
+                -1F, 1F,    // 左上
+                1F, -1F,    // 右下
+                1F, 1F      // 右上
             )
         )
         val defaultTextureCoordinates = allocateFloatBuffer(
             floatArrayOf(
-                0.0f, 0.0f,     // 左下
-                0.0f, 1.0f,     // 左上
-                1.0f, 0.0f,     // 右下
-                1.0f, 1.0f      // 右上
+                0F, 0F,     // 左下
+                0F, 1F,     // 左上
+                1F, 0F,     // 右下
+                1F, 1F      // 右上
             )
         )
     }

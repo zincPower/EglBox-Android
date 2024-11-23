@@ -25,6 +25,6 @@ void main() {
         color = vec3(1.0);
     }
 
-    vec4 finalColor = vec4(color, 0);
+    vec4 finalColor = vec4(color, 1.0);
     fragColor = finalColor * vAmbientLight + finalColor * vDiffuseLight + finalColor * vSpecularLight;
 }
