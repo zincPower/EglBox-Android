@@ -14,6 +14,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
+import com.jiangpengyong.eglbox_filter.utils.toRadians
 import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin

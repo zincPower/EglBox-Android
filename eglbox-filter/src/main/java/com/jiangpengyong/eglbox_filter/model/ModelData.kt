@@ -10,8 +10,6 @@ data class ModelData(
     val textureStep: Int = 0,              // 纹理跨度
     val normalData: FloatArray?,           // 法向量数据
     val frontFace: FrontFace,              // 卷绕方向
-    val space: Space,                      // 空间
-    val sideRenderingType: SideRenderingType,// 面渲染方式
     val normalVectorType: NormalVectorType,  // 法向量计算方式
 ) {
     /**
@@ -40,12 +38,35 @@ data class ModelData(
 
     val normalBuffer: FloatBuffer?
         get() = normalData?.let { allocateFloatBuffer(it) }
+
+    val space: Space
+        get() {
+            if (count <= 0) return Space(0F, 0F, 0F, 0F, 0F, 0F)
+            var top = Float.MIN_VALUE
+            var bottom = Float.MAX_VALUE
+            var left = Float.MAX_VALUE
+            var right = Float.MIN_VALUE
+            var near = Float.MIN_VALUE
+            var far = Float.MAX_VALUE
+            for (i in 0 until count) {
+                val x = vertexData[i * 3 + 0]
+                val y = vertexData[i * 3 + 1]
+                val z = vertexData[i * 3 + 2]
+                top = Math.max(y, top)
+                bottom = Math.min(y, bottom)
+                left = Math.min(x, left)
+                right = Math.max(x, right)
+                near = Math.max(z, near)
+                far = Math.min(z, far)
+            }
+            return Space(top, bottom, left, right, near, far)
+        }
 }
 
 /**
  * 数据索引方式
  */
-enum class DataIndexType(){
+enum class DataIndexType() {
 
 }
 
@@ -55,14 +76,6 @@ enum class DataIndexType(){
 enum class FrontFace(val value: Int) {
     CW(GLES20.GL_CW),
     CCW(GLES20.GL_CCW),
-}
-
-/**
- * 面渲染方式
- */
-enum class SideRenderingType {
-    Single,     // 单面
-    Double,     // 双面
 }
 
 /**

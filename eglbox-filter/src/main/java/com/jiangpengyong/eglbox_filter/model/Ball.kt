@@ -1,18 +1,17 @@
 package com.jiangpengyong.eglbox_filter.model
 
-import com.jiangpengyong.eglbox_filter.toRadians
+import com.jiangpengyong.eglbox_filter.utils.toRadians
 import kotlin.math.cos
 import kotlin.math.sin
 
 class Ball(
     private val angleSpan: Int = 10,
     private val radius: Float = 1F,
-    private val sideRenderingType: SideRenderingType = SideRenderingType.Single,
-) {
+) : Model() {
     private val vertexList = ArrayList<Float>()
     private var vertexCount = 0
 
-    fun create(): ModelData {
+    override fun onCreate(): ModelData {
         var verticalAngle = -90.0
 
         // 计算中间每一层的点
@@ -153,8 +152,6 @@ class Ball(
             // 因为球体的几何体征，球心在原点，所以各个点法向量和顶点位置刚好一致，不用再次计算
             normalData = vertexList.toFloatArray(),
             frontFace = FrontFace.CCW,
-            space = Space(1F, 1F, 1F, 1F, 1F, 1F),
-            sideRenderingType = sideRenderingType,
             normalVectorType = NormalVectorType.Vertex,
         )
     }

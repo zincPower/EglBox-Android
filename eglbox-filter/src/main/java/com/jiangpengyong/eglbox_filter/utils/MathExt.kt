@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox_filter
+package com.jiangpengyong.eglbox_filter.utils
 
 fun Int.toRadians(): Double {
     return Math.toRadians(this.toDouble())

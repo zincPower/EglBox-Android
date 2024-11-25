@@ -6,14 +6,9 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
-import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
 import com.jiangpengyong.eglbox_filter.model.ModelCreator
 import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.utils.toRadians
-import java.nio.FloatBuffer
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * @author jiang peng yong
@@ -40,7 +35,7 @@ class PlanetProgram : GLProgram() {
     private var mMMatrix: GLMatrix = GLMatrix()
 
     private var mLightPoint = Point(0F, 0F, 0F)
-    private var mCameraPoint = Point(0F, 0F, 0F)
+    private var mViewPoint = Point(0F, 0F, 0F)
     private var mShininess = 50F
 
     private var mTexture: GLTexture? = null
@@ -59,8 +54,8 @@ class PlanetProgram : GLProgram() {
         mLightPoint = lightPoint
     }
 
-    fun setCameraPosition(cameraPoint: Point) {
-        mCameraPoint = cameraPoint
+    fun setViewPoint(viewPoint: Point) {
+        mViewPoint = viewPoint
     }
 
     fun setShininess(shininess: Float) {
@@ -94,7 +89,7 @@ class PlanetProgram : GLProgram() {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
         GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
-        GLES20.glUniform3f(mCameraPositionHandle, mCameraPoint.x, mCameraPoint.y, mCameraPoint.z)
+        GLES20.glUniform3f(mCameraPositionHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.vertexBuffer)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.normalBuffer)

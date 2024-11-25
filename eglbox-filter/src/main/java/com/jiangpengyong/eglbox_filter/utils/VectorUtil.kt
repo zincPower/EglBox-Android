@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.f_geometry.utils
+package com.jiangpengyong.eglbox_filter.utils
 
 import kotlin.math.acos
 import kotlin.math.cos

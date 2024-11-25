@@ -11,9 +11,10 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.sample.f_geometry.geometry.GeometryInfo
+import com.jiangpengyong.eglbox_filter.model.ModelCreator
+import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.sample.f_geometry.geometry.GeometryProgram
-import com.jiangpengyong.sample.f_geometry.geometry.shape.Torus
+import com.jiangpengyong.sample.f_geometry.geometry.DrawMode
 
 /**
  * @author jiang peng yong
@@ -29,11 +30,9 @@ class RingFilter(
 ) : GLFilter() {
     private val mProgram = GeometryProgram()
 
-    private var mTopTexture: GLTexture? = null
-    private var mBottomTexture: GLTexture? = null
-    private var mSideTexture: GLTexture? = null
+    private var mTexture: GLTexture? = null
 
-    private val mTorusInfo: GeometryInfo
+    private val mModelData: ModelData = ModelCreator.createRing(majorRadius, minorRadius, majorSegment, minorSegment)
 
     private val mProjectMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
@@ -46,19 +45,8 @@ class RingFilter(
     private var mLightPosition = floatArrayOf(0F, 0F, 5F)
     private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
-    init {
-        val torus = Torus(majorRadius, minorRadius, majorSegment, minorSegment)
-        mTorusInfo = torus.create()
-    }
-
-    fun setTexture(
-        topTexture: GLTexture,
-        sideTexture: GLTexture,
-        bottomTexture: GLTexture,
-    ) {
-        this.mTopTexture = topTexture
-        this.mSideTexture = sideTexture
-        this.mBottomTexture = bottomTexture
+    fun setTexture(texture: GLTexture) {
+        this.mTexture = texture
     }
 
     override fun onInit(context: FilterContext) {
@@ -96,17 +84,17 @@ class RingFilter(
     }
 
     private fun drawTorus() {
-        mTopTexture?.let { mProgram.setTexture(it) }
+        mTexture?.let { mProgram.setTexture(it) }
         mProgram.setCameraPosition(mCameraPosition)
         mProgram.setLightPosition(mLightPosition)
         mProgram.setData(
-            vertexBuffer = mTorusInfo.vertexBuffer,
-            textureBuffer = mTorusInfo.textureBuffer,
-            normalBuffer = mTorusInfo.normalBuffer,
-            vertexCount = mTorusInfo.vertexCount
+            vertexBuffer = mModelData.vertexBuffer,
+            textureBuffer = mModelData.textureBuffer ?: return,
+            normalBuffer = mModelData.normalBuffer ?: return,
+            vertexCount = mModelData.count
         )
-        GLES20.glFrontFace(mTorusInfo.frontFace.value)
-        mProgram.setDrawMode(mTorusInfo.drawMode)
+        GLES20.glFrontFace(mModelData.frontFace.value)
+        mProgram.setDrawMode(DrawMode.Triangles)
         mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
         mProgram.setMMatrix(mModelMatrix)
         mProgram.draw()

@@ -1,11 +1,7 @@
-package com.jiangpengyong.sample.f_geometry.geometry.shape
+package com.jiangpengyong.eglbox_filter.model
 
-import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
-import com.jiangpengyong.sample.f_geometry.geometry.DrawMode
-import com.jiangpengyong.sample.f_geometry.geometry.FrontFace
-import com.jiangpengyong.sample.f_geometry.geometry.GeometryInfo
-import com.jiangpengyong.sample.f_geometry.utils.VectorUtil
-import com.jiangpengyong.sample.utils.toRadians
+import com.jiangpengyong.eglbox_filter.utils.VectorUtil
+import com.jiangpengyong.eglbox_filter.utils.toRadians
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -15,22 +11,23 @@ import kotlin.math.sin
  * @email 56002982@qq.com
  * @des 圆环
  */
-class Torus(
+class Ring(
     val majorRadius: Float,     // 主半径，圆环中心到圆环切面中心距离
     val minorRadius: Float,     // 子半径，圆环切面半径
     val majorSegment: Int,      // 裁剪主圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
     val minorSegment: Int,      // 裁剪子圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
 ) {
-    private var mGeometryInfo: GeometryInfo? = null
     private val mMajorSpanAngle = 360F / majorSegment
     private val mMinorSpanAngle = 360F / minorSegment
     private val mVertexOrgList = ArrayList<Float>()
     private val mTextureOrgList = ArrayList<Float>()
 
-    fun create(): GeometryInfo {
-        val geometryInfo = mGeometryInfo
-        if (geometryInfo != null) {
-            return geometryInfo
+    private var mModelData: ModelData? = null
+
+    fun create(): ModelData {
+        val modelData = mModelData
+        if (modelData != null) {
+            return modelData
         }
 
         initData()
@@ -51,14 +48,100 @@ class Torus(
             }
         }
 
-        return GeometryInfo(
-            vertexBuffer = allocateFloatBuffer(vertexList.toFloatArray()),
-            textureBuffer = allocateFloatBuffer(textureList.toFloatArray()),
-            normalBuffer = allocateFloatBuffer(normalList.toFloatArray()),
-            vertexCount = vertexList.size / 3,
-            drawMode = DrawMode.Triangles,
+        return ModelData(
+            vertexData = vertexList.toFloatArray(),
+            textureData = textureList.toFloatArray(),
+            textureStep = 2,
+            normalData = normalList.toFloatArray(),
             frontFace = FrontFace.CCW,
-        ).apply { mGeometryInfo = this }
+            normalVectorType = NormalVectorType.Vertex,
+        ).apply { mModelData = this }
+    }
+
+    private fun initData() {
+        var curMajorAngle = 0F
+        while (curMajorAngle < 360F) {
+            val curMajorRadian = curMajorAngle.toRadians().toFloat()
+            calculateVertex(mVertexOrgList, curMajorRadian)
+            calculateTexture(mTextureOrgList, curMajorAngle)
+            curMajorAngle += mMajorSpanAngle
+        }
+        calculateVertex(mVertexOrgList, 0F.toRadians().toFloat())
+        calculateTexture(mTextureOrgList, 360F)
+    }
+
+    private fun calculateVertex(vertexOrgList: ArrayList<Float>, curMajorRadian: Float) {
+        var curMinorAngle = 0F
+        while (curMinorAngle < 360F) {
+            val curMinorRadian = curMinorAngle.toRadians()
+
+            val temp = majorRadius + minorRadius * cos(curMinorRadian)
+
+            val x = temp * cos(curMajorRadian)
+            val y = minorRadius * sin(curMinorRadian)
+            val z = temp * sin(curMajorRadian)
+
+            vertexOrgList.add(x.toFloat())
+            vertexOrgList.add(y.toFloat())
+            vertexOrgList.add(z.toFloat())
+
+            curMinorAngle += mMinorSpanAngle
+        }
+
+        val curMinorRadian = 360F.toRadians()
+        val temp = majorRadius + minorRadius * cos(curMinorRadian)
+        val x = temp * cos(curMajorRadian)
+        val y = minorRadius * sin(curMinorRadian)
+        val z = temp * sin(curMajorRadian)
+        vertexOrgList.add(x.toFloat())
+        vertexOrgList.add(y.toFloat())
+        vertexOrgList.add(z.toFloat())
+    }
+
+    private fun calculateTexture(textureOrgList: ArrayList<Float>, curMajorAngle: Float) {
+        var curMinorAngle = 0F
+        val t = curMajorAngle / 360F
+        while (curMinorAngle < 360F) {
+            val s = curMinorAngle / 360F
+            textureOrgList.add(s)
+            textureOrgList.add(t)
+            curMinorAngle += mMinorSpanAngle
+        }
+
+        val s = 360F / 360F
+        textureOrgList.add(s)
+        textureOrgList.add(t)
+    }
+
+    private fun assembleVertex(
+        vertexList: ArrayList<Float>,
+        curVertexIndex: Int,
+        nextVertexIndex: Int,
+        minorIndex: Int
+    ) {
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 0])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 1])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 2])
+
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 0])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 1])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 2])
+
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 3])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 4])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 5])
+
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 3])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 4])
+        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 5])
+
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 3])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 4])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 5])
+
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 0])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 1])
+        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 2])
     }
 
     private fun assembleTexture(textureList: java.util.ArrayList<Float>, majorIndex: Int, minorIndex: Int) {
@@ -139,94 +222,5 @@ class Torus(
         normalList.add(normalVector2[0])
         normalList.add(normalVector2[1])
         normalList.add(normalVector2[2])
-    }
-
-    private fun assembleVertex(
-        vertexList: ArrayList<Float>,
-        curVertexIndex: Int,
-        nextVertexIndex: Int,
-        minorIndex: Int
-    ) {
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 0])
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 1])
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 2])
-
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 0])
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 1])
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 2])
-
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 3])
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 4])
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 5])
-
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 3])
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 4])
-        vertexList.add(mVertexOrgList[curVertexIndex + minorIndex * 3 + 5])
-
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 3])
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 4])
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 5])
-
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 0])
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 1])
-        vertexList.add(mVertexOrgList[nextVertexIndex + minorIndex * 3 + 2])
-    }
-
-    /**
-     * 初始化点数据
-     */
-    private fun initData() {
-        var curMajorAngle = 0F
-        while (curMajorAngle < 360F) {
-            val curMajorRadian = curMajorAngle.toRadians().toFloat()
-            calculateVertex(mVertexOrgList, curMajorRadian)
-            calculateTexture(mTextureOrgList, curMajorAngle)
-            curMajorAngle += mMajorSpanAngle
-        }
-        calculateVertex(mVertexOrgList, 0F.toRadians().toFloat())
-        calculateTexture(mTextureOrgList, 360F)
-    }
-
-    private fun calculateVertex(vertexOrgList: ArrayList<Float>, curMajorRadian: Float) {
-        var curMinorAngle = 0F
-        while (curMinorAngle < 360F) {
-            val curMinorRadian = curMinorAngle.toRadians()
-
-            val temp = majorRadius + minorRadius * cos(curMinorRadian)
-
-            val x = temp * cos(curMajorRadian)
-            val y = minorRadius * sin(curMinorRadian)
-            val z = temp * sin(curMajorRadian)
-
-            vertexOrgList.add(x.toFloat())
-            vertexOrgList.add(y.toFloat())
-            vertexOrgList.add(z.toFloat())
-
-            curMinorAngle += mMinorSpanAngle
-        }
-
-        val curMinorRadian = 360F.toRadians()
-        val temp = majorRadius + minorRadius * cos(curMinorRadian)
-        val x = temp * cos(curMajorRadian)
-        val y = minorRadius * sin(curMinorRadian)
-        val z = temp * sin(curMajorRadian)
-        vertexOrgList.add(x.toFloat())
-        vertexOrgList.add(y.toFloat())
-        vertexOrgList.add(z.toFloat())
-    }
-
-    private fun calculateTexture(textureOrgList: ArrayList<Float>, curMajorAngle: Float) {
-        var curMinorAngle = 0F
-        val t = curMajorAngle / 360F
-        while (curMinorAngle < 360F) {
-            val s = curMinorAngle / 360F
-            textureOrgList.add(s)
-            textureOrgList.add(t)
-            curMinorAngle += mMinorSpanAngle
-        }
-
-        val s = 360F / 360F
-        textureOrgList.add(s)
-        textureOrgList.add(t)
     }
 }
