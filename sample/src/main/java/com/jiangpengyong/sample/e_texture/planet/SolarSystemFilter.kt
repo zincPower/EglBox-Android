@@ -229,7 +229,6 @@ class SolarSystemFilter : GLFilter() {
                 drawEarth(planetInfo)
                 drawMoon(planetInfo.matrix)
             } else {
-                GLES20.glFrontFace(GLES20.GL_CW)
                 mPlanetProgram.setTexture(planetInfo.texture)
                 mPlanetProgram.setLightPoint(mSunPoint)
                 mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)

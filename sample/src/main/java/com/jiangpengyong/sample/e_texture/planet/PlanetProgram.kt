@@ -7,6 +7,8 @@ import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
+import com.jiangpengyong.eglbox_filter.model.ModelCreator
+import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.utils.toRadians
 import java.nio.FloatBuffer
@@ -34,23 +36,16 @@ class PlanetProgram : GLProgram() {
     private var mTextureHandle = 0
     private var mTextureCoordHandle = 0
 
-    private var mVertexCount = 0
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mMMatrix: GLMatrix = GLMatrix()
 
-    private lateinit var mVertexBuffer: FloatBuffer
-    private lateinit var mNormalBuffer: FloatBuffer
-    private lateinit var mTextureBuffer: FloatBuffer
-
     private var mLightPoint = Point(0F, 0F, 0F)
-    private var mCameraPoint = Point(0F,0F,0F)
+    private var mCameraPoint = Point(0F, 0F, 0F)
     private var mShininess = 50F
 
     private var mTexture: GLTexture? = null
 
-    init {
-        calculateVertex()
-    }
+    private var mModelData: ModelData = ModelCreator.createBall(mAngleSpan, mRadius)
 
     fun setMVPMatrix(matrix: GLMatrix) {
         mMVPMatrix = matrix
@@ -74,7 +69,7 @@ class PlanetProgram : GLProgram() {
 
     fun setAngleSpan(angleSpan: Int) {
         mAngleSpan = angleSpan
-        calculateVertex()
+        mModelData = ModelCreator.createBall(mAngleSpan, mRadius)
     }
 
     fun setTexture(texture: GLTexture) {
@@ -101,13 +96,13 @@ class PlanetProgram : GLProgram() {
         GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         GLES20.glUniform3f(mCameraPositionHandle, mCameraPoint.x, mCameraPoint.y, mCameraPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
-        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mVertexBuffer)
-        GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mNormalBuffer)
-        GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, mTextureBuffer)
+        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.vertexBuffer)
+        GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.normalBuffer)
+        GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, mModelData.textureBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mNormalHandle)
         GLES20.glEnableVertexAttribArray(mTextureCoordHandle)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mModelData.count)
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mNormalHandle)
         GLES20.glDisableVertexAttribArray(mTextureCoordHandle)
@@ -130,145 +125,4 @@ class PlanetProgram : GLProgram() {
     override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/vertex.glsl")
 
     override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/fragment.glsl")
-
-    private fun calculateVertex() {
-        val vertexList = ArrayList<Float>()
-
-        var verticalAngle = -90.0
-
-        // 计算中间每一层的点
-        while (verticalAngle < 90F) {   // 垂直角度从 -90 到 90
-            // 这一层的半径
-            val curLayerAngle = verticalAngle.toRadians()
-            val layerRadius = mRadius * cos(curLayerAngle)
-
-            // 下一层的半径
-            val nextLayerAngle = (verticalAngle + mAngleSpan).toRadians()
-            val nextLayerRadius = mRadius * cos(nextLayerAngle)
-
-            val curLayerY = mRadius * sin(curLayerAngle)
-            val nextLayerY = mRadius * sin(nextLayerAngle)
-
-            var horizontalAngle = 0.0
-            while (horizontalAngle < 360) {     // 水平角度从 0 到 360
-                val curHorAngle = horizontalAngle.toRadians()
-                val nextHorAngle = (horizontalAngle + mAngleSpan).toRadians()
-
-                /**
-                 *     P2(x2, y2, z2)   P3(x3, y3, z3)
-                 *      ------------------
-                 *      ｜              ╱｜
-                 *      ｜            ╱  ｜
-                 *      ｜          ╱    ｜
-                 *      ｜        ╱      ｜
-                 *      ｜      ╱        ｜
-                 *      ｜    ╱          ｜
-                 *      ｜  ╱            ｜
-                 *      ｜╱              ｜
-                 *      ------------------
-                 *     P1(x1, y1, z1)   P0(x0, y0, z0)
-                 */
-                val x0 = layerRadius * cos(curHorAngle)
-                val y0 = curLayerY
-                val z0 = layerRadius * sin(curHorAngle)
-
-                val x1 = layerRadius * cos(nextHorAngle)
-                val y1 = curLayerY
-                val z1 = layerRadius * sin(nextHorAngle)
-
-                val x2 = nextLayerRadius * cos(nextHorAngle)
-                val y2 = nextLayerY
-                val z2 = nextLayerRadius * sin(nextHorAngle)
-
-                val x3 = nextLayerRadius * cos(curHorAngle)
-                val y3 = nextLayerY
-                val z3 = nextLayerRadius * sin(curHorAngle)
-
-                vertexList.add(x1.toFloat())
-                vertexList.add(y1.toFloat())
-                vertexList.add(z1.toFloat())
-
-                vertexList.add(x3.toFloat())
-                vertexList.add(y3.toFloat())
-                vertexList.add(z3.toFloat())
-
-                vertexList.add(x0.toFloat())
-                vertexList.add(y0.toFloat())
-                vertexList.add(z0.toFloat())
-
-                vertexList.add(x1.toFloat())
-                vertexList.add(y1.toFloat())
-                vertexList.add(z1.toFloat())
-
-                vertexList.add(x2.toFloat())
-                vertexList.add(y2.toFloat())
-                vertexList.add(z2.toFloat())
-
-                vertexList.add(x3.toFloat())
-                vertexList.add(y3.toFloat())
-                vertexList.add(z3.toFloat())
-
-                horizontalAngle += mAngleSpan
-            }
-            verticalAngle += mAngleSpan
-        }
-        mVertexCount = vertexList.size / 3
-        mVertexBuffer = allocateFloatBuffer(vertexList.toFloatArray())
-        // 因为球体的几何体征，球心在原点，所以各个点法向量和顶点位置刚好一致，不用再次计算
-        mNormalBuffer = allocateFloatBuffer(vertexList.toFloatArray())
-
-        val textureList = ArrayList<Float>()
-        val vCounts = 180 / mAngleSpan
-        val vSpan = 1 / vCounts.toFloat()
-        val hCounts = 360 / mAngleSpan
-        val hSpan = 1 / hCounts.toFloat()
-        for (v in 0 until vCounts) {
-            for (h in 0 until hCounts) {
-                /**
-                 *     P2(x2, y2)   P3(x3, y3)
-                 *      ------------------
-                 *      ｜              ╱｜
-                 *      ｜            ╱  ｜
-                 *      ｜          ╱    ｜
-                 *      ｜        ╱      ｜
-                 *      ｜      ╱        ｜
-                 *      ｜    ╱          ｜
-                 *      ｜  ╱            ｜
-                 *      ｜╱              ｜
-                 *      ------------------
-                 *     P1(x1, y1)   P0(x0, y0)
-                 */
-                val x0 = 1 - h * hSpan
-                val y0 = 1 - v * vSpan
-
-                val x1 = 1 - (h + 1) * hSpan
-                val y1 = 1 - v * vSpan
-
-                val x2 = 1 - (h + 1) * hSpan
-                val y2 = 1 - (v + 1) * vSpan
-
-                val x3 = 1 - h * hSpan
-                val y3 = 1 - (v + 1) * vSpan
-
-                textureList.add(x1)
-                textureList.add(y1)
-
-                textureList.add(x3)
-                textureList.add(y3)
-
-                textureList.add(x0)
-                textureList.add(y0)
-
-                textureList.add(x1)
-                textureList.add(y1)
-
-                textureList.add(x2)
-                textureList.add(y2)
-
-                textureList.add(x3)
-                textureList.add(y3)
-            }
-        }
-        mTextureBuffer = allocateFloatBuffer(textureList.toFloatArray())
-    }
 }

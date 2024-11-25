@@ -11,6 +11,12 @@ import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * @author jiang peng yong
+ * @date 2024/11/25 08:32
+ * @email 56002982@qq.com
+ * @des 轨道
+ */
 class OrbitProgram : GLProgram() {
     private var mAngleSpan = 5
     private var mRadius = 1F
