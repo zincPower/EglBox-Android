@@ -69,28 +69,28 @@
             android:name="com.jiangpengyong.sample.d_light.LightMainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.BallActivity"
+            android:name="com.jiangpengyong.sample.d_light.ball.BallActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.AmbientLightActivity"
+            android:name="com.jiangpengyong.sample.d_light.ambient.AmbientLightActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.DiffuseLightActivity"
+            android:name="com.jiangpengyong.sample.d_light.diffuse.DiffuseLightActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.SpecularLightActivity"
+            android:name="com.jiangpengyong.sample.d_light.specular.SpecularLightActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.full_light.FullLightActivity"
+            android:name="com.jiangpengyong.sample.d_light.full.FullLightActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.LightSourceTypeActivity"
+            android:name="com.jiangpengyong.sample.d_light.source_type.LightSourceTypeActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.NormalTypeActivity"
+            android:name="com.jiangpengyong.sample.d_light.normal_type.NormalTypeActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.d_light.LightCalculateTypeActivity"
+            android:name="com.jiangpengyong.sample.d_light.calculate_type.LightCalculateTypeActivity"
             android:screenOrientation="landscape" />
 
         <activity

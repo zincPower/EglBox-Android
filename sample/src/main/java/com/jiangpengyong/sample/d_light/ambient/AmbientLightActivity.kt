@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light
+package com.jiangpengyong.sample.d_light.ambient
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -28,11 +28,11 @@ import javax.microedition.khronos.opengles.GL10
 
 /**
  * @author jiang peng yong
- * @date 2024/7/20 14:47
+ * @date 2024/7/24 22:18
  * @email 56002982@qq.com
- * @des 球体
+ * @des 环境光
  */
-class BallActivity : AppCompatActivity() {
+class AmbientLightActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -44,7 +44,7 @@ class BallActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_ball)
+        setContentView(R.layout.activity_light_ambient)
         mRenderView = findViewById(R.id.surface_view)
         mSpanAngleTitle = findViewById(R.id.span_angle_title)
         findViewById<View>(R.id.reset).setOnClickListener {
@@ -71,9 +71,9 @@ class BallActivity : AppCompatActivity() {
         findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
             mRenderView.updateFilterData(Bundle().apply {
                 when (checkedId) {
-                    R.id.gl_points -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Point.value)
-                    R.id.gl_lines -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Line.value)
-                    R.id.gl_triangles -> putInt("drawingMode", TrigonometricBallProgram.DrawMode.Face.value)
+                    R.id.gl_points -> putInt("drawingMode", AmbientLightBallProgram.DrawMode.Point.value)
+                    R.id.gl_lines -> putInt("drawingMode", AmbientLightBallProgram.DrawMode.Line.value)
+                    R.id.gl_triangles -> putInt("drawingMode", AmbientLightBallProgram.DrawMode.Face.value)
                 }
             })
             mRenderView.requestRender()
@@ -155,7 +155,6 @@ class BallActivity : AppCompatActivity() {
                 mBallFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                GLES20.glFrontFace(GLES20.GL_CW)
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -176,7 +175,7 @@ class BallActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = TrigonometricBallProgram()
+        private val mProgram = AmbientLightBallProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
@@ -190,7 +189,7 @@ class BallActivity : AppCompatActivity() {
         override fun onInit(context: FilterContext) {
             mProgram.init()
             mViewMatrix.setLookAtM(
-                0F, 0F, 3F,
+                0F, 0F, 10F,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -218,13 +217,13 @@ class BallActivity : AppCompatActivity() {
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
-                        2F, 10F
+                        5F, 20F
                     )
                 } else {
                     mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
-                        2F, 10F
+                        5F, 20F
                     )
                 }
                 mPreviewSize = previewSize
@@ -242,9 +241,9 @@ class BallActivity : AppCompatActivity() {
                 val mode = updateData.getInt("drawingMode", 0)
                 if (mode != 0) {
                     when (mode) {
-                        TrigonometricBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Point)
-                        TrigonometricBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Line)
-                        TrigonometricBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(TrigonometricBallProgram.DrawMode.Face)
+                        AmbientLightBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(AmbientLightBallProgram.DrawMode.Point)
+                        AmbientLightBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(AmbientLightBallProgram.DrawMode.Line)
+                        AmbientLightBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(AmbientLightBallProgram.DrawMode.Face)
                     }
                 }
 

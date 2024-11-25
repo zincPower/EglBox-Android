@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light
+package com.jiangpengyong.sample.d_light.calculate_type
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
+import android.widget.CheckBox
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -24,17 +25,17 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.d_light.LightPointProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-
 
 /**
  * @author jiang peng yong
  * @date 2024/7/25 09:00
  * @email 56002982@qq.com
- * @des 镜面光
+ * @des 光照计算位置
  */
-class SpecularLightActivity : AppCompatActivity() {
+class LightCalculateTypeActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -50,7 +51,7 @@ class SpecularLightActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_specular)
+        setContentView(R.layout.activity_light_calculate_type)
         mRenderView = findViewById(R.id.surface_view)
 
         findViewById<View>(R.id.reset).setOnClickListener {
@@ -61,7 +62,7 @@ class SpecularLightActivity : AppCompatActivity() {
         mSpanAngleTitle = findViewById(R.id.span_angle_title)
         mSpanAngleTitle.text = "圆切割度数（10度）"
         findViewById<SeekBar>(R.id.span_angle).apply {
-            setProgress(2)
+            progress = 2
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     val spanAngle = (progress + 1) * 5
@@ -77,13 +78,21 @@ class SpecularLightActivity : AppCompatActivity() {
             })
         }
 
-        findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
+        findViewById<CheckBox>(R.id.ambient_light).setOnCheckedChangeListener { _, isChecked ->
             mRenderView.updateFilterData(Bundle().apply {
-                when (checkedId) {
-                    R.id.gl_points -> putInt("drawingMode", SpecularLightBallProgram.DrawMode.Point.value)
-                    R.id.gl_lines -> putInt("drawingMode", SpecularLightBallProgram.DrawMode.Line.value)
-                    R.id.gl_triangles -> putInt("drawingMode", SpecularLightBallProgram.DrawMode.Face.value)
-                }
+                putInt("ambientLight", if (isChecked) 1 else 0)
+            })
+            mRenderView.requestRender()
+        }
+        findViewById<CheckBox>(R.id.diffuse_light).setOnCheckedChangeListener { _, isChecked ->
+            mRenderView.updateFilterData(Bundle().apply {
+                putInt("diffuseLight", if (isChecked) 1 else 0)
+            })
+            mRenderView.requestRender()
+        }
+        findViewById<CheckBox>(R.id.specular_light).setOnCheckedChangeListener { _, isChecked ->
+            mRenderView.updateFilterData(Bundle().apply {
+                putInt("specularLight", if (isChecked) 1 else 0)
             })
             mRenderView.requestRender()
         }
@@ -93,8 +102,8 @@ class SpecularLightActivity : AppCompatActivity() {
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    // x 在 [-2, 2] 区间游走
-                    val x = progress / max.toFloat() * 4 - 2
+                    // x 在 [-10, 10] 区间游走
+                    val x = progress / max.toFloat() * 20 - 10
                     mLightPosition[0] = x
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightXPosition", x)
@@ -110,8 +119,8 @@ class SpecularLightActivity : AppCompatActivity() {
         findViewById<SeekBar>(R.id.light_y_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    // y 在 [-2, 2] 区间游走
-                    val y = progress / max.toFloat() * 4 - 2
+                    // y 在 [-10, 10] 区间游走
+                    val y = progress / max.toFloat() * 20 - 10
                     mLightPosition[1] = y
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightYPosition", y)
@@ -157,6 +166,32 @@ class SpecularLightActivity : AppCompatActivity() {
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
+        }
+
+        findViewById<RadioGroup>(R.id.light_source_type).setOnCheckedChangeListener { _, checkedId ->
+            if (checkedId == R.id.point_light) {
+                mRenderView.updateFilterData(Bundle().apply {
+                    putInt("lightSourceType", LightCalculateTypeBallProgram.LightSourceType.PointLight.value)
+                })
+            } else if (checkedId == R.id.directional_light) {
+                mRenderView.updateFilterData(Bundle().apply {
+                    putInt("lightSourceType", LightCalculateTypeBallProgram.LightSourceType.DirectionalLight.value)
+                })
+            }
+            mRenderView.requestRender()
+        }
+
+        findViewById<RadioGroup>(R.id.light_calculate_type).setOnCheckedChangeListener { _, checkedId ->
+            if (checkedId == R.id.gouraud) {
+                mRenderView.updateFilterData(Bundle().apply {
+                    putInt("lightCalculateType", LightCalculateTypeBallProgram.LightCalculateType.Vertex.value)
+                })
+            } else if (checkedId == R.id.phong) {
+                mRenderView.updateFilterData(Bundle().apply {
+                    putInt("lightCalculateType", LightCalculateTypeBallProgram.LightCalculateType.Fragment.value)
+                })
+            }
+            mRenderView.requestRender()
         }
     }
 
@@ -237,7 +272,6 @@ class SpecularLightActivity : AppCompatActivity() {
                 mBallFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                GLES20.glFrontFace(GLES20.GL_CW)
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -246,7 +280,7 @@ class SpecularLightActivity : AppCompatActivity() {
             }
 
             override fun onDrawFrame(gl: GL10?) {
-                GLES20.glClearColor(0F, 0F, 0F, 0F)
+                GLES20.glClearColor(0F, 0F, 0F, 1F)
                 GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT or GLES20.GL_COLOR_BUFFER_BIT)
                 mBallFilter.draw(mImage)
             }
@@ -258,12 +292,21 @@ class SpecularLightActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = SpecularLightBallProgram()
+        private val mGouraudProgram = LightCalculateTypeBallProgram(LightCalculateTypeBallProgram.LightCalculateType.Vertex)
+        private val mPhongProgram = LightCalculateTypeBallProgram(LightCalculateTypeBallProgram.LightCalculateType.Fragment)
         private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
-        private val mModelMatrix = ModelMatrix()
+        private val mRotateMatrix = ModelMatrix()
+        private val mLeftModelMatrix = ModelMatrix()
+            .apply {
+                translate(-2F, 0F, 0F)
+            }
+        private val mRightModelMatrix = ModelMatrix()
+            .apply {
+                translate(2F, 0F, 0F)
+            }
 
         private var mXAngle = 0F
         private var mYAngle = 0F
@@ -273,8 +316,11 @@ class SpecularLightActivity : AppCompatActivity() {
         private var mLightPoint = Point(0F, 0F, 5F)
         private var mViewPoint = Point(0F, 0F, 10F)
 
+        private var mLightCalculateType = LightCalculateTypeBallProgram.LightCalculateType.Vertex
+
         override fun onInit(context: FilterContext) {
-            mProgram.init()
+            mGouraudProgram.init()
+            mPhongProgram.init()
             mLightPointProgram.init()
             mViewMatrix.setLookAtM(
                 mViewPoint.x, mViewPoint.y, mViewPoint.z,
@@ -287,12 +333,21 @@ class SpecularLightActivity : AppCompatActivity() {
             GLES20.glClearColor(0F, 0F, 0F, 1F)
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
+            val program = when (mLightCalculateType) {
+                LightCalculateTypeBallProgram.LightCalculateType.Vertex -> mGouraudProgram
+                LightCalculateTypeBallProgram.LightCalculateType.Fragment -> mPhongProgram
+            }
             synchronized(this) {
-                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-                mProgram.setMMatrix(mModelMatrix)
-                mProgram.setLightPoint(mLightPoint)
-                mProgram.setViewPoint(mViewPoint)
-                mProgram.draw()
+                program.setLightPoint(mLightPoint)
+                program.setViewPoint(mViewPoint)
+
+                program.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mLeftModelMatrix)
+                program.setMMatrix(mRotateMatrix * mLeftModelMatrix)
+                program.draw()
+
+                program.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
+                program.setMMatrix(mRotateMatrix * mRightModelMatrix)
+                program.draw()
 
                 mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
                 mLightPointProgram.setLightPoint(mLightPoint)
@@ -301,22 +356,22 @@ class SpecularLightActivity : AppCompatActivity() {
         }
 
         override fun onRelease(context: FilterContext) {
-            mProgram.release()
+            mGouraudProgram.release()
+            mPhongProgram.release()
             mLightPointProgram.release()
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
             val previewSize = context.previewSize
             if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
+                val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
                 if (previewSize.width > previewSize.height) {
-                    val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
                     mProjectMatrix.setFrustumM(
                         -ratio, ratio,
                         -1F, 1F,
                         5F, 20F
                     )
                 } else {
-                    val ratio = previewSize.height.toFloat() / previewSize.width.toFloat()
                     mProjectMatrix.setFrustumM(
                         -1F, 1F,
                         -ratio, ratio,
@@ -331,47 +386,84 @@ class SpecularLightActivity : AppCompatActivity() {
             synchronized(this) {
                 mXAngle += updateData.getFloat("xAngle", 0F)
                 mYAngle += updateData.getFloat("yAngle", 0F)
-                mModelMatrix.reset()
-                mModelMatrix.rotate(mXAngle, 0F, 1F, 0F)
-                mModelMatrix.rotate(mYAngle, 1F, 0F, 0F)
-
-                val mode = updateData.getInt("drawingMode", 0)
-                if (mode != 0) {
-                    when (mode) {
-                        SpecularLightBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(SpecularLightBallProgram.DrawMode.Point)
-                        SpecularLightBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(SpecularLightBallProgram.DrawMode.Line)
-                        SpecularLightBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(SpecularLightBallProgram.DrawMode.Face)
-                    }
-                }
+                mRotateMatrix.reset()
+                mRotateMatrix.rotate(mXAngle, 0F, 1F, 0F)
+                mRotateMatrix.rotate(mYAngle, 1F, 0F, 0F)
 
                 val spanAngle = updateData.getInt("spanAngle", 0)
                 if (spanAngle != 0) {
-                    mProgram.setAngleSpan(spanAngle)
+                    mGouraudProgram.setAngleSpan(spanAngle)
+                    mPhongProgram.setAngleSpan(spanAngle)
                 }
 
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
                         mLightPoint = mLightPoint.copy(x = it)
-                        mProgram.setLightPoint(mLightPoint)
+                        mGouraudProgram.setLightPoint(mLightPoint)
+                        mPhongProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
                         mLightPoint = mLightPoint.copy(y = it)
-                        mProgram.setLightPoint(mLightPoint)
+                        mGouraudProgram.setLightPoint(mLightPoint)
+                        mPhongProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
                         mLightPoint = mLightPoint.copy(z = it)
-                        mProgram.setLightPoint(mLightPoint)
+                        mGouraudProgram.setLightPoint(mLightPoint)
+                        mPhongProgram.setLightPoint(mLightPoint)
                     }
 
                 updateData.getFloat("shininess", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mProgram.setShininess(it)
+                        mGouraudProgram.setShininess(it)
+                        mPhongProgram.setShininess(it)
+                    }
+
+                updateData.getInt("ambientLight", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        mGouraudProgram.isAddAmbientLight(it == 1)
+                        mPhongProgram.isAddAmbientLight(it == 1)
+                    }
+                updateData.getInt("diffuseLight", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        mGouraudProgram.isAddDiffuseLight(it == 1)
+                        mPhongProgram.isAddDiffuseLight(it == 1)
+                    }
+                updateData.getInt("specularLight", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        mGouraudProgram.isAddSpecularLight(it == 1)
+                        mPhongProgram.isAddSpecularLight(it == 1)
+                    }
+
+                updateData.getInt("lightSourceType", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        val type = if (it == LightCalculateTypeBallProgram.LightSourceType.DirectionalLight.value) {
+                            LightCalculateTypeBallProgram.LightSourceType.DirectionalLight
+                        } else {
+                            LightCalculateTypeBallProgram.LightSourceType.PointLight
+                        }
+                        mGouraudProgram.setLightSourceType(type)
+                        mPhongProgram.setLightSourceType(type)
+                    }
+
+                updateData.getInt("lightCalculateType", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        mLightCalculateType = if (it == LightCalculateTypeBallProgram.LightCalculateType.Vertex.value) {
+                            LightCalculateTypeBallProgram.LightCalculateType.Vertex
+                        } else {
+                            LightCalculateTypeBallProgram.LightCalculateType.Fragment
+                        }
                     }
             }
         }
@@ -383,7 +475,7 @@ class SpecularLightActivity : AppCompatActivity() {
                 if (message.what == RESET) {
                     mXAngle = 0F
                     mYAngle = 0F
-                    mModelMatrix.reset()
+                    mRotateMatrix.reset()
                 }
             }
         }

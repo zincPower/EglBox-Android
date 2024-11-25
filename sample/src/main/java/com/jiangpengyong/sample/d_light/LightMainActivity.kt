@@ -5,7 +5,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
-import com.jiangpengyong.sample.d_light.full_light.FullLightActivity
+import com.jiangpengyong.sample.d_light.ambient.AmbientLightActivity
+import com.jiangpengyong.sample.d_light.ball.BallActivity
+import com.jiangpengyong.sample.d_light.calculate_type.LightCalculateTypeActivity
+import com.jiangpengyong.sample.d_light.diffuse.DiffuseLightActivity
+import com.jiangpengyong.sample.d_light.full.FullLightActivity
+import com.jiangpengyong.sample.d_light.normal_type.NormalTypeActivity
+import com.jiangpengyong.sample.d_light.source_type.LightSourceTypeActivity
+import com.jiangpengyong.sample.d_light.specular.SpecularLightActivity
 
 /**
  * @author jiang peng yong

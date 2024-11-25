@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light
+package com.jiangpengyong.sample.d_light.full
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,7 +10,7 @@ import android.util.AttributeSet
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
-import android.widget.RadioGroup
+import android.widget.CheckBox
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -19,7 +19,6 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
-import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
@@ -31,9 +30,9 @@ import javax.microedition.khronos.opengles.GL10
  * @author jiang peng yong
  * @date 2024/7/25 09:00
  * @email 56002982@qq.com
- * @des 散射光
+ * @des 环境光、散射光、镜面光
  */
-class DiffuseLightActivity : AppCompatActivity() {
+class FullLightActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -42,13 +41,14 @@ class DiffuseLightActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
     private lateinit var mSpanAngleTitle: TextView
     private lateinit var mLightPositionTip: TextView
+    private lateinit var mShininessTitle: TextView
 
     private val mLightPosition = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_diffuse)
+        setContentView(R.layout.activity_light_full)
         mRenderView = findViewById(R.id.surface_view)
 
         findViewById<View>(R.id.reset).setOnClickListener {
@@ -75,14 +75,21 @@ class DiffuseLightActivity : AppCompatActivity() {
             })
         }
 
-        findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
+        findViewById<CheckBox>(R.id.ambient_light).setOnCheckedChangeListener { _, isChecked ->
             mRenderView.updateFilterData(Bundle().apply {
-                when (checkedId) {
-                    R.id.gl_points -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Point.value)
-                    R.id.gl_lines -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Line.value)
-                    R.id.gl_triangles -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Face.value)
-                }
-
+                putInt("ambientLight", if (isChecked) 1 else 0)
+            })
+            mRenderView.requestRender()
+        }
+        findViewById<CheckBox>(R.id.diffuse_light).setOnCheckedChangeListener { _, isChecked ->
+            mRenderView.updateFilterData(Bundle().apply {
+                putInt("diffuseLight", if (isChecked) 1 else 0)
+            })
+            mRenderView.requestRender()
+        }
+        findViewById<CheckBox>(R.id.specular_light).setOnCheckedChangeListener { _, isChecked ->
+            mRenderView.updateFilterData(Bundle().apply {
+                putInt("specularLight", if (isChecked) 1 else 0)
             })
             mRenderView.requestRender()
         }
@@ -133,6 +140,23 @@ class DiffuseLightActivity : AppCompatActivity() {
                         putFloat("lightZPosition", z)
                     })
                     updateLightPositionTip()
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+
+        mShininessTitle = findViewById(R.id.shininess_title)
+        findViewById<SeekBar>(R.id.shininess).apply {
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val value = progress + 1
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putFloat("shininess", value.toFloat())
+                    })
+                    mShininessTitle.text = "光滑度（${value}）"
                     mRenderView.requestRender()
                 }
 
@@ -240,8 +264,7 @@ class DiffuseLightActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = DiffuseLightBallProgram()
-        private val mLightPointProgram = LightPointProgram()
+        private val mProgram = FullLightBallProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
@@ -252,13 +275,13 @@ class DiffuseLightActivity : AppCompatActivity() {
 
         private var mPreviewSize = Size(0, 0)
 
-        private var mLightPoint = Point(0F, 0F, 5F)
+        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
+        private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
 
         override fun onInit(context: FilterContext) {
             mProgram.init()
-            mLightPointProgram.init()
             mViewMatrix.setLookAtM(
-                0F, 0F, 10F,
+                mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -271,19 +294,14 @@ class DiffuseLightActivity : AppCompatActivity() {
             synchronized(this) {
                 mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
                 mProgram.setMMatrix(mModelMatrix)
-                mProgram.setLightPoint(mLightPoint)
+                mProgram.setLightPosition(mLightPosition)
+                mProgram.setCameraPosition(mCameraPosition)
                 mProgram.draw()
-
-                // 模型矩阵为单位矩阵，不用进行
-                mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
-                mLightPointProgram.setLightPoint(mLightPoint)
-                mLightPointProgram.draw()
             }
         }
 
         override fun onRelease(context: FilterContext) {
             mProgram.release()
-            mLightPointProgram.release()
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
@@ -315,15 +333,6 @@ class DiffuseLightActivity : AppCompatActivity() {
                 mModelMatrix.rotate(mXAngle, 0F, 1F, 0F)
                 mModelMatrix.rotate(mYAngle, 1F, 0F, 0F)
 
-                val mode = updateData.getInt("drawingMode", 0)
-                if (mode != 0) {
-                    when (mode) {
-                        DiffuseLightBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Point)
-                        DiffuseLightBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Line)
-                        DiffuseLightBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Face)
-                    }
-                }
-
                 val spanAngle = updateData.getInt("spanAngle", 0)
                 if (spanAngle != 0) {
                     mProgram.setAngleSpan(spanAngle)
@@ -332,20 +341,42 @@ class DiffuseLightActivity : AppCompatActivity() {
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPoint = mLightPoint.copy(x = it)
-                        mProgram.setLightPoint(mLightPoint)
+                        mLightPosition[0] = it
+                        mProgram.setLightPosition(mLightPosition)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPoint = mLightPoint.copy(y = it)
-                        mProgram.setLightPoint(mLightPoint)
+                        mLightPosition[1] = it
+                        mProgram.setLightPosition(mLightPosition)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPoint = mLightPoint.copy(z = it)
-                        mProgram.setLightPoint(mLightPoint)
+                        mLightPosition[2] = it
+                        mProgram.setLightPosition(mLightPosition)
+                    }
+
+                updateData.getFloat("shininess", -10000F)
+                    .takeIf { it != -10000F }
+                    ?.let {
+                        mProgram.setShininess(it)
+                    }
+
+                updateData.getInt("ambientLight", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        mProgram.isAddAmbientLight(it == 1)
+                    }
+                updateData.getInt("diffuseLight", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        mProgram.isAddDiffuseLight(it == 1)
+                    }
+                updateData.getInt("specularLight", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        mProgram.isAddSpecularLight(it == 1)
                     }
             }
         }

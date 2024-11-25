@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light.full_light
+package com.jiangpengyong.sample.d_light.normal_type
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,6 +11,7 @@ import android.util.Size
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
+import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -19,27 +20,28 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.d_light.LightPointProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 /**
  * @author jiang peng yong
- * @date 2024/7/25 09:00
+ * @date 2024/7/28 16:40
  * @email 56002982@qq.com
- * @des 环境光、散射光、镜面光
+ * @des 向量类型
  */
-class FullLightActivity : AppCompatActivity() {
+class NormalTypeActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
     }
 
     private lateinit var mRenderView: RenderView
-    private lateinit var mSpanAngleTitle: TextView
     private lateinit var mLightPositionTip: TextView
     private lateinit var mShininessTitle: TextView
 
@@ -48,31 +50,12 @@ class FullLightActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_full)
+        setContentView(R.layout.activity_light_normal_type)
         mRenderView = findViewById(R.id.surface_view)
 
         findViewById<View>(R.id.reset).setOnClickListener {
             mRenderView.sendMessageToFilter(Message.obtain().apply { what = RESET })
             mRenderView.requestRender()
-        }
-
-        mSpanAngleTitle = findViewById(R.id.span_angle_title)
-        mSpanAngleTitle.text = "圆切割度数（10度）"
-        findViewById<SeekBar>(R.id.span_angle).apply {
-            progress = 2
-            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    val spanAngle = (progress + 1) * 5
-                    mSpanAngleTitle.text = "圆切割度数（${spanAngle}度）"
-                    mRenderView.updateFilterData(Bundle().apply {
-                        putInt("spanAngle", spanAngle)
-                    })
-                    mRenderView.requestRender()
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            })
         }
 
         findViewById<CheckBox>(R.id.ambient_light).setOnCheckedChangeListener { _, isChecked ->
@@ -94,13 +77,37 @@ class FullLightActivity : AppCompatActivity() {
             mRenderView.requestRender()
         }
 
+        mShininessTitle = findViewById(R.id.shininess_title)
+        findViewById<SeekBar>(R.id.shininess).apply {
+            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val value = progress + 1
+                    mRenderView.updateFilterData(Bundle().apply {
+                        putFloat("shininess", value.toFloat())
+                    })
+                    mShininessTitle.text = "光滑度（${value}）"
+                    mRenderView.requestRender()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
+        }
+
+        findViewById<RadioGroup>(R.id.normal_type).setOnCheckedChangeListener { _, checkedId ->
+            mRenderView.updateFilterData(Bundle().apply {
+                putInt("normalType", if (checkedId == R.id.vertex_normal) NormalTypeCubeProgram.NormalType.VERTEX_NORMAL.value else NormalTypeCubeProgram.NormalType.FACE_NORMAL.value)
+            })
+            mRenderView.requestRender()
+        }
+
         mLightPositionTip = findViewById(R.id.light_position_tip)
         updateLightPositionTip()
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    // x 在 [-2, 2] 区间游走
-                    val x = progress / max.toFloat() * 4 - 2
+                    // x 在 [-10, 10] 区间游走
+                    val x = progress / max.toFloat() * 20 - 10
                     mLightPosition[0] = x
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightXPosition", x)
@@ -116,8 +123,8 @@ class FullLightActivity : AppCompatActivity() {
         findViewById<SeekBar>(R.id.light_y_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    // y 在 [-2, 2] 区间游走
-                    val y = progress / max.toFloat() * 4 - 2
+                    // y 在 [-10, 10] 区间游走
+                    val y = progress / max.toFloat() * 20 - 10
                     mLightPosition[1] = y
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightYPosition", y)
@@ -140,23 +147,6 @@ class FullLightActivity : AppCompatActivity() {
                         putFloat("lightZPosition", z)
                     })
                     updateLightPositionTip()
-                    mRenderView.requestRender()
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            })
-        }
-
-        mShininessTitle = findViewById(R.id.shininess_title)
-        findViewById<SeekBar>(R.id.shininess).apply {
-            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    val value = progress + 1
-                    mRenderView.updateFilterData(Bundle().apply {
-                        putFloat("shininess", value.toFloat())
-                    })
-                    mShininessTitle.text = "光滑度（${value}）"
                     mRenderView.requestRender()
                 }
 
@@ -243,7 +233,7 @@ class FullLightActivity : AppCompatActivity() {
                 mBallFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                GLES20.glFrontFace(GLES20.GL_CW)
+//                GLES20.glFrontFace(GLES20.GL_CCW)
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -264,24 +254,34 @@ class FullLightActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = FullLightBallProgram()
+        private val mProgram = NormalTypeCubeProgram()
+        private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
-        private val mModelMatrix = ModelMatrix()
+        private val mRotateMatrix = ModelMatrix()
+        private val mLeftModelMatrix = ModelMatrix()
+            .apply {
+                translate(-2F, 0F, 0F)
+            }
+        private val mRightModelMatrix = ModelMatrix()
+            .apply {
+                translate(2F, 0F, 0F)
+            }
 
         private var mXAngle = 0F
         private var mYAngle = 0F
 
         private var mPreviewSize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
-        private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
+        private var mLightPoint = Point(0F, 0F, 5F)
+        private var mViewPoint = Point(0F, 0F, 10F)
 
         override fun onInit(context: FilterContext) {
             mProgram.init()
+            mLightPointProgram.init()
             mViewMatrix.setLookAtM(
-                mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
+                mViewPoint.x, mViewPoint.y, mViewPoint.z,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -292,16 +292,26 @@ class FullLightActivity : AppCompatActivity() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
             synchronized(this) {
-                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-                mProgram.setMMatrix(mModelMatrix)
-                mProgram.setLightPosition(mLightPosition)
-                mProgram.setCameraPosition(mCameraPosition)
+                mProgram.setLightPoint(mLightPoint)
+                mProgram.setViewPoint(mViewPoint)
+
+                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mLeftModelMatrix)
+                mProgram.setModelMatrix(mRotateMatrix * mLeftModelMatrix)
                 mProgram.draw()
+
+                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
+                mProgram.setModelMatrix(mRotateMatrix * mRightModelMatrix)
+                mProgram.draw()
+
+                mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
+                mLightPointProgram.setLightPoint(mLightPoint)
+                mLightPointProgram.draw()
             }
         }
 
         override fun onRelease(context: FilterContext) {
             mProgram.release()
+            mLightPointProgram.release()
         }
 
         private fun updateProjectionMatrix(context: FilterContext) {
@@ -329,38 +339,44 @@ class FullLightActivity : AppCompatActivity() {
             synchronized(this) {
                 mXAngle += updateData.getFloat("xAngle", 0F)
                 mYAngle += updateData.getFloat("yAngle", 0F)
-                mModelMatrix.reset()
-                mModelMatrix.rotate(mXAngle, 0F, 1F, 0F)
-                mModelMatrix.rotate(mYAngle, 1F, 0F, 0F)
-
-                val spanAngle = updateData.getInt("spanAngle", 0)
-                if (spanAngle != 0) {
-                    mProgram.setAngleSpan(spanAngle)
-                }
+                mRotateMatrix.reset()
+                mRotateMatrix.rotate(mXAngle, 0F, 1F, 0F)
+                mRotateMatrix.rotate(mYAngle, 1F, 0F, 0F)
 
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[0] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(x = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[1] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(y = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[2] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = mLightPoint.copy(z = it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
 
                 updateData.getFloat("shininess", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
                         mProgram.setShininess(it)
+                    }
+
+                updateData.getInt("normalType", -10000)
+                    .takeIf { it != -10000 }
+                    ?.let {
+                        when (it) {
+                            NormalTypeCubeProgram.NormalType.VERTEX_NORMAL.value -> mProgram.setNormalType(NormalTypeCubeProgram.NormalType.VERTEX_NORMAL)
+                            NormalTypeCubeProgram.NormalType.FACE_NORMAL.value -> mProgram.setNormalType(NormalTypeCubeProgram.NormalType.FACE_NORMAL)
+                            else -> {}
+                        }
+
                     }
 
                 updateData.getInt("ambientLight", -10000)
@@ -388,7 +404,7 @@ class FullLightActivity : AppCompatActivity() {
                 if (message.what == RESET) {
                     mXAngle = 0F
                     mYAngle = 0F
-                    mModelMatrix.reset()
+                    mRotateMatrix.reset()
                 }
             }
         }

@@ -78,7 +78,7 @@
 
     <view
         android:id="@+id/surface_view"
-        class="com.jiangpengyong.sample.d_light.DiffuseLightActivity$RenderView"
+        class="com.jiangpengyong.sample.d_light.diffuse.DiffuseLightActivity$RenderView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/light_x_position"

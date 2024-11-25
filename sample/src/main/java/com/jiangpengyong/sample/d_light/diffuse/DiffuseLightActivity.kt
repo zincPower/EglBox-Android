@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light
+package com.jiangpengyong.sample.d_light.diffuse
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,7 +10,6 @@ import android.util.AttributeSet
 import android.util.Size
 import android.view.MotionEvent
 import android.view.View
-import android.widget.CheckBox
 import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -25,17 +24,17 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.d_light.LightPointProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-
 
 /**
  * @author jiang peng yong
  * @date 2024/7/25 09:00
  * @email 56002982@qq.com
- * @des 光源类型（定点光、定向光）
+ * @des 散射光
  */
-class LightSourceTypeActivity : AppCompatActivity() {
+class DiffuseLightActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -44,14 +43,13 @@ class LightSourceTypeActivity : AppCompatActivity() {
     private lateinit var mRenderView: RenderView
     private lateinit var mSpanAngleTitle: TextView
     private lateinit var mLightPositionTip: TextView
-    private lateinit var mShininessTitle: TextView
 
     private val mLightPosition = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_source_type)
+        setContentView(R.layout.activity_light_diffuse)
         mRenderView = findViewById(R.id.surface_view)
 
         findViewById<View>(R.id.reset).setOnClickListener {
@@ -78,21 +76,14 @@ class LightSourceTypeActivity : AppCompatActivity() {
             })
         }
 
-        findViewById<CheckBox>(R.id.ambient_light).setOnCheckedChangeListener { _, isChecked ->
+        findViewById<RadioGroup>(R.id.drawing_mode).setOnCheckedChangeListener { group, checkedId ->
             mRenderView.updateFilterData(Bundle().apply {
-                putInt("ambientLight", if (isChecked) 1 else 0)
-            })
-            mRenderView.requestRender()
-        }
-        findViewById<CheckBox>(R.id.diffuse_light).setOnCheckedChangeListener { _, isChecked ->
-            mRenderView.updateFilterData(Bundle().apply {
-                putInt("diffuseLight", if (isChecked) 1 else 0)
-            })
-            mRenderView.requestRender()
-        }
-        findViewById<CheckBox>(R.id.specular_light).setOnCheckedChangeListener { _, isChecked ->
-            mRenderView.updateFilterData(Bundle().apply {
-                putInt("specularLight", if (isChecked) 1 else 0)
+                when (checkedId) {
+                    R.id.gl_points -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Point.value)
+                    R.id.gl_lines -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Line.value)
+                    R.id.gl_triangles -> putInt("drawingMode", DiffuseLightBallProgram.DrawMode.Face.value)
+                }
+
             })
             mRenderView.requestRender()
         }
@@ -102,8 +93,8 @@ class LightSourceTypeActivity : AppCompatActivity() {
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    // x 在 [-10, 10] 区间游走
-                    val x = progress / max.toFloat() * 20 - 10
+                    // x 在 [-2, 2] 区间游走
+                    val x = progress / max.toFloat() * 4 - 2
                     mLightPosition[0] = x
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightXPosition", x)
@@ -119,8 +110,8 @@ class LightSourceTypeActivity : AppCompatActivity() {
         findViewById<SeekBar>(R.id.light_y_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    // y 在 [-10, 10] 区间游走
-                    val y = progress / max.toFloat() * 20 - 10
+                    // y 在 [-2, 2] 区间游走
+                    val y = progress / max.toFloat() * 4 - 2
                     mLightPosition[1] = y
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightYPosition", y)
@@ -149,36 +140,6 @@ class LightSourceTypeActivity : AppCompatActivity() {
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {}
             })
-        }
-
-        mShininessTitle = findViewById(R.id.shininess_title)
-        findViewById<SeekBar>(R.id.shininess).apply {
-            setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                    val value = progress + 1
-                    mRenderView.updateFilterData(Bundle().apply {
-                        putFloat("shininess", value.toFloat())
-                    })
-                    mShininessTitle.text = "光滑度（${value}）"
-                    mRenderView.requestRender()
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-            })
-        }
-
-        findViewById<RadioGroup>(R.id.light_source_type).setOnCheckedChangeListener { _, checkedId ->
-            if (checkedId == R.id.point_light) {
-                mRenderView.updateFilterData(Bundle().apply {
-                    putInt("lightSourceType", LightSourceTypeBallProgram.LightSourceType.PointLight.value)
-                })
-            } else if (checkedId == R.id.directional_light) {
-                mRenderView.updateFilterData(Bundle().apply {
-                    putInt("lightSourceType", LightSourceTypeBallProgram.LightSourceType.DirectionalLight.value)
-                })
-            }
-            mRenderView.requestRender()
         }
     }
 
@@ -259,7 +220,6 @@ class LightSourceTypeActivity : AppCompatActivity() {
                 mBallFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                GLES20.glFrontFace(GLES20.GL_CW)
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -280,20 +240,12 @@ class LightSourceTypeActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = LightSourceTypeBallProgram()
+        private val mProgram = DiffuseLightBallProgram()
         private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
-        private val mRotateMatrix = ModelMatrix()
-        private val mLeftModelMatrix = ModelMatrix()
-            .apply {
-                translate(-2F, 0F, 0F)
-            }
-        private val mRightModelMatrix = ModelMatrix()
-            .apply {
-                translate(2F, 0F, 0F)
-            }
+        private val mModelMatrix = ModelMatrix()
 
         private var mXAngle = 0F
         private var mYAngle = 0F
@@ -301,13 +253,12 @@ class LightSourceTypeActivity : AppCompatActivity() {
         private var mPreviewSize = Size(0, 0)
 
         private var mLightPoint = Point(0F, 0F, 5F)
-        private var mViewPoint = Point(0F, 0F, 10F)
 
         override fun onInit(context: FilterContext) {
             mProgram.init()
             mLightPointProgram.init()
             mViewMatrix.setLookAtM(
-                mViewPoint.x, mViewPoint.y, mViewPoint.z,
+                0F, 0F, 10F,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -318,17 +269,12 @@ class LightSourceTypeActivity : AppCompatActivity() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
             synchronized(this) {
+                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+                mProgram.setMMatrix(mModelMatrix)
                 mProgram.setLightPoint(mLightPoint)
-                mProgram.setViewPoint(mViewPoint)
-
-                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mLeftModelMatrix)
-                mProgram.setMMatrix(mRotateMatrix * mLeftModelMatrix)
                 mProgram.draw()
 
-                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
-                mProgram.setMMatrix(mRotateMatrix * mRightModelMatrix)
-                mProgram.draw()
-
+                // 模型矩阵为单位矩阵，不用进行
                 mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
                 mLightPointProgram.setLightPoint(mLightPoint)
                 mLightPointProgram.draw()
@@ -365,9 +311,18 @@ class LightSourceTypeActivity : AppCompatActivity() {
             synchronized(this) {
                 mXAngle += updateData.getFloat("xAngle", 0F)
                 mYAngle += updateData.getFloat("yAngle", 0F)
-                mRotateMatrix.reset()
-                mRotateMatrix.rotate(mXAngle, 0F, 1F, 0F)
-                mRotateMatrix.rotate(mYAngle, 1F, 0F, 0F)
+                mModelMatrix.reset()
+                mModelMatrix.rotate(mXAngle, 0F, 1F, 0F)
+                mModelMatrix.rotate(mYAngle, 1F, 0F, 0F)
+
+                val mode = updateData.getInt("drawingMode", 0)
+                if (mode != 0) {
+                    when (mode) {
+                        DiffuseLightBallProgram.DrawMode.Point.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Point)
+                        DiffuseLightBallProgram.DrawMode.Line.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Line)
+                        DiffuseLightBallProgram.DrawMode.Face.value -> mProgram.setDrawMode(DiffuseLightBallProgram.DrawMode.Face)
+                    }
+                }
 
                 val spanAngle = updateData.getInt("spanAngle", 0)
                 if (spanAngle != 0) {
@@ -392,40 +347,6 @@ class LightSourceTypeActivity : AppCompatActivity() {
                         mLightPoint = mLightPoint.copy(z = it)
                         mProgram.setLightPoint(mLightPoint)
                     }
-
-                updateData.getFloat("shininess", -10000F)
-                    .takeIf { it != -10000F }
-                    ?.let {
-                        mProgram.setShininess(it)
-                    }
-
-                updateData.getInt("ambientLight", -10000)
-                    .takeIf { it != -10000 }
-                    ?.let {
-                        mProgram.isAddAmbientLight(it == 1)
-                    }
-                updateData.getInt("diffuseLight", -10000)
-                    .takeIf { it != -10000 }
-                    ?.let {
-                        mProgram.isAddDiffuseLight(it == 1)
-                    }
-                updateData.getInt("specularLight", -10000)
-                    .takeIf { it != -10000 }
-                    ?.let {
-                        mProgram.isAddSpecularLight(it == 1)
-                    }
-
-                updateData.getInt("lightSourceType", -10000)
-                    .takeIf { it != -10000 }
-                    ?.let {
-                        mProgram.setLightSourceType(
-                            if (it == LightSourceTypeBallProgram.LightSourceType.DirectionalLight.value) {
-                                LightSourceTypeBallProgram.LightSourceType.DirectionalLight
-                            } else {
-                                LightSourceTypeBallProgram.LightSourceType.PointLight
-                            }
-                        )
-                    }
             }
         }
 
@@ -436,7 +357,7 @@ class LightSourceTypeActivity : AppCompatActivity() {
                 if (message.what == RESET) {
                     mXAngle = 0F
                     mYAngle = 0F
-                    mRotateMatrix.reset()
+                    mModelMatrix.reset()
                 }
             }
         }

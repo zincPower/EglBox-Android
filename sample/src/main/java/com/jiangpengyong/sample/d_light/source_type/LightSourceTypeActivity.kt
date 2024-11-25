@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.d_light
+package com.jiangpengyong.sample.d_light.source_type
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -25,6 +25,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.d_light.LightPointProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -32,9 +33,9 @@ import javax.microedition.khronos.opengles.GL10
  * @author jiang peng yong
  * @date 2024/7/25 09:00
  * @email 56002982@qq.com
- * @des 光照计算位置
+ * @des 光源类型（定点光、定向光）
  */
-class LightCalculateTypeActivity : AppCompatActivity() {
+class LightSourceTypeActivity : AppCompatActivity() {
     companion object {
         private const val TOUCH_SCALE_FACTOR = 1 / 4F
         private const val RESET = 10000
@@ -50,7 +51,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_light_calculate_type)
+        setContentView(R.layout.activity_light_source_type)
         mRenderView = findViewById(R.id.surface_view)
 
         findViewById<View>(R.id.reset).setOnClickListener {
@@ -170,24 +171,11 @@ class LightCalculateTypeActivity : AppCompatActivity() {
         findViewById<RadioGroup>(R.id.light_source_type).setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.point_light) {
                 mRenderView.updateFilterData(Bundle().apply {
-                    putInt("lightSourceType", LightCalculateTypeBallProgram.LightSourceType.PointLight.value)
+                    putInt("lightSourceType", LightSourceTypeBallProgram.LightSourceType.PointLight.value)
                 })
             } else if (checkedId == R.id.directional_light) {
                 mRenderView.updateFilterData(Bundle().apply {
-                    putInt("lightSourceType", LightCalculateTypeBallProgram.LightSourceType.DirectionalLight.value)
-                })
-            }
-            mRenderView.requestRender()
-        }
-
-        findViewById<RadioGroup>(R.id.light_calculate_type).setOnCheckedChangeListener { _, checkedId ->
-            if (checkedId == R.id.gouraud) {
-                mRenderView.updateFilterData(Bundle().apply {
-                    putInt("lightCalculateType", LightCalculateTypeBallProgram.LightCalculateType.Vertex.value)
-                })
-            } else if (checkedId == R.id.phong) {
-                mRenderView.updateFilterData(Bundle().apply {
-                    putInt("lightCalculateType", LightCalculateTypeBallProgram.LightCalculateType.Fragment.value)
+                    putInt("lightSourceType", LightSourceTypeBallProgram.LightSourceType.DirectionalLight.value)
                 })
             }
             mRenderView.requestRender()
@@ -271,7 +259,6 @@ class LightCalculateTypeActivity : AppCompatActivity() {
                 mBallFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                GLES20.glFrontFace(GLES20.GL_CW)
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -292,8 +279,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mGouraudProgram = LightCalculateTypeBallProgram(LightCalculateTypeBallProgram.LightCalculateType.Vertex)
-        private val mPhongProgram = LightCalculateTypeBallProgram(LightCalculateTypeBallProgram.LightCalculateType.Fragment)
+        private val mProgram = LightSourceTypeBallProgram()
         private val mLightPointProgram = LightPointProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
@@ -305,7 +291,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
             }
         private val mRightModelMatrix = ModelMatrix()
             .apply {
-//                translate(2F, 0F, 0F)
+                translate(2F, 0F, 0F)
             }
 
         private var mXAngle = 0F
@@ -316,11 +302,8 @@ class LightCalculateTypeActivity : AppCompatActivity() {
         private var mLightPoint = Point(0F, 0F, 5F)
         private var mViewPoint = Point(0F, 0F, 10F)
 
-        private var mLightCalculateType = LightCalculateTypeBallProgram.LightCalculateType.Vertex
-
         override fun onInit(context: FilterContext) {
-            mGouraudProgram.init()
-            mPhongProgram.init()
+            mProgram.init()
             mLightPointProgram.init()
             mViewMatrix.setLookAtM(
                 mViewPoint.x, mViewPoint.y, mViewPoint.z,
@@ -333,21 +316,17 @@ class LightCalculateTypeActivity : AppCompatActivity() {
             GLES20.glClearColor(0F, 0F, 0F, 1F)
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
-            val program = when (mLightCalculateType) {
-                LightCalculateTypeBallProgram.LightCalculateType.Vertex -> mGouraudProgram
-                LightCalculateTypeBallProgram.LightCalculateType.Fragment -> mPhongProgram
-            }
             synchronized(this) {
-                program.setLightPoint(mLightPoint)
-                program.setViewPoint(mViewPoint)
+                mProgram.setLightPoint(mLightPoint)
+                mProgram.setViewPoint(mViewPoint)
 
-//                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mLeftModelMatrix)
-//                mProgram.setMMatrix(mRotateMatrix * mLeftModelMatrix)
-//                mProgram.draw()
+                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mLeftModelMatrix)
+                mProgram.setMMatrix(mRotateMatrix * mLeftModelMatrix)
+                mProgram.draw()
 
-                program.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
-                program.setMMatrix(mRotateMatrix * mRightModelMatrix)
-                program.draw()
+                mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mRotateMatrix * mRightModelMatrix)
+                mProgram.setMMatrix(mRotateMatrix * mRightModelMatrix)
+                mProgram.draw()
 
                 mLightPointProgram.setMatrix(mProjectMatrix * mViewMatrix)
                 mLightPointProgram.setLightPoint(mLightPoint)
@@ -356,8 +335,7 @@ class LightCalculateTypeActivity : AppCompatActivity() {
         }
 
         override fun onRelease(context: FilterContext) {
-            mGouraudProgram.release()
-            mPhongProgram.release()
+            mProgram.release()
             mLightPointProgram.release()
         }
 
@@ -392,78 +370,60 @@ class LightCalculateTypeActivity : AppCompatActivity() {
 
                 val spanAngle = updateData.getInt("spanAngle", 0)
                 if (spanAngle != 0) {
-                    mGouraudProgram.setAngleSpan(spanAngle)
-                    mPhongProgram.setAngleSpan(spanAngle)
+                    mProgram.setAngleSpan(spanAngle)
                 }
 
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
                         mLightPoint = mLightPoint.copy(x = it)
-                        mGouraudProgram.setLightPoint(mLightPoint)
-                        mPhongProgram.setLightPoint(mLightPoint)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
                         mLightPoint = mLightPoint.copy(y = it)
-                        mGouraudProgram.setLightPoint(mLightPoint)
-                        mPhongProgram.setLightPoint(mLightPoint)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
                         mLightPoint = mLightPoint.copy(z = it)
-                        mGouraudProgram.setLightPoint(mLightPoint)
-                        mPhongProgram.setLightPoint(mLightPoint)
+                        mProgram.setLightPoint(mLightPoint)
                     }
 
                 updateData.getFloat("shininess", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mGouraudProgram.setShininess(it)
-                        mPhongProgram.setShininess(it)
+                        mProgram.setShininess(it)
                     }
 
                 updateData.getInt("ambientLight", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        mGouraudProgram.isAddAmbientLight(it == 1)
-                        mPhongProgram.isAddAmbientLight(it == 1)
+                        mProgram.isAddAmbientLight(it == 1)
                     }
                 updateData.getInt("diffuseLight", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        mGouraudProgram.isAddDiffuseLight(it == 1)
-                        mPhongProgram.isAddDiffuseLight(it == 1)
+                        mProgram.isAddDiffuseLight(it == 1)
                     }
                 updateData.getInt("specularLight", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        mGouraudProgram.isAddSpecularLight(it == 1)
-                        mPhongProgram.isAddSpecularLight(it == 1)
+                        mProgram.isAddSpecularLight(it == 1)
                     }
 
                 updateData.getInt("lightSourceType", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        val type = if (it == LightCalculateTypeBallProgram.LightSourceType.DirectionalLight.value) {
-                            LightCalculateTypeBallProgram.LightSourceType.DirectionalLight
-                        } else {
-                            LightCalculateTypeBallProgram.LightSourceType.PointLight
-                        }
-                        mGouraudProgram.setLightSourceType(type)
-                        mPhongProgram.setLightSourceType(type)
-                    }
-
-                updateData.getInt("lightCalculateType", -10000)
-                    .takeIf { it != -10000 }
-                    ?.let {
-                        mLightCalculateType = if (it == LightCalculateTypeBallProgram.LightCalculateType.Vertex.value) {
-                            LightCalculateTypeBallProgram.LightCalculateType.Vertex
-                        } else {
-                            LightCalculateTypeBallProgram.LightCalculateType.Fragment
-                        }
+                        mProgram.setLightSourceType(
+                            if (it == LightSourceTypeBallProgram.LightSourceType.DirectionalLight.value) {
+                                LightSourceTypeBallProgram.LightSourceType.DirectionalLight
+                            } else {
+                                LightSourceTypeBallProgram.LightSourceType.PointLight
+                            }
+                        )
                     }
             }
         }

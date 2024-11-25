@@ -76,7 +76,7 @@
 
     <view
         android:id="@+id/surface_view"
-        class="com.jiangpengyong.sample.d_light.AmbientLightActivity$RenderView"
+        class="com.jiangpengyong.sample.d_light.ambient.AmbientLightActivity$RenderView"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1" />
