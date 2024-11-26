@@ -56,8 +56,8 @@ class RingProgram(
         mLightPoint = lightPoint
     }
 
-    fun setViewPoint(cameraPosition: Point) {
-        mViewPoint = cameraPosition
+    fun setViewPoint(ViewPoint: Point) {
+        mViewPoint = ViewPoint
     }
 
     fun setShininess(shininess: Float) {

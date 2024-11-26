@@ -6,10 +6,9 @@ import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
-import com.jiangpengyong.eglbox_filter.BallFilter
+import com.jiangpengyong.eglbox_filter.filter.BallFilter
 import com.jiangpengyong.eglbox_filter.TriangleFilter
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App

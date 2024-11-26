@@ -19,9 +19,11 @@ import com.jiangpengyong.eglbox_core.engine.RenderType
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
+import com.jiangpengyong.eglbox_filter.program.BallProgram
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -40,10 +42,10 @@ class FullLightActivity : AppCompatActivity() {
 
     private lateinit var mRenderView: RenderView
     private lateinit var mSpanAngleTitle: TextView
-    private lateinit var mLightPositionTip: TextView
+    private lateinit var mLightPointTip: TextView
     private lateinit var mShininessTitle: TextView
 
-    private val mLightPosition = floatArrayOf(0F, 0F, 5F)
+    private val mLightPoint = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,18 +96,18 @@ class FullLightActivity : AppCompatActivity() {
             mRenderView.requestRender()
         }
 
-        mLightPositionTip = findViewById(R.id.light_position_tip)
-        updateLightPositionTip()
+        mLightPointTip = findViewById(R.id.light_position_tip)
+        updateLightPointTip()
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     // x 在 [-2, 2] 区间游走
                     val x = progress / max.toFloat() * 4 - 2
-                    mLightPosition[0] = x
+                    mLightPoint[0] = x
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightXPosition", x)
                     })
-                    updateLightPositionTip()
+                    updateLightPointTip()
                     mRenderView.requestRender()
                 }
 
@@ -118,11 +120,11 @@ class FullLightActivity : AppCompatActivity() {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     // y 在 [-2, 2] 区间游走
                     val y = progress / max.toFloat() * 4 - 2
-                    mLightPosition[1] = y
+                    mLightPoint[1] = y
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightYPosition", y)
                     })
-                    updateLightPositionTip()
+                    updateLightPointTip()
                     mRenderView.requestRender()
                 }
 
@@ -135,11 +137,11 @@ class FullLightActivity : AppCompatActivity() {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     // z 在 [-5, 5] 区间游走
                     val z = progress / max.toFloat() * 10 - 5
-                    mLightPosition[2] = z
+                    mLightPoint[2] = z
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightZPosition", z)
                     })
-                    updateLightPositionTip()
+                    updateLightPointTip()
                     mRenderView.requestRender()
                 }
 
@@ -166,8 +168,8 @@ class FullLightActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateLightPositionTip() {
-        mLightPositionTip.text = "(${String.format("%.2f", mLightPosition[0])}, ${String.format("%.2f", mLightPosition[1])}, ${String.format("%.2f", mLightPosition[2])})"
+    private fun updateLightPointTip() {
+        mLightPointTip.text = "(${String.format("%.2f", mLightPoint[0])}, ${String.format("%.2f", mLightPoint[1])}, ${String.format("%.2f", mLightPoint[2])})"
     }
 
     override fun onResume() {
@@ -243,7 +245,6 @@ class FullLightActivity : AppCompatActivity() {
                 mBallFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-                GLES20.glFrontFace(GLES20.GL_CW)
             }
 
             override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -264,7 +265,7 @@ class FullLightActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = FullLightBallProgram()
+        private val mProgram = BallProgram()
 
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
@@ -275,13 +276,13 @@ class FullLightActivity : AppCompatActivity() {
 
         private var mPreviewSize = Size(0, 0)
 
-        private var mLightPosition = floatArrayOf(0F, 0F, 5F)
-        private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
+        private var mLightPoint = Point(0F, 0F, 5F)
+        private var mViewPoint = Point(0F, 0F, 10F)
 
         override fun onInit(context: FilterContext) {
             mProgram.init()
             mViewMatrix.setLookAtM(
-                mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
+                mViewPoint.x, mViewPoint.y, mViewPoint.z,
                 0F, 0F, 0F,
                 0F, 1F, 0F
             )
@@ -293,9 +294,9 @@ class FullLightActivity : AppCompatActivity() {
             updateProjectionMatrix(context)
             synchronized(this) {
                 mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-                mProgram.setMMatrix(mModelMatrix)
-                mProgram.setLightPosition(mLightPosition)
-                mProgram.setCameraPosition(mCameraPosition)
+                mProgram.setModelMatrix(mModelMatrix)
+                mProgram.setLightPoint(mLightPoint)
+                mProgram.setViewPoint(mViewPoint)
                 mProgram.draw()
             }
         }
@@ -341,20 +342,20 @@ class FullLightActivity : AppCompatActivity() {
                 updateData.getFloat("lightXPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[0] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = Point(it, mLightPoint.y, mLightPoint.z)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightYPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[1] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = Point(mLightPoint.x, it, mLightPoint.z)
+                        mProgram.setLightPoint(mLightPoint)
                     }
                 updateData.getFloat("lightZPosition", -10000F)
                     .takeIf { it != -10000F }
                     ?.let {
-                        mLightPosition[2] = it
-                        mProgram.setLightPosition(mLightPosition)
+                        mLightPoint = Point(mLightPoint.x, mLightPoint.y, it)
+                        mProgram.setLightPoint(mLightPoint)
                     }
 
                 updateData.getFloat("shininess", -10000F)

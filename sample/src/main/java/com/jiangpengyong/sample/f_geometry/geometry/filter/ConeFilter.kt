@@ -38,8 +38,8 @@ class ConeFilter(
     private var mYAngle = 0F
 
     private var mPreviewSize = Size(0, 0)
-    private var mLightPosition = floatArrayOf(0F, 0F, 5F)
-    private var mCameraPosition = floatArrayOf(0F, 0F, 10F)
+    private var mLightPoint = floatArrayOf(0F, 0F, 5F)
+    private var mViewPoint = floatArrayOf(0F, 0F, 10F)
 
     private var mBottomMatrix = ModelMatrix().apply {
         translate(0F, 0F, height / 2F)
@@ -100,8 +100,8 @@ class ConeFilter(
 
     private fun drawCircle(matrix: ModelMatrix) {
         mTopTexture?.let { mProgram.setTexture(it) }
-        mProgram.setCameraPosition(mCameraPosition)
-        mProgram.setLightPosition(mLightPosition)
+        mProgram.setViewPoint(mViewPoint)
+        mProgram.setLightPoint(mLightPoint)
         mProgram.setData(
             vertexBuffer = mCircleInfo.vertexBuffer,
             textureBuffer = mCircleInfo.textureBuffer,
@@ -117,8 +117,8 @@ class ConeFilter(
 
     private fun drawSide() {
         mTopTexture?.let { mProgram.setTexture(it) }
-        mProgram.setCameraPosition(mCameraPosition)
-        mProgram.setLightPosition(mLightPosition)
+        mProgram.setViewPoint(mViewPoint)
+        mProgram.setLightPoint(mLightPoint)
         mProgram.setData(
             vertexBuffer = mConeSideInfo.vertexBuffer,
             textureBuffer = mConeSideInfo.textureBuffer,
@@ -155,7 +155,7 @@ class ConeFilter(
 
     private fun updateViewMatrix() {
         mViewMatrix.setLookAtM(
-            mCameraPosition[0], mCameraPosition[1], mCameraPosition[2],
+            mViewPoint[0], mViewPoint[1], mViewPoint[2],
             0F, 0F, 0F,
             0F, 1F, 0F
         )

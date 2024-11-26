@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.utils
+package com.jiangpengyong.eglbox_filter.utils
 
 import android.content.res.AssetManager
 import com.jiangpengyong.eglbox_core.logger.Logger

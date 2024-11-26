@@ -42,9 +42,9 @@ class DiffuseLightActivity : AppCompatActivity() {
 
     private lateinit var mRenderView: RenderView
     private lateinit var mSpanAngleTitle: TextView
-    private lateinit var mLightPositionTip: TextView
+    private lateinit var mLightPointTip: TextView
 
-    private val mLightPosition = floatArrayOf(0F, 0F, 5F)
+    private val mLightPoint = floatArrayOf(0F, 0F, 5F)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,18 +88,18 @@ class DiffuseLightActivity : AppCompatActivity() {
             mRenderView.requestRender()
         }
 
-        mLightPositionTip = findViewById(R.id.light_position_tip)
-        updateLightPositionTip()
+        mLightPointTip = findViewById(R.id.light_position_tip)
+        updateLightPointTip()
         findViewById<SeekBar>(R.id.light_x_position).apply {
             setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     // x 在 [-2, 2] 区间游走
                     val x = progress / max.toFloat() * 4 - 2
-                    mLightPosition[0] = x
+                    mLightPoint[0] = x
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightXPosition", x)
                     })
-                    updateLightPositionTip()
+                    updateLightPointTip()
                     mRenderView.requestRender()
                 }
 
@@ -112,11 +112,11 @@ class DiffuseLightActivity : AppCompatActivity() {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     // y 在 [-2, 2] 区间游走
                     val y = progress / max.toFloat() * 4 - 2
-                    mLightPosition[1] = y
+                    mLightPoint[1] = y
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightYPosition", y)
                     })
-                    updateLightPositionTip()
+                    updateLightPointTip()
                     mRenderView.requestRender()
                 }
 
@@ -129,11 +129,11 @@ class DiffuseLightActivity : AppCompatActivity() {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     // z 在 [-5, 5] 区间游走
                     val z = progress / max.toFloat() * 10 - 5
-                    mLightPosition[2] = z
+                    mLightPoint[2] = z
                     mRenderView.updateFilterData(Bundle().apply {
                         putFloat("lightZPosition", z)
                     })
-                    updateLightPositionTip()
+                    updateLightPointTip()
                     mRenderView.requestRender()
                 }
 
@@ -143,8 +143,8 @@ class DiffuseLightActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateLightPositionTip() {
-        mLightPositionTip.text = "(${String.format("%.2f", mLightPosition[0])}, ${String.format("%.2f", mLightPosition[1])}, ${String.format("%.2f", mLightPosition[2])})"
+    private fun updateLightPointTip() {
+        mLightPointTip.text = "(${String.format("%.2f", mLightPoint[0])}, ${String.format("%.2f", mLightPoint[1])}, ${String.format("%.2f", mLightPoint[2])})"
     }
 
     override fun onResume() {

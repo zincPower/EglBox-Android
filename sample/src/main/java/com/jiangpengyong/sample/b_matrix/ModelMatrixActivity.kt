@@ -19,7 +19,7 @@ import com.jiangpengyong.eglbox_core.program.isValid
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_filter.CubeProgram
+import com.jiangpengyong.eglbox_filter.program.CubeProgram
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10

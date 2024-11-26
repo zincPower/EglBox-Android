@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import com.jiangpengyong.eglbox_filter.EglBoxRuntime
-import com.jiangpengyong.sample.utils.FileUtils
+import com.jiangpengyong.eglbox_filter.utils.FileUtils
 
 class App : Application() {
     companion object {

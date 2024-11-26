@@ -9,9 +9,9 @@ in vec3 vNormal;
 // 物体变换矩阵，只包括物体的旋转、平移、缩放
 uniform mat4 uMMatrix;
 // 光源位置
-uniform vec3 uLightPosition;
+uniform vec3 uLightPoint;
 // 相机位置
-uniform vec3 uCameraPosition;
+uniform vec3 uViewPoint;
 // 光滑度
 //in float aShininess;
 
@@ -98,7 +98,7 @@ vec4 calSpecularLight(
     realNormal = normalize(realNormal);
 
     // 顶点到相机的向量
-    vec3 eyeVector = normalize(uCameraPosition - finalPosition);
+    vec3 eyeVector = normalize(uViewPoint - finalPosition);
     // 顶点到光源的向量
     vec3 lightVector;
     if (uLightSourceType == 1) {
@@ -127,14 +127,14 @@ void main() {
     vec4 diffuseLight = vec4(0);
     if (uIsAddDiffuseLight == 1) {
         vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-        diffuseLight = calDiffuseLight(vNormal, uLightPosition, diffuseLightIntensity);
+        diffuseLight = calDiffuseLight(vNormal, uLightPoint, diffuseLightIntensity);
     }
 
     // 镜面光
     vec4 specularLight = vec4(0);
     if (uIsAddSpecularLight == 1) {
         vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
-        specularLight = calSpecularLight(vNormal, uLightPosition, specularLightIntensity);
+        specularLight = calSpecularLight(vNormal, uLightPoint, specularLightIntensity);
     }
 
     vec4 orgColor = calColor();

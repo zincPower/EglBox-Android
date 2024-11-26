@@ -5,9 +5,9 @@ uniform mat4 uMVPMatrix;
 // 物体变换矩阵，只包括物体的旋转、平移、缩放
 uniform mat4 uMMatrix;
 // 光源位置
-uniform vec3 uLightPosition;
+uniform vec3 uLightPoint;
 // 相机位置
-uniform vec3 uCameraPosition;
+uniform vec3 uViewPoint;
 // 顶点位置
 in vec3 aPosition;
 // 法向量
@@ -36,7 +36,7 @@ vec4 calSpecularLight(
     realNormal = normalize(realNormal);
 
     // 顶点到相机的向量
-    vec3 eyeVector = normalize(uCameraPosition - finalPosition);
+    vec3 eyeVector = normalize(uViewPoint - finalPosition);
     // 顶点到光源的向量
     // 需要多一次归一化，否则因为精度问题，会有导致计算有问题：
     // 观察点 （0，0，10）
@@ -63,7 +63,7 @@ void main() {
 
     // 镜面光
     vec4 specularLightIntensity = vec4(0.7, 0.7, 0.7, 1.0);
-    vSpecularLight = calSpecularLight(aNormal, uLightPosition, specularLightIntensity);
+    vSpecularLight = calSpecularLight(aNormal, uLightPoint, specularLightIntensity);
 
     // 为了点绘制时，方便查看点绘制
     gl_PointSize = 10.0;

@@ -27,7 +27,7 @@ class DiffuseLightBallProgram : GLProgram() {
 
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
-    private var mLightPositionHandle = 0
+    private var mLightPointHandle = 0
     private var mPositionHandle = 0
     private var mNormalHandle = 0
 
@@ -63,7 +63,7 @@ class DiffuseLightBallProgram : GLProgram() {
     override fun onInit() {
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
         mMMatrixHandle = getUniformLocation("uMMatrix")
-        mLightPositionHandle = getUniformLocation("uLightPosition")
+        mLightPointHandle = getUniformLocation("uLightPoint")
         mPositionHandle = getAttribLocation("aPosition")
         mNormalHandle = getAttribLocation("aNormal")
     }
@@ -74,7 +74,7 @@ class DiffuseLightBallProgram : GLProgram() {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         // 模型矩阵
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
-        GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
+        GLES20.glUniform3f(mLightPointHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.vertexBuffer)
         // 法向量
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.normalBuffer)
@@ -92,7 +92,7 @@ class DiffuseLightBallProgram : GLProgram() {
     override fun onRelease() {
         mMVPMatrixHandle = 0
         mMMatrixHandle = 0
-        mLightPositionHandle = 0
+        mLightPointHandle = 0
         mPositionHandle = 0
         mNormalHandle = 0
     }

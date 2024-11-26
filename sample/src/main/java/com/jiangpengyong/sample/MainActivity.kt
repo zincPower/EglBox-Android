@@ -15,6 +15,7 @@ import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.g_model.Model3DMainActivity
 import com.jiangpengyong.sample.h_blend.BlendMainActivity
 import com.jiangpengyong.sample.i_scene.Scene3DMainActivity
+import com.jiangpengyong.sample.view.GLPreviewViewActivity
 
 /**
  * @author jiang peng yong
@@ -67,8 +68,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, FontActivity::class.java))
         }
 
-//        findViewById<View>(R.id.preview_view).setOnClickListener {
-//            startActivity(Intent(this, GLPreviewViewActivity::class.java))
-//        }
+        findViewById<View>(R.id.preview_view).setOnClickListener {
+            startActivity(Intent(this, GLPreviewViewActivity::class.java))
+        }
     }
 }

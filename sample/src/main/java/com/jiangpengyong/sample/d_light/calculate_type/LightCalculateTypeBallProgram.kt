@@ -30,8 +30,8 @@ class LightCalculateTypeBallProgram(val lightCalculateType: LightCalculateType) 
 
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
-    private var mLightPositionHandle = 0
-    private var mCameraPositionHandle = 0
+    private var mLightPointHandle = 0
+    private var mViewPointHandle = 0
     private var mPositionHandle = 0
     private var mNormalHandle = 0
     private var mShininessHandle = 0
@@ -99,8 +99,8 @@ class LightCalculateTypeBallProgram(val lightCalculateType: LightCalculateType) 
     override fun onInit() {
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
         mMMatrixHandle = getUniformLocation("uMMatrix")
-        mLightPositionHandle = getUniformLocation("uLightPosition")
-        mCameraPositionHandle = getUniformLocation("uCameraPosition")
+        mLightPointHandle = getUniformLocation("uLightPoint")
+        mViewPointHandle = getUniformLocation("uViewPoint")
         mPositionHandle = getAttribLocation("aPosition")
         mNormalHandle = getAttribLocation("aNormal")
         mShininessHandle = getAttribLocation("aShininess")
@@ -115,9 +115,9 @@ class LightCalculateTypeBallProgram(val lightCalculateType: LightCalculateType) 
         // 模型矩阵
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
         // 光源位置
-        GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
+        GLES20.glUniform3f(mLightPointHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         // 相机位置（观察位置）
-        GLES20.glUniform3f(mCameraPositionHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
+        GLES20.glUniform3f(mViewPointHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
         GLES20.glUniform1i(mIsAddDiffuseLightHandle, if (mIsAddDiffuseLight) 1 else 0)
@@ -137,8 +137,8 @@ class LightCalculateTypeBallProgram(val lightCalculateType: LightCalculateType) 
     override fun onRelease() {
         mMVPMatrixHandle = 0
         mMMatrixHandle = 0
-        mLightPositionHandle = 0
-        mCameraPositionHandle = 0
+        mLightPointHandle = 0
+        mViewPointHandle = 0
         mPositionHandle = 0
         mNormalHandle = 0
         mShininessHandle = 0

@@ -5,7 +5,7 @@ uniform mat4 uMVPMatrix;
 // 物体变换矩阵，只包括物体的旋转、平移、缩放
 uniform mat4 uMMatrix;
 // 光源位置
-uniform vec3 uLightPosition;
+uniform vec3 uLightPoint;
 // 顶点位置
 in vec3 aPosition;
 // 法向量
@@ -44,7 +44,7 @@ void main() {
     vPosition = aPosition;
 
     vec4 diffuseLightIntensity = vec4(0.8, 0.8, 0.8, 1.0);
-    vDiffuseLight = calDiffuseLight(aNormal, uLightPosition, diffuseLightIntensity);
+    vDiffuseLight = calDiffuseLight(aNormal, uLightPoint, diffuseLightIntensity);
 
     // 为了点绘制时，方便查看点绘制
     gl_PointSize = 10.0;

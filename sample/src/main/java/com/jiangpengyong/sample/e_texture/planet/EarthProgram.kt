@@ -24,8 +24,8 @@ class EarthProgram : GLProgram() {
 
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
-    private var mLightPositionHandle = 0
-    private var mCameraPositionHandle = 0
+    private var mLightPointHandle = 0
+    private var mViewPointHandle = 0
     private var mPositionHandle = 0
     private var mNormalHandle = 0
     private var mShininessHandle = 0
@@ -78,8 +78,8 @@ class EarthProgram : GLProgram() {
     override fun onInit() {
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
         mMMatrixHandle = getUniformLocation("uMMatrix")
-        mLightPositionHandle = getUniformLocation("uLightPosition")
-        mCameraPositionHandle = getUniformLocation("uCameraPosition")
+        mLightPointHandle = getUniformLocation("uLightPoint")
+        mViewPointHandle = getUniformLocation("uViewPoint")
         mPositionHandle = getAttribLocation("aPosition")
         mTextureCoordHandle = getAttribLocation("aTextureCoord")
         mNormalHandle = getAttribLocation("aNormal")
@@ -103,8 +103,8 @@ class EarthProgram : GLProgram() {
         GLES20.glUniform1i(mNightTextureHandle, 1)
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
-        GLES20.glUniform3f(mLightPositionHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
-        GLES20.glUniform3f(mCameraPositionHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
+        GLES20.glUniform3f(mLightPointHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
+        GLES20.glUniform3f(mViewPointHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.vertexBuffer)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.normalBuffer)
@@ -123,8 +123,8 @@ class EarthProgram : GLProgram() {
     override fun onRelease() {
         mMVPMatrixHandle = 0
         mMMatrixHandle = 0
-        mLightPositionHandle = 0
-        mCameraPositionHandle = 0
+        mLightPointHandle = 0
+        mViewPointHandle = 0
         mPositionHandle = 0
         mNormalHandle = 0
         mShininessHandle = 0

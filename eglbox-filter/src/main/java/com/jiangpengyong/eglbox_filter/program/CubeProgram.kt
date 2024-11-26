@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox_filter
+package com.jiangpengyong.eglbox_filter.program
 
 import android.graphics.Color
 import android.opengl.GLES20
