@@ -8,7 +8,6 @@ import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_filter.model.ModelCreator
-import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.sample.App
 import java.io.File
 
@@ -19,9 +18,6 @@ import java.io.File
  * @des 地球
  */
 class EarthProgram : GLProgram() {
-    private var mAngleSpan = 10
-    private var mRadius = 1F
-
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
     private var mLightPointHandle = 0
@@ -34,24 +30,24 @@ class EarthProgram : GLProgram() {
     private var mNightTextureHandle = 0
     private var mTextureCoordHandle = 0
 
-    private var mMVPMatrix: GLMatrix = GLMatrix()
-    private var mMMatrix: GLMatrix = GLMatrix()
+    private var mMVPMatrix = GLMatrix()
+    private var mModelMatrix = GLMatrix()
 
     private var mLightPoint = Point(0F, 0F, 0F)
     private var mViewPoint = Point(0F, 0F, 0F)
     private var mShininess = 50F
 
     private var mDayTexture: GLTexture? = null
-    private var mNightTexture: GLTexture = GLTexture()
+    private var mNightTexture = GLTexture()
 
-    private var mModelData: ModelData = ModelCreator.createBall(mAngleSpan, mRadius)
+    private var mModelData = ModelCreator.createBall()
 
     fun setMVPMatrix(matrix: GLMatrix) {
         mMVPMatrix = matrix
     }
 
-    fun setMMatrix(matrix: GLMatrix) {
-        mMMatrix = matrix
+    fun setModelMatrix(matrix: GLMatrix) {
+        mModelMatrix = matrix
     }
 
     fun setLightPoint(lightPoint: Point) {
@@ -64,11 +60,6 @@ class EarthProgram : GLProgram() {
 
     fun setShininess(shininess: Float) {
         mShininess = shininess
-    }
-
-    fun setAngleSpan(angleSpan: Int) {
-        mAngleSpan = angleSpan
-        mModelData = ModelCreator.createBall(mAngleSpan, mRadius)
     }
 
     fun setDayTexture(texture: GLTexture) {
@@ -88,7 +79,6 @@ class EarthProgram : GLProgram() {
         mDayTextureHandle = getUniformLocation("sTextureDay")
         mNightTextureHandle = getUniformLocation("sTextureNight")
 
-        // TODO
         mNightTexture.init()
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/celestial_body/2k_earth_nightmap.jpg").absolutePath).let { bitmap ->
             mNightTexture.setData(bitmap)
@@ -97,18 +87,20 @@ class EarthProgram : GLProgram() {
     }
 
     override fun onDraw() {
-        mDayTexture?.bind(textureUnit = GLES20.GL_TEXTURE0)
+        val dayTexture = mDayTexture ?: return
+        mModelData.frontFace.use()
+        dayTexture.bind(textureUnit = GLES20.GL_TEXTURE0)
         GLES20.glUniform1i(mDayTextureHandle, 0)
         mNightTexture.bind(textureUnit = GLES20.GL_TEXTURE1)
         GLES20.glUniform1i(mNightTextureHandle, 1)
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
-        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
+        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mModelMatrix.matrix, 0)
         GLES20.glUniform3f(mLightPointHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         GLES20.glUniform3f(mViewPointHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.vertexBuffer)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.normalBuffer)
-        GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, mModelData.textureStep * 4, mModelData.textureBuffer)
+        GLES20.glVertexAttribPointer(mTextureCoordHandle, mModelData.textureStep, GLES20.GL_FLOAT, false, mModelData.textureStep * 4, mModelData.textureBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mNormalHandle)
         GLES20.glEnableVertexAttribArray(mTextureCoordHandle)
@@ -116,7 +108,7 @@ class EarthProgram : GLProgram() {
         GLES20.glDisableVertexAttribArray(mPositionHandle)
         GLES20.glDisableVertexAttribArray(mNormalHandle)
         GLES20.glDisableVertexAttribArray(mTextureCoordHandle)
-        mDayTexture?.unbind()
+        dayTexture.unbind()
         mNightTexture.unbind()
     }
 

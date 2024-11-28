@@ -13,7 +13,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.normal_type.NormalTypeCubeProgram
-import com.jiangpengyong.sample.e_texture.planet.RingProgram
+import com.jiangpengyong.eglbox_filter.program.RingProgram
 import com.jiangpengyong.sample.g_model.Model3DInfo
 import com.jiangpengyong.sample.g_model.Model3DProgram
 import com.jiangpengyong.sample.g_model.Obj3DModelLoader

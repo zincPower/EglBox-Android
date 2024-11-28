@@ -7,14 +7,22 @@ import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
+import com.jiangpengyong.eglbox_filter.program.RingProgram
 import com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity.Companion.MESSAGE_TARGET
 import com.jiangpengyong.sample.utils.SizeUtils
 
+/**
+ * @author jiang peng yong
+ * @date 2024/11/27 08:05
+ * @email 56002982@qq.com
+ * @des 太阳系
+ */
 class SolarSystemFilter : GLFilter() {
     enum class Target(val value: Int) {
         SolarSystem(0),
@@ -29,13 +37,12 @@ class SolarSystemFilter : GLFilter() {
     }
 
     // 矩阵
-    private val mProjectMatrix = ProjectionMatrix()
+    private val mProjectionMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
-    private val mGestureMatrix = ModelMatrix()
-
-    // 手势旋转角度
-    private var mXAngle = 45F
-    private var mYAngle = 30F
+    private val mModelMatrix = ModelMatrix().apply {
+        rotate(45F, 0F, 1F, 0F)
+        rotate(30F, 1F, 0F, 0F)
+    }
 
     // 屏幕尺寸
     private var mPreviewSize = Size(0, 0)
@@ -86,10 +93,7 @@ class SolarSystemFilter : GLFilter() {
         mPlanetProgram.init()
         mEarthProgram.init()
         mRingProgram.init()
-        mOrbitProgram.apply {
-            setAngleSpan(1)
-            init()
-        }
+        mOrbitProgram.init()
 
         mSunInfo.init()
         mMoonInfo.init()
@@ -98,20 +102,26 @@ class SolarSystemFilter : GLFilter() {
             item.value.init()
         }
 
-        GLES20.glLineWidth(SizeUtils.dp2px(0.5F).toFloat())
+        GLES20.glLineWidth(SizeUtils.dp2px(0.5F))
     }
 
-    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) = synchronized(this) {
-        GLES20.glClearColor(0F, 0F, 0F, 1F)
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
-
-        updateGestureMatrix()
+    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+        val texture = imageInOut.texture ?: return
         updateOrbitAndRotation()
         updateProjectionMatrix(context)
         updateViewMatrix()
-
-        drawSun()
-        drawPlanet()
+        val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
+        fbo.use {
+            GLES20.glClearColor(0F, 0F, 0F, 1F)
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
+            GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+            GLES20.glEnable(GLES20.GL_CULL_FACE)
+            drawSun()
+            drawPlanet()
+            GLES20.glDisable(GLES20.GL_CULL_FACE)
+            GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+        }
+        imageInOut.out(fbo)
     }
 
     override fun onRelease(context: FilterContext) {
@@ -135,13 +145,13 @@ class SolarSystemFilter : GLFilter() {
         if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
             val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
             if (previewSize.width > previewSize.height) {
-                mProjectMatrix.setFrustumM(
+                mProjectionMatrix.setFrustumM(
                     -ratio, ratio,
                     -1F, 1F,
                     5F, 1000F
                 )
             } else {
-                mProjectMatrix.setFrustumM(
+                mProjectionMatrix.setFrustumM(
                     -1F, 1F,
                     -ratio, ratio,
                     5F, 1000F
@@ -198,20 +208,14 @@ class SolarSystemFilter : GLFilter() {
     }
 
     /**
-     * 更新手势旋转矩阵
-     */
-    private fun updateGestureMatrix() {
-        mGestureMatrix.reset()
-        mGestureMatrix.rotate(mXAngle, 0F, 1F, 0F)
-        mGestureMatrix.rotate(mYAngle, 1F, 0F, 0F)
-    }
-
-    /**
      * 绘制太阳
      */
     private fun drawSun() {
-        mSunProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * mSunInfo.matrix)
-        mSunInfo.updatePosition(mGestureMatrix * mSunInfo.matrix)
+        val space3D = mContext?.space3D ?: return
+        val vpMatrix = space3D.projectionMatrix * mViewMatrix
+        val modelMatrix = space3D.gestureMatrix * mModelMatrix * mSunInfo.matrix
+        mSunInfo.updatePosition(modelMatrix)
+        mSunProgram.setMVPMatrix(vpMatrix * modelMatrix)
         mSunProgram.setTexture(mSunInfo.texture)
         mSunProgram.draw()
     }
@@ -220,26 +224,27 @@ class SolarSystemFilter : GLFilter() {
      * 绘制行星
      */
     private fun drawPlanet() {
+        val space3D = mContext?.space3D ?: return
+        val vpMatrix = space3D.projectionMatrix * mViewMatrix
+        val commonModelMatrix = space3D.gestureMatrix * mModelMatrix
         for (item in mPlanetInfo) {
             val planetInfo = item.value
-
-            drawOrbit(planetInfo)
+            drawOrbit(planetInfo, vpMatrix, commonModelMatrix)
 
             if (planetInfo.celestialBody == CelestialBody.Earth) {
-                drawEarth(planetInfo)
-                drawMoon(planetInfo.matrix)
+                drawEarth(planetInfo, vpMatrix, commonModelMatrix)
+                drawMoon(vpMatrix, commonModelMatrix, planetInfo.matrix)
             } else {
+                val modelMatrix = commonModelMatrix * planetInfo.matrix
+                planetInfo.updatePosition(modelMatrix)
+                mPlanetProgram.setModelMatrix(modelMatrix)
+                mPlanetProgram.setMVPMatrix(vpMatrix * modelMatrix)
                 mPlanetProgram.setTexture(planetInfo.texture)
                 mPlanetProgram.setLightPoint(mSunPoint)
-                mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
-                (mGestureMatrix * planetInfo.matrix).let { modelMatrix ->
-                    mPlanetProgram.setMMatrix(modelMatrix)
-                    planetInfo.updatePosition(modelMatrix)
-                }
                 mPlanetProgram.setShininess(3F)
                 mPlanetProgram.draw()
                 if (planetInfo.celestialBody == CelestialBody.Saturn) {
-                    drawSaturnRing(planetInfo.matrix)
+                    drawSaturnRing(vpMatrix, commonModelMatrix, planetInfo.matrix)
                 }
             }
         }
@@ -248,27 +253,26 @@ class SolarSystemFilter : GLFilter() {
     /**
      * 绘制行星轨道
      */
-    private fun drawOrbit(planetInfo: CelestialBodyInfo) {
+    private fun drawOrbit(planetInfo: CelestialBodyInfo, vpMatrix: GLMatrix, commonModelMatrix: GLMatrix) {
         mOrbitModelMatrix.reset()
         mOrbitModelMatrix.apply {
             rotate(90F, -1F, 0F, 0F)
             scale(planetInfo.tranX, planetInfo.tranX, 1F)
         }
-        mOrbitProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * mOrbitModelMatrix)
+        mOrbitProgram.setMVPMatrix(vpMatrix * commonModelMatrix * mOrbitModelMatrix)
         mOrbitProgram.draw()
     }
 
     /**
      * 绘制月亮
      */
-    private fun drawMoon(matrix: GLMatrix) {
+    private fun drawMoon(vpMatrix: GLMatrix, commonModelMatrix: GLMatrix, earthMatrix: GLMatrix) {
+        val modelMatrix = commonModelMatrix * earthMatrix * mMoonInfo.matrix
+        mMoonInfo.updatePosition(modelMatrix)
+        mPlanetProgram.setModelMatrix(modelMatrix)
+        mPlanetProgram.setMVPMatrix(vpMatrix * modelMatrix)
         mPlanetProgram.setTexture(mMoonInfo.texture)
         mPlanetProgram.setLightPoint(mSunPoint)
-        mPlanetProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * matrix * mMoonInfo.matrix)
-        (mGestureMatrix * matrix * mMoonInfo.matrix).let { modelMatrix ->
-            mPlanetProgram.setMMatrix(modelMatrix)
-            mMoonInfo.updatePosition(modelMatrix)
-        }
         mPlanetProgram.setShininess(3F)
         mPlanetProgram.draw()
     }
@@ -276,15 +280,13 @@ class SolarSystemFilter : GLFilter() {
     /**
      * 绘制土星环
      */
-    private fun drawSaturnRing(matrix: GLMatrix) {
-        GLES20.glFrontFace(GLES20.GL_CCW)
+    private fun drawSaturnRing(vpMatrix: GLMatrix, commonModelMatrix: GLMatrix, saturnMatrix: ModelMatrix) {
+        val modelMatrix = commonModelMatrix * saturnMatrix * mSaturnRingInfo.matrix
+        mSaturnRingInfo.updatePosition(modelMatrix)
+        mRingProgram.setModelMatrix(modelMatrix)
+        mRingProgram.setMVPMatrix(vpMatrix * modelMatrix)
         mRingProgram.setTexture(mSaturnRingInfo.texture)
         mRingProgram.setLightPoint(mSunPoint)
-        mRingProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * matrix * mSaturnRingInfo.matrix)
-        (mGestureMatrix * matrix * mSaturnRingInfo.matrix).let { modelMatrix ->
-            mRingProgram.setModelMatrix(modelMatrix)
-            mSaturnRingInfo.updatePosition(modelMatrix)
-        }
         mRingProgram.setShininess(1F)
         mRingProgram.draw()
     }
@@ -292,29 +294,25 @@ class SolarSystemFilter : GLFilter() {
     /**
      * 绘制地球
      */
-    private fun drawEarth(planetInfo: CelestialBodyInfo) {
+    private fun drawEarth(planetInfo: CelestialBodyInfo, vpMatrix: GLMatrix, commonModelMatrix: GLMatrix) {
+        val modelMatrix = commonModelMatrix * planetInfo.matrix
+        planetInfo.updatePosition(modelMatrix)
+        mEarthProgram.setModelMatrix(modelMatrix)
+        mEarthProgram.setMVPMatrix(vpMatrix * modelMatrix)
         mEarthProgram.setDayTexture(planetInfo.texture)
         mEarthProgram.setLightPoint(mSunPoint)
-        mEarthProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mGestureMatrix * planetInfo.matrix)
-        (mGestureMatrix * planetInfo.matrix).let { modelMatrix ->
-            mEarthProgram.setMMatrix(modelMatrix)
-            planetInfo.updatePosition(modelMatrix)
-        }
         mEarthProgram.setShininess(3F)
         mEarthProgram.draw()
     }
 
-    override fun onUpdateData(updateData: Bundle) = synchronized(this) {
-        mXAngle += updateData.getFloat("xAngle", 0F)
-        mYAngle += updateData.getFloat("yAngle", 0F)
-    }
+    override fun onUpdateData(updateData: Bundle) {}
 
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            MESSAGE_TARGET -> synchronized(this) {
-                mProgress = message.obj as? Float ?: return@synchronized
+            MESSAGE_TARGET -> {
+                mProgress = message.obj as? Float ?: return
                 mEyeSourcePoint = mEyePoint
                 mEyeTarget = when (message.arg1) {
                     Target.SolarSystem.value -> Target.SolarSystem
@@ -334,6 +332,7 @@ class SolarSystemFilter : GLFilter() {
     }
 
     companion object {
+        const val TAG = "SolarSystemFilter"
         private const val DEFAULT_DISTANCE = 8F
         private val defaultEyePosition = Point(0F, 0F, 30F)
     }

@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.e_texture.planet
+package com.jiangpengyong.eglbox_filter.program
 
 import android.opengl.GLES20
 import com.jiangpengyong.eglbox_core.gles.GLProgram
@@ -6,9 +6,9 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
+import com.jiangpengyong.eglbox_filter.EglBoxRuntime
 import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.eglbox_filter.model.ModelCreator
-import com.jiangpengyong.sample.App
 
 /**
  * @author jiang peng yong
@@ -19,7 +19,7 @@ import com.jiangpengyong.sample.App
 class RingProgram(
     majorRadius: Float = 1.5F,     // 主半径，圆环中心到圆环切面中心距离
     minorRadius: Float = 0.5F,     // 子半径，圆环切面半径
-    majorSegment: Int = 36,      // 裁剪主圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
+    majorSegment: Int = 36,        // 裁剪主圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
     minorSegment: Int = 36,
 ) : GLProgram() {
     private var mMVPMatrixHandle = 0
@@ -56,8 +56,8 @@ class RingProgram(
         mLightPoint = lightPoint
     }
 
-    fun setViewPoint(ViewPoint: Point) {
-        mViewPoint = ViewPoint
+    fun setViewPoint(viewPoint: Point) {
+        mViewPoint = viewPoint
     }
 
     fun setShininess(shininess: Float) {
@@ -90,7 +90,7 @@ class RingProgram(
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.vertexBuffer)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, mModelData.normalBuffer ?: return)
-        GLES20.glVertexAttribPointer(mTextureCoordHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, mModelData.textureBuffer ?: return)
+        GLES20.glVertexAttribPointer(mTextureCoordHandle, mModelData.textureStep, GLES20.GL_FLOAT, false, mModelData.textureStep * 4, mModelData.textureBuffer ?: return)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glEnableVertexAttribArray(mNormalHandle)
         GLES20.glEnableVertexAttribArray(mTextureCoordHandle)
@@ -114,7 +114,7 @@ class RingProgram(
         mTextureCoordHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "common/vertex.glsl")
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/texture/celestial_body/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "common/fragment.glsl")
 }

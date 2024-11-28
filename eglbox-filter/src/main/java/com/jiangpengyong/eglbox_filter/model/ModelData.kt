@@ -75,7 +75,11 @@ enum class DataIndexType() {
  */
 enum class FrontFace(val value: Int) {
     CW(GLES20.GL_CW),
-    CCW(GLES20.GL_CCW),
+    CCW(GLES20.GL_CCW);
+
+    fun use() {
+        GLES20.glFrontFace(value)
+    }
 }
 
 /**

@@ -16,7 +16,8 @@ import com.jiangpengyong.eglbox_filter.model.ModelCreator
  */
 class BallProgram(
     angleSpan: Int = 10,
-    radius: Float = 1F
+    radius: Float = 1F,
+    val ballColorType: BallColorType = BallColorType.Texture
 ) : GLProgram() {
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
@@ -28,9 +29,11 @@ class BallProgram(
     private var mIsAddAmbientLightHandle = 0
     private var mIsAddDiffuseLightHandle = 0
     private var mIsAddSpecularHandle = 0
+    private var mTextureHandle = 0
+    private var mTextureCoordHandle = 0
 
     private var mMVPMatrix = GLMatrix()
-    private var mMMatrix = GLMatrix()
+    private var mModelMatrix = GLMatrix()
 
     private var mLightPoint = Point(0F, 0F, 5F)
     private var mViewPoint = Point(0F, 0F, 10F)
@@ -49,7 +52,7 @@ class BallProgram(
     }
 
     fun setModelMatrix(matrix: GLMatrix) {
-        mMMatrix = matrix
+        mModelMatrix = matrix
     }
 
     fun setLightPoint(lightPoint: Point) {
@@ -92,12 +95,17 @@ class BallProgram(
         mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
         mIsAddDiffuseLightHandle = getUniformLocation("uIsAddDiffuseLight")
         mIsAddSpecularHandle = getUniformLocation("uIsAddSpecularLight")
+
+        if (ballColorType == BallColorType.Texture) {
+            mTextureHandle = getUniformLocation("uTexture")
+            mTextureCoordHandle = getAttribLocation("aTextureCoord")
+        }
     }
 
     override fun onDraw() {
         GLES20.glFrontFace(mModelData.frontFace.value)
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
-        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mMMatrix.matrix, 0)
+        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, mModelMatrix.matrix, 0)
         GLES20.glUniform3f(mLightPointHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
         GLES20.glUniform3f(mViewPointHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
         GLES20.glVertexAttrib1f(mShininessHandle, mShininess)
@@ -124,9 +132,29 @@ class BallProgram(
         mIsAddAmbientLightHandle = 0
         mIsAddDiffuseLightHandle = 0
         mIsAddSpecularHandle = 0
+        mTextureHandle = 0
+        mTextureCoordHandle = 0
     }
 
-    override fun getVertexShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "ball/vertex.glsl")
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(
+        resources = EglBoxRuntime.context.resources,
+        filename = when (ballColorType) {
+            BallColorType.Color -> "ball/color/vertex.glsl"
+            BallColorType.Texture -> "ball/texture/vertex.glsl"
+        }
+    )
 
-    override fun getFragmentShaderSource(): String = loadFromAssetsFile(EglBoxRuntime.context.resources, "ball/fragment.glsl")
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(
+        resources = EglBoxRuntime.context.resources,
+        filename = when (ballColorType) {
+            BallColorType.Color -> "ball/color/fragment.glsl"
+            BallColorType.Texture -> "ball/texture/fragment.glsl"
+        }
+    )
+}
+
+// 球体颜色类型
+enum class BallColorType {
+    Color,      // 颜色渲染
+    Texture,    // 纹理渲染
 }

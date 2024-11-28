@@ -160,6 +160,12 @@ class GLTexture(
 
     fun isInit(): Boolean = (id != 0)
 
+    fun bind(textureUnit: Int = GLES20.GL_TEXTURE0, block: (() -> Unit)) {
+        bind(textureUnit)
+        block()
+        unbind()
+    }
+
     fun bind(textureUnit: Int = GLES20.GL_TEXTURE0) {
         if (id <= 0) {
             Logger.i(TAG, "GLTexture isn't initialized.【bind】")
