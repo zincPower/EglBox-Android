@@ -20,10 +20,6 @@ import com.jiangpengyong.eglbox_sample.R
  * @des 太阳系
  */
 class SolarSystemActivity : AppCompatActivity() {
-    companion object {
-        const val MESSAGE_TARGET = 100002
-    }
-
     private lateinit var mGLPreviewView: GLPreviewView
     private var mFilterId: String? = null
 
@@ -35,7 +31,7 @@ class SolarSystemActivity : AppCompatActivity() {
             val filterId = mFilterId ?: return@addUpdateListener
             val value = animator.animatedValue as? Float ?: return@addUpdateListener
             mGLPreviewView.sendMessageToFilter(filterId, Message.obtain().apply {
-                what = MESSAGE_TARGET
+                what = SolarSystemMessageType.CHANGE_TARGET
                 arg1 = mEyeTarget.value
                 obj = value
             })
@@ -45,6 +41,10 @@ class SolarSystemActivity : AppCompatActivity() {
     private val mHandler = Handler(Looper.getMainLooper())
     private val mRunnable = object : Runnable {
         override fun run() {
+            val filterId = mFilterId ?: return
+            mGLPreviewView.sendMessageToFilter(filterId, Message.obtain().apply {
+                what = SolarSystemMessageType.UPDATE_ORBIT_AND_ROTATION
+            })
             mGLPreviewView.requestRender()
             mHandler.postDelayed(this, 10)
         }

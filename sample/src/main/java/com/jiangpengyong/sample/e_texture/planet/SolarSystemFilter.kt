@@ -3,7 +3,6 @@ package com.jiangpengyong.sample.e_texture.planet
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
-import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
@@ -11,10 +10,8 @@ import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.program.RingProgram
-import com.jiangpengyong.sample.e_texture.planet.SolarSystemActivity.Companion.MESSAGE_TARGET
 import com.jiangpengyong.sample.utils.SizeUtils
 
 /**
@@ -37,15 +34,11 @@ class SolarSystemFilter : GLFilter() {
     }
 
     // 矩阵
-    private val mProjectionMatrix = ProjectionMatrix()
     private val mViewMatrix = ViewMatrix()
     private val mModelMatrix = ModelMatrix().apply {
         rotate(45F, 0F, 1F, 0F)
         rotate(30F, 1F, 0F, 0F)
     }
-
-    // 屏幕尺寸
-    private var mPreviewSize = Size(0, 0)
 
     // 绘制程序
     private val mSunProgram = SunProgram()
@@ -107,8 +100,6 @@ class SolarSystemFilter : GLFilter() {
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val texture = imageInOut.texture ?: return
-        updateOrbitAndRotation()
-        updateProjectionMatrix(context)
         updateViewMatrix()
         val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
         fbo.use {
@@ -138,35 +129,11 @@ class SolarSystemFilter : GLFilter() {
     }
 
     /**
-     * 更新投影矩阵
-     */
-    private fun updateProjectionMatrix(context: FilterContext) {
-        val previewSize = context.previewSize
-        if (mPreviewSize.width != previewSize.width || mPreviewSize.height != previewSize.height) {
-            val ratio = previewSize.width.toFloat() / previewSize.height.toFloat()
-            if (previewSize.width > previewSize.height) {
-                mProjectionMatrix.setFrustumM(
-                    -ratio, ratio,
-                    -1F, 1F,
-                    5F, 1000F
-                )
-            } else {
-                mProjectionMatrix.setFrustumM(
-                    -1F, 1F,
-                    -ratio, ratio,
-                    5F, 1000F
-                )
-            }
-            mPreviewSize = previewSize
-        }
-    }
-
-    /**
      * 更新视图矩阵
      */
     private fun updateViewMatrix() {
         when (mEyeTarget) {
-            Target.SolarSystem -> defaultEyePosition
+            Target.SolarSystem -> DEFAULT_EYE_POSITION
             Target.Mercury -> (mPlanetInfo[CelestialBody.Mercury]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
             Target.Venus -> (mPlanetInfo[CelestialBody.Venus]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
             Target.Earth -> (mPlanetInfo[CelestialBody.Earth]?.position ?: mEyePoint).let { Point(it.x, it.y, it.z + DEFAULT_DISTANCE) }
@@ -306,12 +273,11 @@ class SolarSystemFilter : GLFilter() {
     }
 
     override fun onUpdateData(updateData: Bundle) {}
-
     override fun onRestoreData(inputData: Bundle) {}
     override fun onStoreData(outputData: Bundle) {}
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            MESSAGE_TARGET -> {
+            SolarSystemMessageType.CHANGE_TARGET -> {
                 mProgress = message.obj as? Float ?: return
                 mEyeSourcePoint = mEyePoint
                 mEyeTarget = when (message.arg1) {
@@ -328,12 +294,21 @@ class SolarSystemFilter : GLFilter() {
                     else -> Target.SolarSystem
                 }
             }
+
+            SolarSystemMessageType.UPDATE_ORBIT_AND_ROTATION -> {
+                updateOrbitAndRotation()
+            }
         }
     }
 
     companion object {
         const val TAG = "SolarSystemFilter"
         private const val DEFAULT_DISTANCE = 8F
-        private val defaultEyePosition = Point(0F, 0F, 30F)
+        private val DEFAULT_EYE_POSITION = Point(0F, 0F, 30F)
     }
+}
+
+object SolarSystemMessageType {
+    const val CHANGE_TARGET = 1_000
+    const val UPDATE_ORBIT_AND_ROTATION = 1_001
 }
