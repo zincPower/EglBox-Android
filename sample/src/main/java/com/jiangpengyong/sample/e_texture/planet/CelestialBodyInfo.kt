@@ -5,6 +5,7 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
+import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.sample.App
 import java.io.File
 
@@ -38,15 +39,41 @@ data class CelestialBodyInfo(
     val celestialBody: CelestialBody,
     val tranX: Float,
     val angle: Float,
-    val scale: Float,
+    val scaleX: Float,
+    val scaleY: Float,
+    val scaleZ: Float,
     var orbitSpeed: Float,
     var rotationSpeed: Float
 ) {
-    val matrix = ModelMatrix()
+    constructor(
+        celestialBody: CelestialBody,
+        tranX: Float,
+        angle: Float,
+        scale: Float,
+        orbitSpeed: Float,
+        rotationSpeed: Float
+    ) : this(celestialBody, tranX, angle, scale, scale, scale, orbitSpeed, rotationSpeed)
+
+    // 自身矩阵，不考虑外部旋转
+    private val selfMatrix = ModelMatrix()
+
+    // 外部矩阵，作用于该天体
+    private var outsideMatrix = GLMatrix()
+
+    // 最终天体矩阵
+    val modelMatrix: GLMatrix
+        get() {
+            return outsideMatrix * selfMatrix
+        }
+
+    // 天体纹理
     val texture = GLTexture()
 
-    var position = originalPoint
-        private set
+    // 获取最终位置
+    val position: Point
+        get() {
+            return modelMatrix * originalPoint
+        }
 
     // 公转
     private var mOrbit = 0F
@@ -73,18 +100,18 @@ data class CelestialBodyInfo(
         updateMatrix()
     }
 
-    fun updatePosition(matrix: GLMatrix) {
-        position = matrix * originalPoint
+    fun setOutsideMatrix(matrix: GLMatrix) {
+        outsideMatrix = matrix
     }
 
     private fun updateMatrix() {
-        matrix.apply {
+        selfMatrix.apply {
             reset()
             rotate(mOrbit, 0F, 1F, 0F)
             translate(tranX, 0F, 0F)
             rotate(angle, 0F, 0F, 1F)
             rotate(mRotation, 0F, 1F, 0F)
-            scale(scale, scale, scale)
+            scale(scaleX, scaleY, scaleZ)
         }
     }
 

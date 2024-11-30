@@ -24,8 +24,8 @@ class SolarSystemActivity : AppCompatActivity() {
     private var mFilterId: String? = null
 
     private var mEyeTarget = SolarSystemFilter.Target.SolarSystem
-    private val mFloatAnimation = ValueAnimator.ofFloat(0F, 1F).apply {
-        setDuration(2000)
+    private val mTranAnim = ValueAnimator.ofFloat(0F, 1F).apply {
+        setDuration(2_000)
         interpolator = DecelerateInterpolator()
         addUpdateListener { animator ->
             val filterId = mFilterId ?: return@addUpdateListener
@@ -39,14 +39,14 @@ class SolarSystemActivity : AppCompatActivity() {
     }
 
     private val mHandler = Handler(Looper.getMainLooper())
-    private val mRunnable = object : Runnable {
+    private val mRenderTrigger = object : Runnable {
         override fun run() {
             val filterId = mFilterId ?: return
             mGLPreviewView.sendMessageToFilter(filterId, Message.obtain().apply {
                 what = SolarSystemMessageType.UPDATE_ORBIT_AND_ROTATION
             })
             mGLPreviewView.requestRender()
-            mHandler.postDelayed(this, 10)
+            mHandler.postDelayed(this, RENDER_INTERVAL)
         }
     }
 
@@ -61,7 +61,7 @@ class SolarSystemActivity : AppCompatActivity() {
         mGLPreviewView.post {
             mGLPreviewView.setBlank()
             mFilterId = mGLPreviewView.addFilter(SolarSystemFilter.TAG)
-            mHandler.postDelayed(mRunnable, 10)
+            mHandler.postDelayed(mRenderTrigger, RENDER_INTERVAL)
         }
 
         findViewById<View>(R.id.solar_system).setOnClickListener {
@@ -95,8 +95,12 @@ class SolarSystemActivity : AppCompatActivity() {
 
     private fun updateTarget(target: SolarSystemFilter.Target) {
         if (mEyeTarget == target) return
-        if (mFloatAnimation.isRunning) mFloatAnimation.cancel()
+        if (mTranAnim.isRunning) mTranAnim.cancel()
         mEyeTarget = target
-        mFloatAnimation.start()
+        mTranAnim.start()
+    }
+
+    companion object {
+        private const val RENDER_INTERVAL = 10L
     }
 }

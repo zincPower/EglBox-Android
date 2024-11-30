@@ -16,6 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
+/**
+ * @author jiang peng yong
+ * @date 2024/11/30 10:01
+ * @email 56002982@qq.com
+ * @des GLPreviewView 例子
+ */
 class GLPreviewViewActivity : AppCompatActivity() {
     private lateinit var previewView: GLPreviewView
     private var triangleFilter: String? = null

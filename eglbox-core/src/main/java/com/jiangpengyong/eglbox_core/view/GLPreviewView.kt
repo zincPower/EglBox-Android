@@ -11,7 +11,6 @@ import android.util.Size
 import android.view.MotionEvent
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
-import android.widget.Filter
 import android.widget.FrameLayout
 import com.jiangpengyong.eglbox_core.filter.Orientation
 import com.jiangpengyong.eglbox_core.processor.GLProcessor.Companion.SOURCE_FILTER_ID
@@ -114,8 +113,8 @@ class GLPreviewView : FrameLayout {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
-        val y = event.y
         val x = event.x
+        val y = event.y
         when (event.action) {
             MotionEvent.ACTION_MOVE -> {
                 val dx = x - mBeforeX

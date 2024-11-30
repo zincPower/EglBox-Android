@@ -81,7 +81,6 @@ class Space3D {
         gestureMatrix.reset()
         gestureMatrix.rotate(rotation.angleX, 0F, 1F, 0F)
         gestureMatrix.rotate(rotation.angleY, 1F, 0F, 0F)
-        gestureMatrix.rotate(rotation.angleZ, 0F, 0F, 1F)
     }
 
     /**
