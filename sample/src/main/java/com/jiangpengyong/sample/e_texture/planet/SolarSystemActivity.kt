@@ -9,6 +9,7 @@ import android.os.Message
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import com.jiangpengyong.eglbox_core.space3d.ProjectionType
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_sample.R
@@ -61,6 +62,8 @@ class SolarSystemActivity : AppCompatActivity() {
         mGLPreviewView.post {
             mGLPreviewView.setBlank()
             mFilterId = mGLPreviewView.addFilter(SolarSystemFilter.TAG)
+            mGLPreviewView.setRotation(60F, 45F, 0F)
+            mGLPreviewView.setProjection(ProjectionType.Perspective, 10F, 1000F, 1F)
             mHandler.postDelayed(mRenderTrigger, RENDER_INTERVAL)
         }
 

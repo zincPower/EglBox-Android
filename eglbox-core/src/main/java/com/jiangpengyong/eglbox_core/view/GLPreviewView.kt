@@ -134,6 +134,15 @@ class GLPreviewView : FrameLayout {
         return true
     }
 
+    fun setRotation(angleX: Float, angleY: Float, angleZ: Float) {
+        mAngleX = angleX
+        mAngleY = angleY
+        Space3DMessageType.obtainUpdateRotationMessage(angleX, angleY, angleZ).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
     fun resetRotation() {
         mBeforeX = 0F
         mBeforeY = 0F
