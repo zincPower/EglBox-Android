@@ -132,7 +132,7 @@ class GLFilterGroup : GLFilter() {
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-        Logger.i(TAG, "onDraw")
+//        Logger.i(TAG, "onDraw")
     }
 
     override fun onRelease(context: FilterContext) {

@@ -103,6 +103,11 @@ class SolarSystemActivity : AppCompatActivity() {
         mTranAnim.start()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mHandler.removeCallbacksAndMessages(null)
+    }
+
     companion object {
         private const val RENDER_INTERVAL = 10L
     }

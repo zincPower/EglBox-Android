@@ -27,6 +27,7 @@ enum class CelestialBody(val textureFile: String) {
     Moon("images/celestial_body/2k_moon.jpg"),                       // 月亮
     Sun("images/celestial_body/2k_sun.jpg"),                         // 太阳
     SaturnRing("images/celestial_body/2k_saturn_ring_alpha.png"),    // 土星环
+    EarthCloud("images/celestial_body/2k_earth_clouds.jpg"),         // 地球云
 }
 
 /**

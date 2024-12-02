@@ -43,6 +43,7 @@ class SolarSystemFilter : GLFilter() {
     private val mEarthProgram = EarthProgram()
     private val mRingProgram = RingProgram()
     private val mOrbitProgram = OrbitProgram()
+    private val mEarthCloudProgram = EarthCloudProgram()
 
     // 地球信息，作为其他天体基准
     private var mEarthRatio = 1 / 3F
@@ -68,6 +69,7 @@ class SolarSystemFilter : GLFilter() {
     private val mMoonInfo = CelestialBodyInfo(CelestialBody.Moon, 2F, -0.5F, 0.25F, mEarthOrbitSpeed * 4F, mEarthOrbitSpeed * 4F)
     private val mSunInfo = CelestialBodyInfo(CelestialBody.Sun, 0F, 0F, 1.5F, 0F, 0F)
     private val mSaturnRingInfo = CelestialBodyInfo(CelestialBody.SaturnRing, 0F, -27F, 1.2F, 0.12F, 1.2F, 0F, mEarthRotationSpeed * 2F)
+    private val mEarthCloudInfo = CelestialBodyInfo(CelestialBody.EarthCloud, 6.5F, -23.44F, mEarthRatio * 1.1F, mEarthOrbitSpeed, mEarthRotationSpeed * 1 / 3F)
     private val mPlanetInfo = mapOf(
         CelestialBody.Mercury to CelestialBodyInfo(CelestialBody.Mercury, 2.5F, -0.034F, mEarthRatio * 0.5F, mEarthOrbitSpeed / 0.24F, mEarthRotationSpeed * 2F),
         CelestialBody.Venus to CelestialBodyInfo(CelestialBody.Venus, 4.5F, -177.4F, mEarthRatio * 0.949F, mEarthOrbitSpeed / 0.62F, mEarthRotationSpeed * 1.2F),
@@ -85,10 +87,12 @@ class SolarSystemFilter : GLFilter() {
         mEarthProgram.init()
         mRingProgram.init()
         mOrbitProgram.init()
+        mEarthCloudProgram.init()
 
         mSunInfo.init()
         mMoonInfo.init()
         mSaturnRingInfo.init()
+        mEarthCloudInfo.init()
         for (item in mPlanetInfo) {
             item.value.init()
         }
@@ -120,10 +124,12 @@ class SolarSystemFilter : GLFilter() {
         mEarthProgram.release()
         mRingProgram.release()
         mOrbitProgram.release()
+        mEarthCloudProgram.release()
 
         mSunInfo.release()
         mMoonInfo.release()
         mSaturnRingInfo.release()
+        mEarthCloudInfo.release()
         for (item in mPlanetInfo) {
             item.value.release()
         }
@@ -134,6 +140,7 @@ class SolarSystemFilter : GLFilter() {
      */
     private fun updateCelestialData(space3D: Space3D) {
         mSunInfo.setOutsideMatrix(space3D.gestureMatrix)
+        mEarthCloudInfo.setOutsideMatrix(space3D.gestureMatrix)
         for (planet in mPlanetInfo) {
             planet.value.setOutsideMatrix(space3D.gestureMatrix)
             when (planet.key) {
@@ -187,6 +194,7 @@ class SolarSystemFilter : GLFilter() {
         }
         mMoonInfo.orbitAndRotation()
         mSaturnRingInfo.orbitAndRotation()
+        mEarthCloudInfo.orbitAndRotation()
     }
 
     /**
@@ -206,12 +214,17 @@ class SolarSystemFilter : GLFilter() {
     private fun drawPlanet() {
         val space3D = mContext?.space3D ?: return
         val vpMatrix = space3D.projectionMatrix * mViewMatrix
+
         for (item in mPlanetInfo) {
             val planetInfo = item.value
             drawOrbit(planetInfo, vpMatrix, space3D.gestureMatrix)
 
             if (planetInfo.celestialBody == CelestialBody.Earth) {
                 drawEarth(planetInfo, vpMatrix)
+                GLES20.glEnable(GLES20.GL_BLEND)
+                GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+                drawEarthCloud(vpMatrix)
+                GLES20.glDisable(GLES20.GL_BLEND)
                 drawMoon(vpMatrix)
             } else {
                 val modelMatrix = planetInfo.modelMatrix
@@ -278,6 +291,19 @@ class SolarSystemFilter : GLFilter() {
         mEarthProgram.setLightPoint(mSunPoint)
         mEarthProgram.setShininess(3F)
         mEarthProgram.draw()
+    }
+
+    /**
+     * 绘制地球
+     */
+    private fun drawEarthCloud(vpMatrix: GLMatrix) {
+        val modelMatrix = mEarthCloudInfo.modelMatrix
+        mEarthCloudProgram.setModelMatrix(modelMatrix)
+        mEarthCloudProgram.setMVPMatrix(vpMatrix * modelMatrix)
+        mEarthCloudProgram.setLightPoint(mSunPoint)
+        mEarthCloudProgram.setShininess(1F)
+        mEarthCloudProgram.setTexture(mEarthCloudInfo.texture)
+        mEarthCloudProgram.draw()
     }
 
     override fun onUpdateData(updateData: Bundle) {}

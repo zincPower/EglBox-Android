@@ -17,7 +17,7 @@ import com.jiangpengyong.eglbox_filter.model.ModelCreator
 class BallProgram(
     angleSpan: Int = 10,
     radius: Float = 1F,
-    val ballColorType: BallColorType = BallColorType.Texture
+    val ballColorType: BallColorType = BallColorType.Texture,
 ) : GLProgram() {
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
