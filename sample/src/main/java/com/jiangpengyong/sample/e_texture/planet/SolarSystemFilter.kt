@@ -8,6 +8,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
+import com.jiangpengyong.eglbox_core.gles.blend
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.space3d.Space3D
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
@@ -225,10 +226,9 @@ class SolarSystemFilter : GLFilter() {
 
             if (planetInfo.celestialBody == CelestialBody.Earth) {
                 drawEarth(planetInfo, vpMatrix)
-                GLES20.glEnable(GLES20.GL_BLEND)
-                GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-                drawEarthCloud(vpMatrix)
-                GLES20.glDisable(GLES20.GL_BLEND)
+                blend(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA) {
+                    drawEarthCloud(vpMatrix)
+                }
                 drawMoon(vpMatrix)
             } else {
                 val modelMatrix = planetInfo.modelMatrix

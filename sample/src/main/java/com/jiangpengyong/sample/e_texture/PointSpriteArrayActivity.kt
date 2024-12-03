@@ -19,6 +19,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.EglBox
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.gles.blend
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
@@ -195,19 +196,18 @@ class PointSpriteArrayActivity : AppCompatActivity() {
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
 
             // 开启混合，否则透明通道会遮挡后面的纹理
-            GLES20.glEnable(GLES20.GL_BLEND)
-            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
+            blend(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA){
+                // 开启纹理数组
+                GLES20.glEnable(GLES30.GL_TEXTURE_2D_ARRAY)
 
-            // 开启纹理数组
-            GLES20.glEnable(GLES30.GL_TEXTURE_2D_ARRAY)
-
-            updateProjectionMatrix(context)
-            imageInOut.texture?.let { mProgram.setTexture(it) }
-            mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
-            synchronized(this) {
-                mProgram.setPointSize(mPointSize)
+                updateProjectionMatrix(context)
+                imageInOut.texture?.let { mProgram.setTexture(it) }
+                mProgram.setMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
+                synchronized(this) {
+                    mProgram.setPointSize(mPointSize)
+                }
+                mProgram.draw()
             }
-            mProgram.draw()
         }
 
         override fun onRelease(context: FilterContext) {

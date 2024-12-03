@@ -12,6 +12,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.gles.Target
+import com.jiangpengyong.eglbox_core.gles.blend
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
@@ -54,21 +55,19 @@ class AlphaSniperScopeFilter : GLFilter() {
             GLES20.glDisable(GLES20.GL_CULL_FACE)
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
 
-            GLES20.glEnable(GLES20.GL_BLEND)
-            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-            val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
-                ScaleType.CENTER_INSIDE,
-                Size(mSniperScopeTexture.width, mSniperScopeTexture.height),
-                Size(imageInOut.texture?.width ?: 0, imageInOut.texture?.height ?: 0),
-            )
-            Log.i(TAG, "scaleX=${scaleX} scaleY=${scaleY}")
-            mSniperScopeMatrix.reset()
-            mSniperScopeMatrix.scale(scaleX, -scaleY, 1F)
-            mTexture2DProgram.setVertexMatrix(mSniperScopeMatrix.matrix)
-            mTexture2DProgram.setTexture(mSniperScopeTexture)
-            mTexture2DProgram.draw()
-
-            GLES20.glDisable(GLES20.GL_BLEND)
+            blend(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA){
+                val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
+                    ScaleType.CENTER_INSIDE,
+                    Size(mSniperScopeTexture.width, mSniperScopeTexture.height),
+                    Size(imageInOut.texture?.width ?: 0, imageInOut.texture?.height ?: 0),
+                )
+                Log.i(TAG, "scaleX=${scaleX} scaleY=${scaleY}")
+                mSniperScopeMatrix.reset()
+                mSniperScopeMatrix.scale(scaleX, -scaleY, 1F)
+                mTexture2DProgram.setVertexMatrix(mSniperScopeMatrix.matrix)
+                mTexture2DProgram.setTexture(mSniperScopeTexture)
+                mTexture2DProgram.draw()
+            }
         }
         imageInOut.out(fbo)
     }
