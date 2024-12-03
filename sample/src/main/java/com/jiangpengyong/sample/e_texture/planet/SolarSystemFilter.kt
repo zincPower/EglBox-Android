@@ -3,6 +3,7 @@ package com.jiangpengyong.sample.e_texture.planet
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
+import android.util.Log
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
@@ -167,21 +168,24 @@ class SolarSystemFilter : GLFilter() {
             Target.Neptune -> (mPlanetInfo[CelestialBody.Neptune]?.position ?: mCurrentViewPoint).let { Pair(Point(it.x, it.y, it.z + PLANET_DISTANCE), PLANET_DISTANCE) }
         }.let { (viewPoint, distance) ->
             mTargetViewPoint = viewPoint
-            if (mProgress < 0F || mProgress >= 1F) {
+            if (mProgress <= 0F) {
                 Pair(mTargetViewPoint, distance)
+            } else if (mProgress >= 1F) {
+                Pair(mSourceViewPoint, distance)
             } else {
-                val x = (mTargetViewPoint.x - mSourceViewPoint.x) * mProgress + mSourceViewPoint.x
-                val y = (mTargetViewPoint.y - mSourceViewPoint.y) * mProgress + mSourceViewPoint.y
-                val z = (mTargetViewPoint.z - mSourceViewPoint.z) * mProgress + mSourceViewPoint.z
+                Log.i(TAG, "mEyeTarget=${mEyeTarget} mProgress=${mProgress}")
+                val x = mTargetViewPoint.x + (mSourceViewPoint.x - mTargetViewPoint.x) * mProgress
+                val y = mTargetViewPoint.y + (mSourceViewPoint.y - mTargetViewPoint.y) * mProgress
+                val z = mTargetViewPoint.z + (mSourceViewPoint.z - mTargetViewPoint.z) * mProgress
                 Pair(Point(x, y, z), distance)
-            }.let { (viewPoint, distance) ->
-                mCurrentViewPoint = viewPoint
-                mViewMatrix.setLookAtM(
-                    viewPoint.x, viewPoint.y, viewPoint.z,
-                    viewPoint.x, viewPoint.y, viewPoint.z - distance,
-                    0F, 1F, 0F
-                )
             }
+        }.let { (viewPoint, distance) ->
+            mCurrentViewPoint = viewPoint
+            mViewMatrix.setLookAtM(
+                viewPoint.x, viewPoint.y, viewPoint.z,
+                viewPoint.x, viewPoint.y, viewPoint.z - distance,
+                0F, 1F, 0F
+            )
         }
     }
 
@@ -301,7 +305,7 @@ class SolarSystemFilter : GLFilter() {
         mEarthCloudProgram.setModelMatrix(modelMatrix)
         mEarthCloudProgram.setMVPMatrix(vpMatrix * modelMatrix)
         mEarthCloudProgram.setLightPoint(mSunPoint)
-        mEarthCloudProgram.setShininess(1F)
+        mEarthCloudProgram.setShininess(10F)
         mEarthCloudProgram.setTexture(mEarthCloudInfo.texture)
         mEarthCloudProgram.draw()
     }
@@ -312,7 +316,6 @@ class SolarSystemFilter : GLFilter() {
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
             SolarSystemMessageType.CHANGE_TARGET -> {
-                mProgress = message.obj as? Float ?: return
                 mSourceViewPoint = mCurrentViewPoint
                 mEyeTarget = when (message.arg1) {
                     Target.SolarSystem.value -> Target.SolarSystem
@@ -326,6 +329,10 @@ class SolarSystemFilter : GLFilter() {
                     Target.Neptune.value -> Target.Neptune
                     else -> Target.SolarSystem
                 }
+            }
+
+            SolarSystemMessageType.UPDATE_TRANSITION_ANIMATION -> {
+                mProgress = message.obj as? Float ?: return
             }
 
             SolarSystemMessageType.UPDATE_ORBIT_AND_ROTATION -> {
@@ -344,5 +351,6 @@ class SolarSystemFilter : GLFilter() {
 
 object SolarSystemMessageType {
     const val CHANGE_TARGET = 1_000
-    const val UPDATE_ORBIT_AND_ROTATION = 1_001
+    const val UPDATE_TRANSITION_ANIMATION = 1_001
+    const val UPDATE_ORBIT_AND_ROTATION = 1_002
 }

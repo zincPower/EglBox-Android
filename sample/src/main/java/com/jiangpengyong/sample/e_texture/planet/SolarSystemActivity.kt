@@ -8,6 +8,7 @@ import android.os.Looper
 import android.os.Message
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_core.space3d.ProjectionType
 import com.jiangpengyong.eglbox_core.view.FilterCenter
@@ -25,15 +26,14 @@ class SolarSystemActivity : AppCompatActivity() {
     private var mFilterId: String? = null
 
     private var mEyeTarget = SolarSystemFilter.Target.SolarSystem
-    private val mTranAnim = ValueAnimator.ofFloat(0F, 1F).apply {
-        setDuration(2_000)
+    private val mTranAnim = ValueAnimator.ofFloat(1F, 0F).apply {
+        setDuration(500)
         interpolator = DecelerateInterpolator()
         addUpdateListener { animator ->
             val filterId = mFilterId ?: return@addUpdateListener
             val value = animator.animatedValue as? Float ?: return@addUpdateListener
             mGLPreviewView.sendMessageToFilter(filterId, Message.obtain().apply {
-                what = SolarSystemMessageType.CHANGE_TARGET
-                arg1 = mEyeTarget.value
+                what = SolarSystemMessageType.UPDATE_TRANSITION_ANIMATION
                 obj = value
             })
         }
@@ -100,6 +100,10 @@ class SolarSystemActivity : AppCompatActivity() {
         if (mEyeTarget == target) return
         if (mTranAnim.isRunning) mTranAnim.cancel()
         mEyeTarget = target
+        mGLPreviewView.sendMessageToFilter(this.mFilterId ?: return, Message.obtain().apply {
+            what = SolarSystemMessageType.CHANGE_TARGET
+            arg1 = mEyeTarget.value
+        })
         mTranAnim.start()
     }
 

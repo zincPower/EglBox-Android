@@ -12,6 +12,6 @@ out vec4 fragColor;
 
 void main() {
     vec4 textureColor = texture(uTexture, vTextureCoord);
-    textureColor.a = (textureColor.r + textureColor.g, textureColor.b) / 3.0;
+    textureColor.a = (textureColor.r + textureColor.g + textureColor.b) / 3.0;
     fragColor = textureColor * vAmbientLight + textureColor * vDiffuseLight + textureColor * vSpecularLight;
 }
