@@ -159,6 +159,9 @@
         <activity
             android:name="com.jiangpengyong.sample.h_blend.AlphaSniperScopeActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.h_blend.FogActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.i_scene.Scene3DMainActivity"

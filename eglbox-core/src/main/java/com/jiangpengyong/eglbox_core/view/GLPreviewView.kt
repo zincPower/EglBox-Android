@@ -8,7 +8,11 @@ import android.os.Message
 import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
 import android.view.TextureView
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.FrameLayout
@@ -22,8 +26,10 @@ import com.jiangpengyong.eglbox_core.processor.listener.SurfaceViewManager
 import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.space3d.ProjectionType
 import com.jiangpengyong.eglbox_core.space3d.Space3DMessageType
+import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
+
 
 /**
  * @author: jiang peng yong
@@ -37,10 +43,14 @@ class GLPreviewView : FrameLayout {
     private val mPreviewProcessor = PreviewProcessor()
     private val mImageProcessor = ImageProcessor()
 
+    private val mScaleDetector = ScaleGestureDetector(context, ScaleListener(this))
+    private val mGestureListener = GestureListener(this)
+    private val mGestureDetector = GestureDetector(context, mGestureListener)
+
     private var mAngleX = 0F
     private var mAngleY = 0F
-    private var mBeforeY = 0F
-    private var mBeforeX = 0F
+    private var mAngleZ = 0F
+    private var mScale = 1F
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -113,45 +123,36 @@ class GLPreviewView : FrameLayout {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
-        val x = event.x
-        val y = event.y
-        when (event.action) {
-            MotionEvent.ACTION_MOVE -> {
-                val dx = x - mBeforeX
-                mAngleX += dx * TOUCH_SCALE_FACTOR
-                val dy = y - mBeforeY
-                mAngleY += dy * TOUCH_SCALE_FACTOR
-                Space3DMessageType.obtainUpdateRotationMessage(
-                    mAngleX, mAngleY, 0F
-                ).apply {
-                    sendMessageToFilter(SOURCE_FILTER_ID, this)
-                }
-                requestRender()
-            }
+        if (event.pointerCount == 1) {
+            mGestureDetector.onTouchEvent(event)
+        } else {
+            mScaleDetector.onTouchEvent(event)
         }
-        mBeforeX = x
-        mBeforeY = y
         return true
     }
 
     fun setRotation(angleX: Float, angleY: Float, angleZ: Float) {
         mAngleX = angleX
         mAngleY = angleY
-        Space3DMessageType.obtainUpdateRotationMessage(angleX, angleY, angleZ).apply {
-            sendMessageToFilter(SOURCE_FILTER_ID, this)
-        }
-        requestRender()
+        mAngleZ = angleZ
+        updateAngle()
     }
 
     fun resetRotation() {
-        mBeforeX = 0F
-        mBeforeY = 0F
         mAngleX = 0F
         mAngleY = 0F
-        Space3DMessageType.obtainResetRotationMessage().apply {
-            sendMessageToFilter(SOURCE_FILTER_ID, this)
-        }
-        requestRender()
+        mAngleZ = 0F
+        updateAngle()
+    }
+
+    fun setScale(scale: Float) {
+        mScale = scale
+        updateScale()
+    }
+
+    fun resetScale() {
+        mScale = 1F
+        updateAngle()
     }
 
     fun setViewpoint(x: Float, y: Float, z: Float) {
@@ -222,6 +223,20 @@ class GLPreviewView : FrameLayout {
         }
     }
 
+    private fun updateAngle() {
+        Space3DMessageType.obtainUpdateRotationMessage(mAngleX, mAngleY, mAngleZ).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
+    private fun updateScale() {
+        Space3DMessageType.obtainUpdateScaleMessage(mScale, mScale, mScale).apply {
+            sendMessageToFilter(SOURCE_FILTER_ID, this)
+        }
+        requestRender()
+    }
+
     private class SurfaceTextureListenerImpl(private val surfaceId: String) : SurfaceTextureListener {
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
             SurfaceViewManager.surfaceCreated(surfaceId, surface, width, height)
@@ -238,6 +253,33 @@ class GLPreviewView : FrameLayout {
         }
 
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+        }
+    }
+
+    class ScaleListener(glPreviewView: GLPreviewView) : SimpleOnScaleGestureListener() {
+        private val mGLPreviewView = WeakReference(glPreviewView)
+
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            val previewView = mGLPreviewView.get() ?: return true
+            previewView.mScale *= detector.scaleFactor
+            previewView.updateScale()
+            return true
+        }
+    }
+
+    class GestureListener(glPreviewView: GLPreviewView) : SimpleOnGestureListener() {
+        private val mGLPreviewView = WeakReference(glPreviewView)
+
+        override fun onDown(e: MotionEvent): Boolean {
+            return true
+        }
+
+        override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+            val previewView = mGLPreviewView.get() ?: return true
+            previewView.mAngleY -= distanceX * TOUCH_SCALE_FACTOR
+            previewView.mAngleX -= distanceY * TOUCH_SCALE_FACTOR
+            previewView.updateAngle()
+            return true
         }
     }
 

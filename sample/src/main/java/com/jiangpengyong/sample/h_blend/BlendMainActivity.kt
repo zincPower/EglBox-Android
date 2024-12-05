@@ -24,5 +24,9 @@ class BlendMainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.blend_alpha).setOnClickListener {
             startActivity(Intent(this, AlphaSniperScopeActivity::class.java))
         }
+
+        findViewById<TextView>(R.id.blend_fog).setOnClickListener {
+            startActivity(Intent(this, FogActivity::class.java))
+        }
     }
 }

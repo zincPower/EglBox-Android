@@ -13,4 +13,9 @@
         style="@style/common_button"
         android:text="狙击镜混合（有透明）" />
 
+    <TextView
+        android:id="@+id/blend_fog"
+        style="@style/common_button"
+        android:text="雾" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>
