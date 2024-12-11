@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.h_blend
+package com.jiangpengyong.sample.h_blend.fog
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +19,6 @@ class FogActivity : AppCompatActivity() {
         setContentView(R.layout.activity_blend)
 
         previewView = findViewById(R.id.gl_preview_view)
-    
+
     }
 }

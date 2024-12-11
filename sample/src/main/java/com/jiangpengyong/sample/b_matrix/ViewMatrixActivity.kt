@@ -18,7 +18,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_filter.program.CubeProgram
+import com.jiangpengyong.eglbox_filter.program.CenterPointCubeProgram
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.utils.toRadians
 import javax.microedition.khronos.egl.EGLConfig
@@ -132,7 +132,7 @@ class ViewMatrixActivity : AppCompatActivity() {
         enum class State { Out, In }
 
         // 立方体
-        private val mCubeProgram = CubeProgram()
+        private val mCubeProgram = CenterPointCubeProgram()
 
         // 投影矩阵
         private val mProjectMatrix = ProjectionMatrix()

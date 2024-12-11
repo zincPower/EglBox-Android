@@ -15,7 +15,7 @@ import java.nio.FloatBuffer
  * @email 56002982@qq.com
  * @des 绘制立方体
  */
-class CubeProgram : GLProgram() {
+class CenterPointCubeProgram : GLProgram() {
     private val sideLength = 1F
     private val halfSideLength = sideLength / 2F
     private val mVertexBuffer = allocateFloatBuffer(

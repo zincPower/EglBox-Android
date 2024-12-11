@@ -367,17 +367,17 @@ class FullLightActivity : AppCompatActivity() {
                 updateData.getInt("ambientLight", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        mProgram.isAddAmbientLight(it == 1)
+                        mProgram.setIsAddAmbientLight(it == 1)
                     }
                 updateData.getInt("diffuseLight", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        mProgram.isAddDiffuseLight(it == 1)
+                        mProgram.setIsAddDiffuseLight(it == 1)
                     }
                 updateData.getInt("specularLight", -10000)
                     .takeIf { it != -10000 }
                     ?.let {
-                        mProgram.isAddSpecularLight(it == 1)
+                        mProgram.setIsAddSpecularLight(it == 1)
                     }
             }
         }

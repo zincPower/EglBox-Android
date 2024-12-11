@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.h_blend
+package com.jiangpengyong.sample.h_blend.alpha_sniper_scope
 
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
@@ -18,6 +18,7 @@ import com.jiangpengyong.eglbox_core.program.Texture2DProgram
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.sample.App
+import com.jiangpengyong.sample.h_blend.BlendSceneFilter
 import java.io.File
 
 /**
@@ -26,7 +27,7 @@ import java.io.File
  * @email 56002982@qq.com
  * @des 狙击镜滤镜，无透明
  */
-class SniperScopeFilter : GLFilter() {
+class AlphaSniperScopeFilter : GLFilter() {
     private val mSceneFilter = BlendSceneFilter()
 
     private val mTexture2DProgram = Texture2DProgram(target = Target.TEXTURE_2D)
@@ -36,7 +37,7 @@ class SniperScopeFilter : GLFilter() {
     override fun onInit(context: FilterContext) {
         mContext?.let { mSceneFilter.init(it) }
         mTexture2DProgram.init()
-        BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/sniper_scope_1.png").absolutePath).let { bitmap ->
+        BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/sniper_scope_2.png").absolutePath).let { bitmap ->
             mSniperScopeTexture.init()
             mSniperScopeTexture.setData(bitmap)
             bitmap.recycle()
@@ -55,7 +56,7 @@ class SniperScopeFilter : GLFilter() {
             GLES20.glDisable(GLES20.GL_CULL_FACE)
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
 
-            blend(GLES20.GL_SRC_COLOR, GLES20.GL_ONE_MINUS_SRC_COLOR) {
+            blend(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA){
                 val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
                     ScaleType.CENTER_INSIDE,
                     Size(mSniperScopeTexture.width, mSniperScopeTexture.height),
@@ -63,8 +64,7 @@ class SniperScopeFilter : GLFilter() {
                 )
                 Log.i(TAG, "scaleX=${scaleX} scaleY=${scaleY}")
                 mSniperScopeMatrix.reset()
-                mSniperScopeMatrix.scale(0.3F, 0.3F, 1F)
-                mSniperScopeMatrix.scale(scaleX, scaleY, 1F)
+                mSniperScopeMatrix.scale(scaleX, -scaleY, 1F)
                 mTexture2DProgram.setVertexMatrix(mSniperScopeMatrix.matrix)
                 mTexture2DProgram.setTexture(mSniperScopeTexture)
                 mTexture2DProgram.draw()
@@ -85,7 +85,7 @@ class SniperScopeFilter : GLFilter() {
     override fun onReceiveMessage(message: Message) {}
 
     companion object {
-        const val TAG = "SniperScopeFilter"
+        const val TAG = "AlphaSniperScopeFilter"
     }
 }
 

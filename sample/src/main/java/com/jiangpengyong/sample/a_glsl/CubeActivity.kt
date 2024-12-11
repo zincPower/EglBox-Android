@@ -14,7 +14,7 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_filter.program.CubeProgram
+import com.jiangpengyong.eglbox_filter.program.CenterPointCubeProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -81,7 +81,7 @@ class CubeActivity : AppCompatActivity() {
         private val mViewMatrix = ViewMatrix()
         private val mModelMatrix = ModelMatrix()
 
-        private val mCubeProgram = CubeProgram()
+        private val mCubeProgram = CenterPointCubeProgram()
         private var mPreviewSize = Size(0, 0)
 
         override fun onInit(context: FilterContext) {

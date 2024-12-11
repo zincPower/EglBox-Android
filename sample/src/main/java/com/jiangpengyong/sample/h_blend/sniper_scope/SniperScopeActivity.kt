@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.h_blend
+package com.jiangpengyong.sample.h_blend.sniper_scope
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

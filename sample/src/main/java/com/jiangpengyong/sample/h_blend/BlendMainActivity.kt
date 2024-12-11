@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
+import com.jiangpengyong.sample.h_blend.alpha_sniper_scope.AlphaSniperScopeActivity
+import com.jiangpengyong.sample.h_blend.fog.FogActivity
+import com.jiangpengyong.sample.h_blend.sniper_scope.SniperScopeActivity
 
 /**
  * @author jiang peng yong

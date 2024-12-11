@@ -154,13 +154,13 @@
             android:name="com.jiangpengyong.sample.h_blend.BlendMainActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.h_blend.SniperScopeActivity"
+            android:name="com.jiangpengyong.sample.h_blend.sniper_scope.SniperScopeActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.h_blend.AlphaSniperScopeActivity"
+            android:name="com.jiangpengyong.sample.h_blend.alpha_sniper_scope.AlphaSniperScopeActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.jiangpengyong.sample.h_blend.FogActivity"
+            android:name="com.jiangpengyong.sample.h_blend.fog.FogActivity"
             android:screenOrientation="landscape" />
 
         <activity

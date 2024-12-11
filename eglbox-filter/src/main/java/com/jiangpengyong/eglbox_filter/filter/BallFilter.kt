@@ -10,7 +10,6 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_filter.program.BallColorType
 import com.jiangpengyong.eglbox_filter.program.BallProgram
 
 /**
@@ -20,7 +19,7 @@ import com.jiangpengyong.eglbox_filter.program.BallProgram
  * @des 球体滤镜
  */
 class BallFilter : GLFilter() {
-    private val mProgram = BallProgram(ballColorType = BallColorType.Color)
+    private val mProgram = BallProgram()
     private val mModelMatrix = ModelMatrix()
 
     override fun onInit(context: FilterContext) {
