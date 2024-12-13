@@ -11,6 +11,7 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.space3d.Scale
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
+import com.jiangpengyong.eglbox_filter.program.LightProgram
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.normal_type.NormalTypeCubeProgram
 import com.jiangpengyong.eglbox_filter.program.RingProgram
@@ -41,7 +42,7 @@ class BlendSceneFilter : GLFilter() {
     private val mFilmModelMatrix = ModelMatrix()
     private var mFilmScaleInfo = Scale(1F, 1F, 1F)
 
-    private val mRingProgram = RingProgram()
+    private val mRingProgram = RingProgram(majorSegment = 360)
     private val mRingTexture = GLTexture()
     private val mRingModelMatrix = ModelMatrix()
 

@@ -14,6 +14,7 @@ import com.jiangpengyong.eglbox_core.space3d.Space3D
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
+import com.jiangpengyong.eglbox_filter.program.LightProgram
 import com.jiangpengyong.eglbox_filter.program.RingProgram
 import com.jiangpengyong.sample.utils.SizeUtils
 
@@ -43,7 +44,7 @@ class SolarSystemFilter : GLFilter() {
     private val mSunProgram = SunProgram()
     private val mPlanetProgram = PlanetProgram()
     private val mEarthProgram = EarthProgram()
-    private val mRingProgram = RingProgram()
+    private val mRingProgram = RingProgram(majorSegment = 360)
     private val mOrbitProgram = OrbitProgram()
     private val mEarthCloudProgram = EarthCloudProgram()
 

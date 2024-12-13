@@ -39,6 +39,8 @@ out vec4 vAmbientLight;
 out vec4 vDiffuseLight;
 // 镜面光亮度
 out vec4 vSpecularLight;
+// 未经过改变的坐标
+out vec3 vPosition;
 
 // 计算顶点的散射光强度
 vec4 calDiffuseLight(
@@ -96,13 +98,14 @@ vec4 calSpecularLight(
 
     // 利用点积，计算 cos 的值
     float dotResult = dot(realNormal, halfVector);
-    float powerResult = max(0.0, pow(dotResult, aShininess));
+    float powerResult = max(0.0, pow(dotResult, uShininess));
     return ligthCoefficient * powerResult;
 }
 
 void main() {
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     vTextureCoord = aTextureCoord;
+    vPosition = aPosition;
 
     // 环境光
     if (uIsAddAmbientLight == 1) {
@@ -113,14 +116,14 @@ void main() {
 
     // 散射光
     if (uIsAddDiffuseLight == 1) {
-        vDiffuseLight = calDiffuseLight(aNormal, uLightPoint, diffuseLightCoefficient);
+        vDiffuseLight = calDiffuseLight(normalize(aNormal), uLightPoint, diffuseLightCoefficient);
     } else {
         vDiffuseLight = vec4(0);
     }
 
     // 镜面光
     if (uIsAddSpecularLight == 1) {
-        vSpecularLight = calSpecularLight(aNormal, uLightPoint, specularLightCoefficient);
+        vSpecularLight = calSpecularLight(normalize(aNormal), uLightPoint, specularLightCoefficient);
     } else {
         vSpecularLight = vec4(0);
     }

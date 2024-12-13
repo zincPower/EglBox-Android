@@ -11,7 +11,7 @@ import com.jiangpengyong.eglbox_filter.model.ModelCreator
 class BallProgram(
     angleSpan: Int = 10,
     radius: Float = 1F,
-    lightCalculateType: LightCalculateType = LightCalculateType.Fragment
+    lightCalculateType: LightCalculateType = LightCalculateType.Vertex
 ) : LightProgram(
     modelData = ModelCreator.createBall(angleSpan, radius),
     lightCalculateType = lightCalculateType,

@@ -13,6 +13,7 @@ in vec3 aNormal;
 out vec3 vNormal;
 // 纹理坐标
 out vec2 vTextureCoord;
+// 未经过改变的坐标
 out vec3 vPosition;
 
 void main() {
@@ -20,7 +21,7 @@ void main() {
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     vPosition = aPosition;
     vTextureCoord = aTextureCoord;
-    vNormal = aNormal;
+    vNormal = normalize(aNormal);
 
     // 为了点绘制时，方便查看点绘制
     gl_PointSize = 10.0;

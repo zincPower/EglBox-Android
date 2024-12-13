@@ -20,7 +20,8 @@ open class LightProgram(
     var modelData: ModelData,
     val lightCalculateType: LightCalculateType,
 ) : GLProgram() {
-    enum class TextureType { Color, Texture }
+    enum class TextureType(val value: Int) { SolidColor(1), CheckeredColor(2), Texture(3) }
+    enum class ColorType { SolidColor, CheckeredColor }
     enum class LightCalculateType { Vertex, Fragment }
     enum class LightSourceType { PointLight, DirectionalLight }
     enum class DrawMode(val value: Int) {
@@ -52,7 +53,7 @@ open class LightProgram(
     private var mTextureHandle = 0
     private var mTextureCoordHandle = 0
     private var mColorHandle = 0
-    private var mIsUseTextureHandle = 0
+    private var mTextureTypeHandle = 0
 
     private var mMVPMatrix: GLMatrix = GLMatrix()
     private var mModelMatrix: GLMatrix = GLMatrix()
@@ -63,7 +64,7 @@ open class LightProgram(
 
     private var mTexture: GLTexture? = null
     private var mColor = Color(1F, 1F, 1F, 1F)
-    private var mTextureType = TextureType.Color
+    private var mTextureType = TextureType.CheckeredColor
 
     private var mLightSourceType = LightSourceType.PointLight
 
@@ -143,9 +144,12 @@ open class LightProgram(
         return this
     }
 
-    fun setColor(color: Color): LightProgram {
+    fun setColor(color: Color, colorType: ColorType): LightProgram {
         mColor = color
-        mTextureType = TextureType.Color
+        mTextureType = when (colorType) {
+            ColorType.SolidColor -> TextureType.SolidColor
+            ColorType.CheckeredColor -> TextureType.CheckeredColor
+        }
         return this
     }
 
@@ -172,7 +176,7 @@ open class LightProgram(
         mLightSourceTypeHandle = getUniformLocation("uLightSourceType")
         mTextureHandle = getUniformLocation("uTexture")
         mColorHandle = getUniformLocation("uColor")
-        mIsUseTextureHandle = getUniformLocation("uIsUseTexture")
+        mTextureTypeHandle = getUniformLocation("uTextureType")
     }
 
     override fun onDraw() {
@@ -206,7 +210,7 @@ open class LightProgram(
         mTextureHandle = 0
         mTextureCoordHandle = 0
         mColorHandle = 0
-        mIsUseTextureHandle = 0
+        mTextureTypeHandle = 0
     }
 
     override fun getVertexShaderSource(): String = loadFromAssetsFile(
@@ -243,6 +247,7 @@ open class LightProgram(
         } else {
             GLES20.glUniform4f(mColorHandle, mColor.red, mColor.green, mColor.blue, mColor.alpha)
         }
+        GLES20.glUniform1i(mTextureTypeHandle, mTextureType.value)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, modelData.normalBuffer ?: return)
         GLES20.glEnableVertexAttribArray(mNormalHandle)
         GLES20.glUniform1f(mShininessHandle, mShininess)

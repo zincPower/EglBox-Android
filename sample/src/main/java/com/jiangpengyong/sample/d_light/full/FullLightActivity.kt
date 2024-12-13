@@ -24,6 +24,7 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.program.BallProgram
+import com.jiangpengyong.eglbox_filter.program.LightProgram
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -281,6 +282,7 @@ class FullLightActivity : AppCompatActivity() {
 
         override fun onInit(context: FilterContext) {
             mProgram.init()
+            mProgram.setColor(LightProgram.Color(128 / 255F, 190 / 255F, 245 / 255F, 1F), LightProgram.ColorType.CheckeredColor)
             mViewMatrix.setLookAtM(
                 mViewPoint.x, mViewPoint.y, mViewPoint.z,
                 0F, 0F, 0F,

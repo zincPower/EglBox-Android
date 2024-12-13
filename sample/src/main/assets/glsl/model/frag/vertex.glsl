@@ -9,18 +9,16 @@ in vec2 aTextureCoord;
 // 法向量
 in vec3 aNormal;
 
-// 将未转换的顶点位置传递给片元着色器
-out vec3 vPosition;
-// 输出纹理坐标
-out vec2 vTextureCoord;
 // 法向量
 out vec3 vNormal;
+// 输出纹理坐标
+out vec2 vTextureCoord;
+// 将未转换的顶点位置传递给片元着色器
+out vec3 vPosition;
 
 void main() {
     // 使用变换矩阵计算绘制顶点的最终位置
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
-
-    // 将未转换的顶点位置传给片元着色器
     vPosition = aPosition;
     vTextureCoord = aTextureCoord;
     vNormal = normalize(aNormal);
