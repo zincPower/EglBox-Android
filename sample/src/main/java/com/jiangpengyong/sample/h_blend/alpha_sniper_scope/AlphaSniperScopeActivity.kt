@@ -14,7 +14,6 @@ import com.jiangpengyong.eglbox_sample.R
  * @des 带透明狙击镜混合
  */
 class AlphaSniperScopeActivity : AppCompatActivity() {
-
     private lateinit var glPreviewView: GLPreviewView
     private var filterId: String? = null
 
@@ -34,5 +33,4 @@ class AlphaSniperScopeActivity : AppCompatActivity() {
             glPreviewView.requestRender()
         }
     }
-
 }

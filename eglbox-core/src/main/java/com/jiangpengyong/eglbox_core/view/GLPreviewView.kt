@@ -30,7 +30,6 @@ import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 
-
 /**
  * @author: jiang peng yong
  * @date: 2024/8/15 12:55
@@ -276,8 +275,8 @@ class GLPreviewView : FrameLayout {
 
         override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
             val previewView = mGLPreviewView.get() ?: return true
-            previewView.mAngleY -= distanceX * TOUCH_SCALE_FACTOR
-            previewView.mAngleX -= distanceY * TOUCH_SCALE_FACTOR
+            previewView.mAngleY -= distanceY * TOUCH_SCALE_FACTOR
+            previewView.mAngleX -= distanceX * TOUCH_SCALE_FACTOR
             previewView.updateAngle()
             return true
         }

@@ -80,7 +80,7 @@ class Space3D {
     private fun updateGestureMatrix() {
         gestureMatrix.reset()
         gestureMatrix.rotate(rotation.angleX, 0F, 1F, 0F)
-        gestureMatrix.rotate(rotation.angleY, 1F, 0F, 0F)
+        gestureMatrix.rotate(rotation.angleY, 0F, 0F, 1F)
     }
 
     /**
