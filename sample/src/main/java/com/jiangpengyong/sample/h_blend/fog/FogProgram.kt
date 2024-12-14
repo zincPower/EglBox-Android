@@ -1,4 +1,4 @@
-package com.jiangpengyong.eglbox_filter.program
+package com.jiangpengyong.sample.h_blend.fog
 
 import android.opengl.GLES20
 import android.util.Log
@@ -14,9 +14,12 @@ import com.jiangpengyong.eglbox_filter.model.ModelData
  * @author jiang peng yong
  * @date 2024/12/6 21:17
  * @email 56002982@qq.com
- * @des 光效 Program
+ * @des 雾 Program
  */
-open class LightProgram(val lightCalculateType: LightCalculateType = LightCalculateType.Vertex) : GLProgram() {
+open class FogProgram(
+    var modelData: ModelData? = null,
+    val lightCalculateType: LightCalculateType = LightCalculateType.Vertex,
+) : GLProgram() {
     enum class TextureType(val value: Int) { SolidColor(1), CheckeredColor(2), Texture(3) }
     enum class ColorType { SolidColor, CheckeredColor }
     enum class LightCalculateType { Vertex, Fragment }
@@ -75,75 +78,73 @@ open class LightProgram(val lightCalculateType: LightCalculateType = LightCalcul
 
     private var mDrawMode: DrawMode? = null
 
-    private var mModelData: ModelData? = null
-
-    fun setMVPMatrix(matrix: GLMatrix): LightProgram {
+    fun setMVPMatrix(matrix: GLMatrix): FogProgram {
         mMVPMatrix = matrix
         return this
     }
 
-    fun setModelMatrix(matrix: GLMatrix): LightProgram {
+    fun setModelMatrix(matrix: GLMatrix): FogProgram {
         mModelMatrix = matrix
         return this
     }
 
-    fun setLightPoint(lightPoint: Point): LightProgram {
+    fun setLightPoint(lightPoint: Point): FogProgram {
         mLightPoint = lightPoint
         return this
     }
 
-    fun setViewPoint(viewPoint: Point): LightProgram {
+    fun setViewPoint(viewPoint: Point): FogProgram {
         mViewPoint = viewPoint
         return this
     }
 
-    fun setShininess(shininess: Float): LightProgram {
+    fun setShininess(shininess: Float): FogProgram {
         mShininess = shininess
         return this
     }
 
-    fun setIsAddAmbientLight(value: Boolean): LightProgram {
+    fun setIsAddAmbientLight(value: Boolean): FogProgram {
         mIsAddAmbientLight = value
         return this
     }
 
-    fun setIsAddDiffuseLight(value: Boolean): LightProgram {
+    fun setIsAddDiffuseLight(value: Boolean): FogProgram {
         mIsAddDiffuseLight = value
         return this
     }
 
-    fun setIsAddSpecularLight(value: Boolean): LightProgram {
+    fun setIsAddSpecularLight(value: Boolean): FogProgram {
         mIsAddSpecularLight = value
         return this
     }
 
-    fun setAmbientLightCoefficient(coefficient: Light): LightProgram {
+    fun setAmbientLightCoefficient(coefficient: Light): FogProgram {
         mAmbientLightCoefficient = coefficient
         return this
     }
 
-    fun setDiffuseLightCoefficient(coefficient: Light): LightProgram {
+    fun setDiffuseLightCoefficient(coefficient: Light): FogProgram {
         mDiffuseLightCoefficient = coefficient
         return this
     }
 
-    fun setSpecularLightCoefficient(coefficient: Light): LightProgram {
+    fun setSpecularLightCoefficient(coefficient: Light): FogProgram {
         mSpecularLightCoefficient = coefficient
         return this
     }
 
-    fun setLightSourceType(lightSourceType: LightSourceType): LightProgram {
+    fun setLightSourceType(lightSourceType: LightSourceType): FogProgram {
         mLightSourceType = lightSourceType
         return this
     }
 
-    fun setTexture(texture: GLTexture): LightProgram {
+    fun setTexture(texture: GLTexture): FogProgram {
         mTexture = texture
         mTextureType = TextureType.Texture
         return this
     }
 
-    fun setColor(color: Color, colorType: ColorType): LightProgram {
+    fun setColor(color: Color, colorType: ColorType): FogProgram {
         mColor = color
         mTextureType = when (colorType) {
             ColorType.SolidColor -> TextureType.SolidColor
@@ -152,13 +153,9 @@ open class LightProgram(val lightCalculateType: LightCalculateType = LightCalcul
         return this
     }
 
-    fun setDrawMode(drawMode: DrawMode): LightProgram {
+    fun setDrawMode(drawMode: DrawMode): FogProgram {
         mDrawMode = drawMode
         return this
-    }
-
-    fun setModelData(modelData: ModelData) {
-        mModelData = modelData
     }
 
     override fun onInit() {
@@ -183,7 +180,7 @@ open class LightProgram(val lightCalculateType: LightCalculateType = LightCalcul
     }
 
     override fun onDraw() {
-        val modelData = mModelData
+        val modelData = modelData
         if (modelData == null) {
             Log.e(TAG, "Model data is null.")
             return
@@ -224,16 +221,16 @@ open class LightProgram(val lightCalculateType: LightCalculateType = LightCalcul
     override fun getVertexShaderSource(): String = loadFromAssetsFile(
         EglBoxRuntime.context.resources,
         when (lightCalculateType) {
-            LightCalculateType.Vertex -> "light/gouraud/vertex.glsl"
-            LightCalculateType.Fragment -> "light/phong/vertex.glsl"
+            LightCalculateType.Vertex -> "glsl/fog/gouraud/vertex.glsl"
+            LightCalculateType.Fragment -> "glsl/fog/phong/vertex.glsl"
         }
     )
 
     override fun getFragmentShaderSource(): String = loadFromAssetsFile(
         EglBoxRuntime.context.resources,
         when (lightCalculateType) {
-            LightCalculateType.Vertex -> "light/gouraud/fragment.glsl"
-            LightCalculateType.Fragment -> "light/phong/fragment.glsl"
+            LightCalculateType.Vertex -> "glsl/fog/gouraud/fragment.glsl"
+            LightCalculateType.Fragment -> "glsl/fog/phong/fragment.glsl"
         }
     )
 

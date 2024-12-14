@@ -1,16 +1,16 @@
-package com.jiangpengyong.sample.g_model
+package com.jiangpengyong.eglbox_filter.utils
 
 import android.content.res.Resources
-import android.opengl.GLES20
 import android.util.Log
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.space3d.Vector
 import com.jiangpengyong.eglbox_core.utils.Math3D
-import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
+import com.jiangpengyong.eglbox_filter.model.FrontFace
+import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.model.NormalVectorType
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.nio.FloatBuffer
 
 /**
  * @author jiang peng yong
@@ -60,22 +60,20 @@ object Obj3DModelLoader {
      * @param assetPath 文件路径
      * @param textureSize 纹理需要多少个维度。默认为二个维度，即ST。如果需要三个维度，传入3，则可以得到STP。
      * @param textureFlip 纹理坐标是否需要反转，需要的话，T会进行反转
-     * @param sideRenderingType
-     * @param normalVectorType
-     * @return 成功则返回 [Model3DInfo] 或失败则返回 null
+     * @param normalVectorType 法向量类型
+     * @return 成功则返回 [ModelData] 或失败则返回 null
      */
     fun load(
         resources: Resources,
         assetPath: String,
         textureSize: Int = 2,
         textureFlip: Boolean = false,
-        sideRenderingType: SideRenderingType = SideRenderingType.Single,
         normalVectorType: NormalVectorType = NormalVectorType.Vertex,
-    ): Model3DInfo? {
+    ): ModelData? {
         val bufferedReader = getBufferReader(resources, assetPath)
         bufferedReader ?: return null
         return bufferedReader.use {
-            load(it, textureSize, textureFlip, sideRenderingType, normalVectorType)
+            load(it, textureSize, textureFlip, normalVectorType)
         }
     }
 
@@ -83,13 +81,12 @@ object Obj3DModelLoader {
         filePath: String,
         textureSize: Int = 2,
         textureFlip: Boolean = false,
-        sideRenderingType: SideRenderingType = SideRenderingType.Single,
         normalVectorType: NormalVectorType = NormalVectorType.Vertex,
-    ): Model3DInfo? {
+    ): ModelData? {
         val bufferedReader = getBufferReader(filePath)
         bufferedReader ?: return null
         return bufferedReader.use {
-            load(bufferedReader, textureSize, textureFlip, sideRenderingType, normalVectorType)
+            load(bufferedReader, textureSize, textureFlip, normalVectorType)
         }
     }
 
@@ -97,13 +94,12 @@ object Obj3DModelLoader {
         file: File,
         textureSize: Int = 2,
         textureFlip: Boolean = false,
-        sideRenderingType: SideRenderingType = SideRenderingType.Single,
         normalVectorType: NormalVectorType = NormalVectorType.Vertex,
-    ): Model3DInfo? {
+    ): ModelData? {
         val bufferedReader = getBufferReader(file)
         bufferedReader ?: return null
         return bufferedReader.use {
-            load(bufferedReader, textureSize, textureFlip, sideRenderingType, normalVectorType)
+            load(bufferedReader, textureSize, textureFlip, normalVectorType)
         }
     }
 
@@ -111,14 +107,12 @@ object Obj3DModelLoader {
         bufferedReader: BufferedReader,
         textureSize: Int,
         textureFlip: Boolean,
-        sideRenderingType: SideRenderingType = SideRenderingType.Single,
         normalVectorType: NormalVectorType = NormalVectorType.Vertex,
-    ): Model3DInfo? {
+    ): ModelData? {
         return Obj3DModelParser(
             bufferedReader = bufferedReader,
             textureSize = textureSize,
             textureFlip = textureFlip,
-            sideRenderingType = sideRenderingType,
             normalVectorType = normalVectorType,
         ).parse()
     }
@@ -161,13 +155,11 @@ object Obj3DModelLoader {
  * @date 2024/11/16 15:06
  * @email 56002982@qq.com
  * @des 3D 模型解析器
- *
  */
 class Obj3DModelParser(
     val bufferedReader: BufferedReader,
     val textureSize: Int,
     val textureFlip: Boolean,
-    val sideRenderingType: SideRenderingType,
     val normalVectorType: NormalVectorType,
 ) {
     private val vertexData = arrayListOf<Float>()
@@ -195,7 +187,7 @@ class Obj3DModelParser(
     private var near = Float.MIN_VALUE
     private var far = Float.MAX_VALUE
 
-    fun parse(): Model3DInfo? {
+    fun parse(): ModelData? {
         init()
         var line: String?
 
@@ -243,14 +235,12 @@ class Obj3DModelParser(
         }
 
         return if (isSuccess) {  // 成功
-            Model3DInfo(
+            ModelData(
                 vertexData = vertexResultData.toFloatArray(),
                 textureData = if (textureResultData.isEmpty()) null else textureResultData.toFloatArray(),
                 textureStep = textureSize,
                 normalData = if (normalResultData.isEmpty()) null else normalResultData.toFloatArray(),
                 frontFace = FrontFace.CCW,
-                space = Space(top, bottom, left, right, near, far),
-                sideRenderingType = sideRenderingType,
                 normalVectorType = normalVectorType,
             )
         } else {
@@ -563,86 +553,6 @@ class Obj3DModelParser(
         private const val FACE = "f"
     }
 }
-
-/**
- * @author jiang peng yong
- * @date 2024/9/23 21:19
- * @email 56002982@qq.com
- * @des 3D 模型信息
- */
-data class Model3DInfo(
-    val vertexData: FloatArray,            // 顶点数据
-    val textureData: FloatArray?,          // 纹理数据
-    val textureStep: Int = 0,              // 纹理跨度
-    val normalData: FloatArray?,           // 法向量数据
-    val frontFace: FrontFace,              // 卷绕方向
-    val space: Space,                      // 空间
-    val sideRenderingType: SideRenderingType,// 面渲染方式
-    val normalVectorType: NormalVectorType,  // 法向量计算方式
-) {
-    /**
-     * 顶点数据
-     */
-    val count: Int
-        get() = vertexData.size / 3
-
-    /**
-     * 是否有法向量数据
-     */
-    val hasNormal: Boolean
-        get() = (normalData?.size ?: 0) > 0
-
-    /**
-     * 是否有纹理数据
-     */
-    val hasTexture: Boolean
-        get() = (textureData?.size ?: 0) > 0
-
-    val vertexBuffer: FloatBuffer
-        get() = allocateFloatBuffer(vertexData)
-
-    val textureBuffer: FloatBuffer?
-        get() = textureData?.let { allocateFloatBuffer(it) }
-
-    val normalBuffer: FloatBuffer?
-        get() = normalData?.let { allocateFloatBuffer(it) }
-}
-
-/**
- * 卷绕方向
- */
-enum class FrontFace(val value: Int) {
-    CW(GLES20.GL_CW),
-    CCW(GLES20.GL_CCW),
-}
-
-/**
- * 面渲染方式
- */
-enum class SideRenderingType {
-    Single,     // 单面
-    Double,     // 双面
-}
-
-/**
- * 法向量类型
- */
-enum class NormalVectorType {
-    Vertex,     // 点法向量
-    Surface,    // 面法向量
-}
-
-/**
- * 空间
- */
-data class Space(
-    val top: Float,
-    val bottom: Float,
-    val left: Float,
-    val right: Float,
-    val near: Float,
-    val far: Float,
-)
 
 /**
  * 法向量，计算平均法向量

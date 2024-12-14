@@ -29,10 +29,10 @@ object ModelCreator {
      * @param minorSegment 裁剪子圈份数，数值越大越光滑但顶点数量越多，数值越小则棱角明显顶点数量少
      */
     fun createRing(
-        majorRadius: Float,
-        minorRadius: Float,
-        majorSegment: Int,
-        minorSegment: Int,
+        majorRadius: Float = 1.5F,
+        minorRadius: Float = 0.5F,
+        majorSegment: Int = 36,
+        minorSegment: Int = 36,
     ): ModelData {
         return Ring(majorRadius, minorRadius, majorSegment, minorSegment).create()
     }

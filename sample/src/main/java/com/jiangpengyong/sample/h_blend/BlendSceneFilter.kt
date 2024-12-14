@@ -11,12 +11,13 @@ import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.space3d.Scale
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_filter.program.RingProgram
+import com.jiangpengyong.eglbox_filter.model.ModelCreator
+import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.program.LightProgram
+import com.jiangpengyong.eglbox_filter.utils.Obj3DModelLoader
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.normal_type.NormalTypeCubeProgram
-import com.jiangpengyong.sample.g_model.Model3DInfo
 import com.jiangpengyong.sample.g_model.Model3DProgram
-import com.jiangpengyong.sample.g_model.Obj3DModelLoader
 import com.jiangpengyong.sample.utils.toRadians
 import java.io.File
 import kotlin.math.cos
@@ -31,17 +32,18 @@ import kotlin.math.sin
 class BlendSceneFilter : GLFilter() {
     private val model3DProgram = Model3DProgram()
 
-    private var mTeapotModel3DInfo: Model3DInfo? = null
+    private var mTeapotModelData: ModelData? = null
     private val mTeapotTexture = GLTexture()
     private val mTeapotModelMatrix = ModelMatrix()
     private var mTeapotScaleInfo = Scale(1F, 1F, 1F)
 
-    private var mFilmModel3DInfo: Model3DInfo? = null
+    private var mFilmModelData: ModelData? = null
     private val mFilmTexture = GLTexture()
     private val mFilmModelMatrix = ModelMatrix()
     private var mFilmScaleInfo = Scale(1F, 1F, 1F)
 
-    private val mRingProgram = RingProgram(majorSegment = 360)
+    private val mLightProgram = LightProgram()
+    private lateinit var mRingModelData: ModelData
     private val mRingTexture = GLTexture()
     private val mRingModelMatrix = ModelMatrix()
 
@@ -52,8 +54,10 @@ class BlendSceneFilter : GLFilter() {
 
     override fun onInit(context: FilterContext) {
         model3DProgram.init()
-        mRingProgram.init()
+        mLightProgram.init()
         mTableProgram.init()
+
+        mRingModelData = ModelCreator.createRing(majorSegment = 360)
 
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
             mRingTexture.init()
@@ -63,11 +67,11 @@ class BlendSceneFilter : GLFilter() {
 
         File(App.context.filesDir, "model/film/film.obj")
             .let { file ->
-                mFilmModel3DInfo = Obj3DModelLoader.load(file = file, textureFlip = true)
-                val model3DInfo = mFilmModel3DInfo ?: return@let
-                val x = model3DInfo.space.right - model3DInfo.space.left
-                val y = model3DInfo.space.top - model3DInfo.space.bottom
-                val z = model3DInfo.space.far - model3DInfo.space.near
+                mFilmModelData = Obj3DModelLoader.load(file = file, textureFlip = true)
+                val modelData = mFilmModelData ?: return@let
+                val x = modelData.space.right - modelData.space.left
+                val y = modelData.space.top - modelData.space.bottom
+                val z = modelData.space.far - modelData.space.near
                 val max = Math.max(Math.max(x, y), z) / 2
                 mFilmScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
@@ -79,11 +83,11 @@ class BlendSceneFilter : GLFilter() {
 
         File(App.context.filesDir, "model/teapot/all/teapot.obj")
             .let { file ->
-                mTeapotModel3DInfo = Obj3DModelLoader.load(file = file, textureFlip = true)
-                val model3DInfo = mTeapotModel3DInfo ?: return@let
-                val x = model3DInfo.space.right - model3DInfo.space.left
-                val y = model3DInfo.space.top - model3DInfo.space.bottom
-                val z = model3DInfo.space.far - model3DInfo.space.near
+                mTeapotModelData = Obj3DModelLoader.load(file = file, textureFlip = true)
+                val modelData = mTeapotModelData ?: return@let
+                val x = modelData.space.right - modelData.space.left
+                val y = modelData.space.top - modelData.space.bottom
+                val z = modelData.space.far - modelData.space.near
                 val max = Math.max(Math.max(x, y), z) / 5
                 mTeapotScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
@@ -120,14 +124,15 @@ class BlendSceneFilter : GLFilter() {
 
         mRingModelMatrix.reset()
         mRingModelMatrix.translate(0F, 0.5F, -2F)
-        mRingProgram.setModelMatrix(mRingModelMatrix)
-        mRingProgram.setMVPMatrix(vpMatrix * mRingModelMatrix)
-        mRingProgram.setLightPoint(lightPoint)
-        mRingProgram.setViewPoint(viewPoint)
-        mRingProgram.setTexture(mRingTexture)
-        mRingProgram.draw()
+        mLightProgram.setModelData(mRingModelData)
+        mLightProgram.setModelMatrix(mRingModelMatrix)
+        mLightProgram.setMVPMatrix(vpMatrix * mRingModelMatrix)
+        mLightProgram.setLightPoint(lightPoint)
+        mLightProgram.setViewPoint(viewPoint)
+        mLightProgram.setTexture(mRingTexture)
+        mLightProgram.draw()
 
-        mFilmModel3DInfo?.let { model3DInfo ->
+        mFilmModelData?.let { modelData ->
             mFilmModelMatrix.reset()
             mFilmModelMatrix.translate(3.5F, 0F, 2F)
             mFilmModelMatrix.scale(mFilmScaleInfo.scaleX, mFilmScaleInfo.scaleY, mFilmScaleInfo.scaleZ)
@@ -138,16 +143,16 @@ class BlendSceneFilter : GLFilter() {
             model3DProgram.setViewPoint(viewPoint)
             model3DProgram.setTexture(mFilmTexture)
             model3DProgram.setData(
-                vertexBuffer = model3DInfo.vertexBuffer,
-                textureBuffer = model3DInfo.textureBuffer,
-                normalBuffer = model3DInfo.normalBuffer ?: return@let,
-                vertexCount = model3DInfo.count,
+                vertexBuffer = modelData.vertexBuffer,
+                textureBuffer = modelData.textureBuffer,
+                normalBuffer = modelData.normalBuffer ?: return@let,
+                vertexCount = modelData.count,
             )
             model3DProgram.draw()
         }
 
 
-        mTeapotModel3DInfo?.let { model3DInfo ->
+        mTeapotModelData?.let { modelData ->
             mTeapotModelMatrix.reset()
             mTeapotModelMatrix.translate(-5F, 0F, 0F)
             mTeapotModelMatrix.scale(mTeapotScaleInfo.scaleX, mTeapotScaleInfo.scaleY, mTeapotScaleInfo.scaleZ)
@@ -157,10 +162,10 @@ class BlendSceneFilter : GLFilter() {
             model3DProgram.setViewPoint(viewPoint)
             model3DProgram.setTexture(mTeapotTexture)
             model3DProgram.setData(
-                vertexBuffer = model3DInfo.vertexBuffer,
-                textureBuffer = model3DInfo.textureBuffer,
-                normalBuffer = model3DInfo.normalBuffer ?: return@let,
-                vertexCount = model3DInfo.count,
+                vertexBuffer = modelData.vertexBuffer,
+                textureBuffer = modelData.textureBuffer,
+                normalBuffer = modelData.normalBuffer ?: return@let,
+                vertexCount = modelData.count,
             )
             model3DProgram.draw()
         }
@@ -177,7 +182,7 @@ class BlendSceneFilter : GLFilter() {
 
     override fun onRelease(context: FilterContext) {
         model3DProgram.release()
-        mRingProgram.release()
+        mLightProgram.release()
         mTableProgram.release()
         mTeapotTexture.release()
         mFilmTexture.release()

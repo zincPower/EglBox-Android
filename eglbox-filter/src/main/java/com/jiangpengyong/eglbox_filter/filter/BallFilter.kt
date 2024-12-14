@@ -10,7 +10,9 @@ import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.program.ScaleType
 import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
-import com.jiangpengyong.eglbox_filter.program.BallProgram
+import com.jiangpengyong.eglbox_filter.model.ModelCreator
+import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.program.LightProgram
 
 /**
  * @author jiang peng yong
@@ -19,11 +21,13 @@ import com.jiangpengyong.eglbox_filter.program.BallProgram
  * @des 球体滤镜
  */
 class BallFilter : GLFilter() {
-    private val mProgram = BallProgram()
+    private val mProgram = LightProgram()
     private val mModelMatrix = ModelMatrix()
+    private lateinit var mModelData: ModelData
 
     override fun onInit(context: FilterContext) {
         mProgram.init()
+        mModelData = ModelCreator.createBall()
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
@@ -41,6 +45,7 @@ class BallFilter : GLFilter() {
                 val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(ScaleType.CENTER_INSIDE, space3D.previewSize, Size(texture.width, texture.height))
                 mModelMatrix.scale(scaleX, scaleY, 1F)
                 val modelMatrix = mModelMatrix * space3D.gestureMatrix
+                mProgram.setModelData(mModelData)
                 mProgram.setLightPoint(space3D.lightPoint)
                 mProgram.setViewPoint(space3D.viewPoint)
                 mProgram.setMVPMatrix(space3D.projectionMatrix * space3D.viewMatrix * modelMatrix)

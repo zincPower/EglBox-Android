@@ -1,48 +1,116 @@
 package com.jiangpengyong.sample.h_blend.fog
 
 import android.graphics.BitmapFactory
+import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
+import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
+import com.jiangpengyong.eglbox_core.gles.DepthType
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.gles.Target
+import com.jiangpengyong.eglbox_core.gles.blend
+import com.jiangpengyong.eglbox_core.program.ScaleType
+import com.jiangpengyong.eglbox_core.program.Texture2DProgram
+import com.jiangpengyong.eglbox_core.program.VertexAlgorithmFactory
 import com.jiangpengyong.eglbox_core.space3d.Scale
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_filter.program.LightProgram
+import com.jiangpengyong.eglbox_filter.model.ModelCreator
+import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.utils.Obj3DModelLoader
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.normal_type.NormalTypeCubeProgram
-import com.jiangpengyong.eglbox_filter.program.RingProgram
-import com.jiangpengyong.sample.g_model.Model3DInfo
-import com.jiangpengyong.sample.g_model.Model3DProgram
-import com.jiangpengyong.sample.g_model.Obj3DModelLoader
 import com.jiangpengyong.sample.utils.toRadians
 import java.io.File
 import kotlin.math.cos
 import kotlin.math.sin
 
-/**
- * @author jiang peng yong
- * @date 2024/11/18 08:46
- * @email 56002982@qq.com
- * @des 雾场景滤镜
- */
-class FogSceneFilter : GLFilter() {
-    private val model3DProgram = Model3DProgram()
+class FogFilter : GLFilter() {
+    private val mSceneFilter = FogSceneFilter()
 
-    private var mTeapotModel3DInfo: Model3DInfo? = null
+    private val mTexture2DProgram = Texture2DProgram(target = Target.TEXTURE_2D)
+    private val mSniperScopeTexture = GLTexture()
+    private val mSniperScopeMatrix = ModelMatrix()
+
+    override fun onInit(context: FilterContext) {
+        mContext?.let { mSceneFilter.init(it) }
+        mTexture2DProgram.init()
+        BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/sniper_scope_1.png").absolutePath).let { bitmap ->
+            mSniperScopeTexture.init()
+            mSniperScopeTexture.setData(bitmap)
+            bitmap.recycle()
+        }
+    }
+
+    override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
+        val texture = imageInOut.texture ?: return
+        val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
+        fbo.use {
+            GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+            GLES20.glEnable(GLES20.GL_CULL_FACE)
+
+            mSceneFilter.draw(imageInOut)
+
+            GLES20.glDisable(GLES20.GL_CULL_FACE)
+            GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+
+            blend(GLES20.GL_SRC_COLOR, GLES20.GL_ONE_MINUS_SRC_COLOR) {
+                val (scaleX, scaleY) = VertexAlgorithmFactory.calculate(
+                    ScaleType.CENTER_INSIDE,
+                    Size(mSniperScopeTexture.width, mSniperScopeTexture.height),
+                    Size(imageInOut.texture?.width ?: 0, imageInOut.texture?.height ?: 0),
+                )
+                Log.i(TAG, "scaleX=${scaleX} scaleY=${scaleY}")
+                mSniperScopeMatrix.reset()
+                mSniperScopeMatrix.scale(0.3F, 0.3F, 1F)
+                mSniperScopeMatrix.scale(scaleX, scaleY, 1F)
+                mTexture2DProgram.setVertexMatrix(mSniperScopeMatrix.matrix)
+                mTexture2DProgram.setTexture(mSniperScopeTexture)
+                mTexture2DProgram.draw()
+            }
+        }
+        imageInOut.out(fbo)
+    }
+
+    override fun onRelease(context: FilterContext) {
+        mSceneFilter.release()
+        mTexture2DProgram.release()
+        mSniperScopeTexture.release()
+    }
+
+    override fun onUpdateData(updateData: Bundle) {}
+    override fun onRestoreData(inputData: Bundle) {}
+    override fun onStoreData(outputData: Bundle) {}
+    override fun onReceiveMessage(message: Message) {}
+
+    companion object {
+        const val TAG = "FogSceneFilter"
+    }
+}
+
+class FogSceneFilter : GLFilter() {
+    private val model3DProgram = FogProgram(
+        lightCalculateType = FogProgram.LightCalculateType.Vertex,
+    )
+
+    private var mTeapotModelData: ModelData? = null
     private val mTeapotTexture = GLTexture()
     private val mTeapotModelMatrix = ModelMatrix()
     private var mTeapotScaleInfo = Scale(1F, 1F, 1F)
 
-    private var mFilmModel3DInfo: Model3DInfo? = null
+    private var mFilmModelData: ModelData? = null
     private val mFilmTexture = GLTexture()
     private val mFilmModelMatrix = ModelMatrix()
     private var mFilmScaleInfo = Scale(1F, 1F, 1F)
 
-    private val mRingProgram = RingProgram(majorSegment = 360)
+    private val mRingProgram = FogProgram(
+        modelData = ModelCreator.createRing(1.5F, 0.5F, 36, 36),
+        lightCalculateType = FogProgram.LightCalculateType.Vertex,
+    )
     private val mRingTexture = GLTexture()
     private val mRingModelMatrix = ModelMatrix()
 
@@ -64,11 +132,11 @@ class FogSceneFilter : GLFilter() {
 
         File(App.context.filesDir, "model/film/film.obj")
             .let { file ->
-                mFilmModel3DInfo = Obj3DModelLoader.load(file = file, textureFlip = true)
-                val model3DInfo = mFilmModel3DInfo ?: return@let
-                val x = model3DInfo.space.right - model3DInfo.space.left
-                val y = model3DInfo.space.top - model3DInfo.space.bottom
-                val z = model3DInfo.space.far - model3DInfo.space.near
+                mFilmModelData = Obj3DModelLoader.load(file = file, textureFlip = true)
+                val modelData = mFilmModelData ?: return@let
+                val x = modelData.space.right - modelData.space.left
+                val y = modelData.space.top - modelData.space.bottom
+                val z = modelData.space.far - modelData.space.near
                 val max = Math.max(Math.max(x, y), z) / 2
                 mFilmScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
@@ -80,11 +148,11 @@ class FogSceneFilter : GLFilter() {
 
         File(App.context.filesDir, "model/teapot/all/teapot.obj")
             .let { file ->
-                mTeapotModel3DInfo = Obj3DModelLoader.load(file = file, textureFlip = true)
-                val model3DInfo = mTeapotModel3DInfo ?: return@let
-                val x = model3DInfo.space.right - model3DInfo.space.left
-                val y = model3DInfo.space.top - model3DInfo.space.bottom
-                val z = model3DInfo.space.far - model3DInfo.space.near
+                mTeapotModelData = Obj3DModelLoader.load(file = file, textureFlip = true)
+                val modelData = mTeapotModelData ?: return@let
+                val x = modelData.space.right - modelData.space.left
+                val y = modelData.space.top - modelData.space.bottom
+                val z = modelData.space.far - modelData.space.near
                 val max = Math.max(Math.max(x, y), z) / 5
                 mTeapotScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
@@ -99,7 +167,6 @@ class FogSceneFilter : GLFilter() {
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val space3D = context.space3D
         val lightPoint = space3D.lightPoint
-        val centerPoint = space3D.centerPoint
         val viewPoint = space3D.viewPoint
 
         val radius = viewPoint.z
@@ -129,7 +196,7 @@ class FogSceneFilter : GLFilter() {
         mRingProgram.setTexture(mRingTexture)
         mRingProgram.draw()
 
-        mFilmModel3DInfo?.let { model3DInfo ->
+        mFilmModelData?.let { modelData ->
             mFilmModelMatrix.reset()
             mFilmModelMatrix.translate(3.5F, 0F, 2F)
             mFilmModelMatrix.scale(mFilmScaleInfo.scaleX, mFilmScaleInfo.scaleY, mFilmScaleInfo.scaleZ)
@@ -139,17 +206,12 @@ class FogSceneFilter : GLFilter() {
             model3DProgram.setLightPoint(lightPoint)
             model3DProgram.setViewPoint(viewPoint)
             model3DProgram.setTexture(mFilmTexture)
-            model3DProgram.setData(
-                vertexBuffer = model3DInfo.vertexBuffer,
-                textureBuffer = model3DInfo.textureBuffer,
-                normalBuffer = model3DInfo.normalBuffer ?: return@let,
-                vertexCount = model3DInfo.count,
-            )
+            model3DProgram.modelData = modelData
             model3DProgram.draw()
         }
 
 
-        mTeapotModel3DInfo?.let { model3DInfo ->
+        mTeapotModelData?.let { modelData ->
             mTeapotModelMatrix.reset()
             mTeapotModelMatrix.translate(-5F, 0F, 0F)
             mTeapotModelMatrix.scale(mTeapotScaleInfo.scaleX, mTeapotScaleInfo.scaleY, mTeapotScaleInfo.scaleZ)
@@ -158,12 +220,7 @@ class FogSceneFilter : GLFilter() {
             model3DProgram.setLightPoint(lightPoint)
             model3DProgram.setViewPoint(viewPoint)
             model3DProgram.setTexture(mTeapotTexture)
-            model3DProgram.setData(
-                vertexBuffer = model3DInfo.vertexBuffer,
-                textureBuffer = model3DInfo.textureBuffer,
-                normalBuffer = model3DInfo.normalBuffer ?: return@let,
-                vertexCount = model3DInfo.count,
-            )
+            model3DProgram.modelData = modelData
             model3DProgram.draw()
         }
 

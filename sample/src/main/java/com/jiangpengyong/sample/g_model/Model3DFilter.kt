@@ -15,6 +15,7 @@ import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_filter.EglBoxRuntime
+import com.jiangpengyong.eglbox_filter.model.ModelData
 import java.nio.FloatBuffer
 
 /**
@@ -27,7 +28,8 @@ class Model3DFilter : GLFilter() {
     private val mVertProgram = Model3DProgram(CalculateLightingType.Vertex)
     private val mFragProgram = Model3DProgram(CalculateLightingType.Fragment)
 
-    private var mModel3DInfo: Model3DInfo? = null
+    private var mSideRenderingType = SideRenderingType.Single
+    private var mModelData: ModelData? = null
     private var mTexture: GLTexture? = null
     private var mIsVertexCalculateLighting = true
 
@@ -39,16 +41,16 @@ class Model3DFilter : GLFilter() {
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
-        val model3DInfo = mModel3DInfo ?: return
+        val modelData = mModelData ?: return
         val texture = imageInOut.texture ?: return
-        val vertexBuffer = model3DInfo.vertexBuffer
-        val textureBuffer = model3DInfo.textureBuffer
-        val normalBuffer = model3DInfo.normalBuffer ?: return
+        val vertexBuffer = modelData.vertexBuffer
+        val textureBuffer = modelData.textureBuffer
+        val normalBuffer = modelData.normalBuffer ?: return
 
         val fbo = context.getTexFBO(texture.width, texture.height, DepthType.Texture)
         fbo.use {
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
-            if (mModel3DInfo?.sideRenderingType == SideRenderingType.Double) {
+            if (mSideRenderingType == SideRenderingType.Double) {
                 GLES20.glDisable(GLES20.GL_CULL_FACE)
             } else {
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
@@ -62,7 +64,7 @@ class Model3DFilter : GLFilter() {
 //            context.texture2DProgram.setTexture(texture)
 //            context.texture2DProgram.draw()
 
-            GLES20.glFrontFace(model3DInfo.frontFace.value)
+            GLES20.glFrontFace(modelData.frontFace.value)
 
             val program = if (mIsVertexCalculateLighting) mVertProgram else mFragProgram
             program.setLightPoint(context.space3D.lightPoint)
@@ -71,16 +73,16 @@ class Model3DFilter : GLFilter() {
                 vertexBuffer = vertexBuffer,
                 textureBuffer = textureBuffer,
                 normalBuffer = normalBuffer,
-                vertexCount = model3DInfo.count,
+                vertexCount = modelData.count,
             )
             program.setTexture(mTexture)
             program.setMVPMatrix(mvpMatrix)
             program.setModelMatrix(modelMatrix)
-            program.setSideRendering(mModel3DInfo?.sideRenderingType ?: SideRenderingType.Single)
+            program.setSideRendering(mSideRenderingType)
             program.draw()
 
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
-            if (mModel3DInfo?.sideRenderingType != SideRenderingType.Double) {
+            if (mSideRenderingType != SideRenderingType.Double) {
                 GLES20.glDisable(GLES20.GL_CULL_FACE)
             }
         }
@@ -101,8 +103,8 @@ class Model3DFilter : GLFilter() {
         when (message.what) {
             Model3DMessageType.SET_MODEL_DATA.value -> {
                 mModelMatrix.reset()
-                mModel3DInfo = message.obj as? Model3DInfo
-                mModel3DInfo?.apply {
+                mModelData = message.obj as? ModelData
+                mModelData?.apply {
                     space.apply {
                         mModelMatrix.translate(
                             -(left + right) / 2F,
@@ -122,8 +124,12 @@ class Model3DFilter : GLFilter() {
                 }
             }
 
+            Model3DMessageType.SET_SIDE_RENDERING_TYPE.value->{
+                mSideRenderingType = message.obj as SideRenderingType
+            }
+
             Model3DMessageType.RESET_ALL_DATA.value -> {
-                mModel3DInfo = null
+                mModelData = null
                 mTexture?.release()
                 mTexture = null
                 mIsVertexCalculateLighting = false
@@ -336,6 +342,7 @@ enum class CalculateLightingType {
 
 enum class Model3DMessageType(val value: Int) {
     SET_MODEL_DATA(10000),               // 设置模型数据
-    SET_MODEL_TEXTURE_IMAGE(10001),      // 设置模型纹理数据
-    RESET_ALL_DATA(10002),               // 重置
+    SET_SIDE_RENDERING_TYPE(10001),      // 设置渲染面类型
+    SET_MODEL_TEXTURE_IMAGE(10002),      // 设置模型纹理数据
+    RESET_ALL_DATA(10003),               // 重置
 }

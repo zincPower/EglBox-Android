@@ -3,7 +3,6 @@ package com.jiangpengyong.sample.e_texture.planet
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Message
-import android.util.Log
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
@@ -14,8 +13,9 @@ import com.jiangpengyong.eglbox_core.space3d.Space3D
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
+import com.jiangpengyong.eglbox_filter.model.ModelCreator
+import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.eglbox_filter.program.LightProgram
-import com.jiangpengyong.eglbox_filter.program.RingProgram
 import com.jiangpengyong.sample.utils.SizeUtils
 
 /**
@@ -41,12 +41,14 @@ class SolarSystemFilter : GLFilter() {
     private val mViewMatrix = ViewMatrix()
 
     // 绘制程序
+    private val mLightProgram = LightProgram()
     private val mSunProgram = SunProgram()
     private val mPlanetProgram = PlanetProgram()
     private val mEarthProgram = EarthProgram()
-    private val mRingProgram = RingProgram(majorSegment = 360)
     private val mOrbitProgram = OrbitProgram()
     private val mEarthCloudProgram = EarthCloudProgram()
+
+    private lateinit var mRingModelData: ModelData
 
     // 地球信息，作为其他天体基准
     private var mEarthRatio = 1 / 3F
@@ -88,9 +90,11 @@ class SolarSystemFilter : GLFilter() {
         mSunProgram.init()
         mPlanetProgram.init()
         mEarthProgram.init()
-        mRingProgram.init()
+        mLightProgram.init()
         mOrbitProgram.init()
         mEarthCloudProgram.init()
+
+        mRingModelData = ModelCreator.createRing(majorSegment = 36)
 
         mSunInfo.init()
         mMoonInfo.init()
@@ -125,7 +129,7 @@ class SolarSystemFilter : GLFilter() {
         mSunProgram.release()
         mPlanetProgram.release()
         mEarthProgram.release()
-        mRingProgram.release()
+        mLightProgram.release()
         mOrbitProgram.release()
         mEarthCloudProgram.release()
 
@@ -284,12 +288,13 @@ class SolarSystemFilter : GLFilter() {
      */
     private fun drawSaturnRing(vpMatrix: GLMatrix) {
         val modelMatrix = mSaturnRingInfo.modelMatrix
-        mRingProgram.setModelMatrix(modelMatrix)
-        mRingProgram.setMVPMatrix(vpMatrix * modelMatrix)
-        mRingProgram.setTexture(mSaturnRingInfo.texture)
-        mRingProgram.setLightPoint(mSunPoint)
-        mRingProgram.setShininess(1F)
-        mRingProgram.draw()
+        mLightProgram.setModelData(mRingModelData)
+        mLightProgram.setModelMatrix(modelMatrix)
+        mLightProgram.setMVPMatrix(vpMatrix * modelMatrix)
+        mLightProgram.setTexture(mSaturnRingInfo.texture)
+        mLightProgram.setLightPoint(mSunPoint)
+        mLightProgram.setShininess(1F)
+        mLightProgram.draw()
     }
 
     /**

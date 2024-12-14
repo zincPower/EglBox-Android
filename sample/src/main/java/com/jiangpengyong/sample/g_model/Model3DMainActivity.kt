@@ -8,11 +8,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.jiangpengyong.eglbox_core.logger.Logger
-import com.jiangpengyong.eglbox_core.processor.preview.PreviewProcessor
 import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
 import com.jiangpengyong.eglbox_filter.TriangleFilter
+import com.jiangpengyong.eglbox_filter.model.NormalVectorType
+import com.jiangpengyong.eglbox_filter.utils.Obj3DModelLoader
 import com.jiangpengyong.eglbox_sample.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,21 +106,24 @@ class Model3DMainActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             val file = File(filesDir, modelInfo.modelPath)
-            val model3DInfo = Obj3DModelLoader.load(
+            val modelData = Obj3DModelLoader.load(
                 file = file,
                 textureFlip = true,
-                sideRenderingType = modelInfo.sideRenderingType,
                 normalVectorType = normalVectorType,
             )
-            if (model3DInfo == null) {
+            if (modelData == null) {
                 Logger.e(TAG, "Obj parser failure. File=${file}")
                 return@launch
             }
-            Logger.i(TAG, "Model 3D info. Space=${model3DInfo.space} File=${file}")
+            Logger.i(TAG, "Model 3D info. Space=${modelData.space} File=${file}")
             withContext(Dispatchers.Main) {
                 glPreviewView.sendMessageToFilter(filterId, Message.obtain().apply {
                     what = Model3DMessageType.SET_MODEL_DATA.value
-                    obj = model3DInfo
+                    obj = modelData
+                })
+                glPreviewView.sendMessageToFilter(filterId, Message.obtain().apply {
+                    what = Model3DMessageType.SET_SIDE_RENDERING_TYPE.value
+                    obj = modelInfo.sideRenderingType
                 })
                 glPreviewView.requestRender()
             }
@@ -152,3 +156,11 @@ data class ModelInfo(
     val viewpoint: Point,
     val lightPoint: Point,
 )
+
+/**
+ * 面渲染方式
+ */
+enum class SideRenderingType {
+    Single,     // 单面
+    Double,     // 双面
+}

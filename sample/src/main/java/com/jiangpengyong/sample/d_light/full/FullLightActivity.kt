@@ -23,7 +23,8 @@ import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_filter.program.BallProgram
+import com.jiangpengyong.eglbox_filter.model.ModelCreator
+import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.eglbox_filter.program.LightProgram
 import com.jiangpengyong.eglbox_sample.R
 import javax.microedition.khronos.egl.EGLConfig
@@ -266,7 +267,8 @@ class FullLightActivity : AppCompatActivity() {
     }
 
     class BallFilter : GLFilter() {
-        private val mProgram = BallProgram()
+        private val mProgram = LightProgram()
+        private lateinit var mModelData: ModelData
 
         private val mProjectMatrix = ProjectionMatrix()
         private val mViewMatrix = ViewMatrix()
@@ -283,6 +285,7 @@ class FullLightActivity : AppCompatActivity() {
         override fun onInit(context: FilterContext) {
             mProgram.init()
             mProgram.setColor(LightProgram.Color(128 / 255F, 190 / 255F, 245 / 255F, 1F), LightProgram.ColorType.CheckeredColor)
+            mModelData = ModelCreator.createBall()
             mViewMatrix.setLookAtM(
                 mViewPoint.x, mViewPoint.y, mViewPoint.z,
                 0F, 0F, 0F,
@@ -295,6 +298,7 @@ class FullLightActivity : AppCompatActivity() {
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             updateProjectionMatrix(context)
             synchronized(this) {
+                mProgram.setModelData(mModelData)
                 mProgram.setMVPMatrix(mProjectMatrix * mViewMatrix * mModelMatrix)
                 mProgram.setModelMatrix(mModelMatrix)
                 mProgram.setLightPoint(mLightPoint)
@@ -338,7 +342,8 @@ class FullLightActivity : AppCompatActivity() {
 
                 val spanAngle = updateData.getInt("spanAngle", 0)
                 if (spanAngle != 0) {
-                    mProgram.setAngleSpan(spanAngle)
+                    mModelData = ModelCreator.createBall(spanAngle)
+                    mProgram.setModelData(mModelData)
                 }
 
                 updateData.getFloat("lightXPosition", -10000F)
