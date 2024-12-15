@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.h_blend.fog
+package com.jiangpengyong.sample.i_scene.fog
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

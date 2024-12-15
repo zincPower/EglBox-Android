@@ -16,23 +16,7 @@ import com.jiangpengyong.eglbox_filter.model.ModelData
  * @email 56002982@qq.com
  * @des 光效 Program
  */
-open class LightProgram(val lightCalculateType: LightCalculateType = LightCalculateType.Vertex) : GLProgram() {
-    enum class TextureType(val value: Int) { SolidColor(1), CheckeredColor(2), Texture(3) }
-    enum class ColorType { SolidColor, CheckeredColor }
-    enum class LightCalculateType { Vertex, Fragment }
-    enum class LightSourceType { PointLight, DirectionalLight }
-    enum class DrawMode(val value: Int) {
-        Triangles(GLES20.GL_TRIANGLES),
-        TriangleFan(GLES20.GL_TRIANGLE_FAN),
-        TriangleStrip(GLES20.GL_TRIANGLE_STRIP),
-        Lines(GLES20.GL_LINES),
-        LineStrip(GLES20.GL_LINE_STRIP),
-        LineLoop(GLES20.GL_LINE_LOOP),
-    }
-
-    data class Color(val red: Float, val green: Float, val blue: Float, val alpha: Float)
-    data class Light(val red: Float, val green: Float, val blue: Float, val alpha: Float)
-
+open class LightProgram(protected val lightCalculateType: LightCalculateType = LightCalculateType.Vertex) : GLProgram() {
     private var mMVPMatrixHandle = 0
     private var mModelMatrixHandle = 0
     private var mLightPointHandle = 0
@@ -237,7 +221,7 @@ open class LightProgram(val lightCalculateType: LightCalculateType = LightCalcul
         }
     )
 
-    private fun realDraw(modelData: ModelData) {
+    protected open fun realDraw(modelData: ModelData) {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         GLES20.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix.matrix, 0)
         GLES20.glUniform3f(mLightPointHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)

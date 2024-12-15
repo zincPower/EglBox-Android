@@ -1,4 +1,4 @@
-package com.jiangpengyong.sample.h_blend.fog
+package com.jiangpengyong.sample.i_scene.fog
 
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
@@ -21,6 +21,8 @@ import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.model.ModelCreator
 import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.program.FogProgram
+import com.jiangpengyong.eglbox_filter.program.LightProgram
 import com.jiangpengyong.eglbox_filter.utils.Obj3DModelLoader
 import com.jiangpengyong.sample.App
 import com.jiangpengyong.sample.d_light.normal_type.NormalTypeCubeProgram
@@ -93,9 +95,7 @@ class FogFilter : GLFilter() {
 }
 
 class FogSceneFilter : GLFilter() {
-    private val model3DProgram = FogProgram(
-        lightCalculateType = FogProgram.LightCalculateType.Vertex,
-    )
+    private val model3DProgram = FogProgram()
 
     private var mTeapotModelData: ModelData? = null
     private val mTeapotTexture = GLTexture()
@@ -107,10 +107,9 @@ class FogSceneFilter : GLFilter() {
     private val mFilmModelMatrix = ModelMatrix()
     private var mFilmScaleInfo = Scale(1F, 1F, 1F)
 
-    private val mRingProgram = FogProgram(
-        modelData = ModelCreator.createRing(1.5F, 0.5F, 36, 36),
-        lightCalculateType = FogProgram.LightCalculateType.Vertex,
-    )
+    private var mLightProgram = LightProgram()
+    private var mRingModelData = ModelCreator.createRing()
+
     private val mRingTexture = GLTexture()
     private val mRingModelMatrix = ModelMatrix()
 
@@ -121,7 +120,7 @@ class FogSceneFilter : GLFilter() {
 
     override fun onInit(context: FilterContext) {
         model3DProgram.init()
-        mRingProgram.init()
+        mLightProgram.init()
         mTableProgram.init()
 
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
@@ -189,25 +188,26 @@ class FogSceneFilter : GLFilter() {
 
         mRingModelMatrix.reset()
         mRingModelMatrix.translate(0F, 0.5F, -2F)
-        mRingProgram.setModelMatrix(mRingModelMatrix)
-        mRingProgram.setMVPMatrix(vpMatrix * mRingModelMatrix)
-        mRingProgram.setLightPoint(lightPoint)
-        mRingProgram.setViewPoint(viewPoint)
-        mRingProgram.setTexture(mRingTexture)
-        mRingProgram.draw()
+        mLightProgram.setModelData(mRingModelData)
+        mLightProgram.setModelMatrix(mRingModelMatrix)
+        mLightProgram.setMVPMatrix(vpMatrix * mRingModelMatrix)
+        mLightProgram.setLightPoint(lightPoint)
+        mLightProgram.setViewPoint(viewPoint)
+        mLightProgram.setTexture(mRingTexture)
+        mLightProgram.draw()
 
         mFilmModelData?.let { modelData ->
             mFilmModelMatrix.reset()
             mFilmModelMatrix.translate(3.5F, 0F, 2F)
             mFilmModelMatrix.scale(mFilmScaleInfo.scaleX, mFilmScaleInfo.scaleY, mFilmScaleInfo.scaleZ)
             mFilmModelMatrix.rotate(-90F, 1F, 0F, 0F)
-            model3DProgram.setModelMatrix(mFilmModelMatrix)
-            model3DProgram.setMVPMatrix(vpMatrix * mFilmModelMatrix)
-            model3DProgram.setLightPoint(lightPoint)
-            model3DProgram.setViewPoint(viewPoint)
-            model3DProgram.setTexture(mFilmTexture)
-            model3DProgram.modelData = modelData
-            model3DProgram.draw()
+            mLightProgram.setModelData(modelData)
+            mLightProgram.setModelMatrix(mFilmModelMatrix)
+            mLightProgram.setMVPMatrix(vpMatrix * mFilmModelMatrix)
+            mLightProgram.setLightPoint(lightPoint)
+            mLightProgram.setViewPoint(viewPoint)
+            mLightProgram.setTexture(mFilmTexture)
+            mLightProgram.draw()
         }
 
 
@@ -215,13 +215,13 @@ class FogSceneFilter : GLFilter() {
             mTeapotModelMatrix.reset()
             mTeapotModelMatrix.translate(-5F, 0F, 0F)
             mTeapotModelMatrix.scale(mTeapotScaleInfo.scaleX, mTeapotScaleInfo.scaleY, mTeapotScaleInfo.scaleZ)
-            model3DProgram.setModelMatrix(mTeapotModelMatrix)
-            model3DProgram.setMVPMatrix(vpMatrix * mTeapotModelMatrix)
-            model3DProgram.setLightPoint(lightPoint)
-            model3DProgram.setViewPoint(viewPoint)
-            model3DProgram.setTexture(mTeapotTexture)
-            model3DProgram.modelData = modelData
-            model3DProgram.draw()
+            mLightProgram.setModelData(modelData)
+            mLightProgram.setModelMatrix(mTeapotModelMatrix)
+            mLightProgram.setMVPMatrix(vpMatrix * mTeapotModelMatrix)
+            mLightProgram.setLightPoint(lightPoint)
+            mLightProgram.setViewPoint(viewPoint)
+            mLightProgram.setTexture(mTeapotTexture)
+            mLightProgram.draw()
         }
 
         mTableModelMatrix.reset()
@@ -236,7 +236,7 @@ class FogSceneFilter : GLFilter() {
 
     override fun onRelease(context: FilterContext) {
         model3DProgram.release()
-        mRingProgram.release()
+        mLightProgram.release()
         mTableProgram.release()
         mTeapotTexture.release()
         mFilmTexture.release()
