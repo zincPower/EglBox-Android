@@ -31,6 +31,10 @@ uniform vec4 specularLightCoefficient;
 // 光源类型 1：定点光 2：定向光
 uniform int uLightSourceType;
 
+// 雾开始和结束
+uniform float uStartFog;
+uniform float uEndFog;
+
 // 纹理坐标
 out vec2 vTextureCoord;
 // 环境光强度
@@ -41,6 +45,8 @@ out vec4 vDiffuseLight;
 out vec4 vSpecularLight;
 // 未经过改变的坐标
 out vec3 vPosition;
+// 雾系数
+out float vFogFactor;
 
 // 计算顶点的散射光强度
 vec4 calDiffuseLight(
@@ -102,10 +108,17 @@ vec4 calSpecularLight(
     return ligthCoefficient * powerResult;
 }
 
+float computeFogFactor() {
+    float fogDistance = length(uViewPoint - (uModelMatrix * vec4(aPosition, 1)).xyz);
+    float factor = 1.0 - smoothstep(uStartFog, uEndFog, fogDistance);
+    return factor;
+}
+
 void main() {
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
     vTextureCoord = aTextureCoord;
     vPosition = aPosition;
+    vFogFactor = computeFogFactor();
 
     // 环境光
     if (uIsAddAmbientLight == 1) {

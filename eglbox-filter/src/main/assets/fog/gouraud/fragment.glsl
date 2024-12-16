@@ -1,18 +1,21 @@
 #version 300 es
 precision mediump float;
 
-// 纹理
+// 纹理()
 uniform sampler2D uTexture;
 // 颜色
 uniform vec4 uColor;
 // 纹理类型，1：纯色；2：格子颜色；3、纹理
 uniform int uTextureType;
+// 雾颜色
+uniform vec4 uFogColor;
 
 in vec3 vPosition;
 in vec2 vTextureCoord;
 in vec4 vAmbientLight;
 in vec4 vDiffuseLight;
 in vec4 vSpecularLight;
+in float vFogFactor;
 
 out vec4 fragColor;
 
@@ -57,5 +60,11 @@ void main() {
     } else {
         orgColor = texture(uTexture, vTextureCoord);
     }
-    fragColor = orgColor * vAmbientLight + orgColor * vDiffuseLight + orgColor * vSpecularLight;
+
+    if (vFogFactor > 0.0) {
+        vec4 lightColor = orgColor * vAmbientLight + orgColor * vDiffuseLight + orgColor * vSpecularLight;
+        fragColor = lightColor * vFogFactor + uFogColor * (1.0 - vFogFactor);
+    } else {
+        fragColor = uFogColor;
+    }
 }

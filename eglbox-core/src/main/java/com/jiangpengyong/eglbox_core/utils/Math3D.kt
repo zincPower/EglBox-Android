@@ -1,5 +1,6 @@
 package com.jiangpengyong.eglbox_core.utils
 
+import com.jiangpengyong.eglbox_core.space3d.Point
 import com.jiangpengyong.eglbox_core.space3d.Vector
 import kotlin.math.sqrt
 
@@ -13,7 +14,15 @@ object Math3D {
     }
 
     fun vectorNormal(vector: Vector): Vector {
-        val module = sqrt((vector.x * vector.x + vector.y * vector.y + vector.z * vector.z).toDouble()).toFloat()
+        val module = length(vector)
         return Vector(x = vector.x / module, y = vector.y / module, z = vector.z / module)
+    }
+
+    fun length(vector: Vector): Float {
+        return sqrt((vector.x * vector.x + vector.y * vector.y + vector.z * vector.z).toDouble()).toFloat()
+    }
+
+    fun length(point1: Point, point2: Point): Float {
+        return length(Vector(Math.abs(point2.x - point1.x), Math.abs(point2.y - point1.y), Math.abs(point2.z - point1.z)))
     }
 }

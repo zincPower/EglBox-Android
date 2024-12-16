@@ -31,6 +31,13 @@ uniform vec4 uColor;
 // 纹理类型，1：纯色；2：格子颜色；3、纹理
 uniform int uTextureType;
 
+// 雾开始和结束
+uniform float uStartFog;
+uniform float uEndFog;
+
+// 雾颜色
+uniform vec4 uFogColor;
+
 in vec3 vPosition;
 in vec2 vTextureCoord;
 in vec3 vNormal;
@@ -129,6 +136,12 @@ vec4 calColor() {
     }
 }
 
+float computeFogFactor() {
+    float fogDistance = length(uViewPoint - (uModelMatrix * vec4(vPosition, 1)).xyz);
+    float factor = 1.0 - smoothstep(uStartFog, uEndFog, fogDistance);
+    return factor;
+}
+
 void main() {
     // 环境光
     vec4 ambientLight = vec4(0);
@@ -156,5 +169,12 @@ void main() {
     } else {
         orgColor = texture(uTexture, vTextureCoord);
     }
-    fragColor = orgColor * ambientLight + orgColor * diffuseLight + orgColor * specularLight;
+
+    float fogFactor = computeFogFactor();
+    if (fogFactor > 0.0) {
+        vec4 lightColor = orgColor * ambientLight + orgColor * diffuseLight + orgColor * specularLight;
+        fragColor = lightColor * fogFactor + uFogColor * (1.0 - fogFactor);
+    } else {
+        fragColor = uFogColor;
+    }
 }
