@@ -1,5 +1,9 @@
-package com.jiangpengyong.eglbox_filter.model
+package com.jiangpengyong.eglbox_filter.model.model
 
+import com.jiangpengyong.eglbox_filter.model.FrontFace
+import com.jiangpengyong.eglbox_filter.model.Model
+import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.model.NormalVectorType
 import com.jiangpengyong.eglbox_filter.utils.toRadians
 import kotlin.math.cos
 import kotlin.math.sin

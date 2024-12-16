@@ -16,7 +16,6 @@ import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.eglbox_filter.program.LightProgram
 import com.jiangpengyong.eglbox_filter.utils.Obj3DModelLoader
 import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.d_light.normal_type.NormalTypeCubeProgram
 import com.jiangpengyong.sample.g_model.Model3DProgram
 import com.jiangpengyong.sample.utils.toRadians
 import java.io.File
@@ -47,21 +46,27 @@ class BlendSceneFilter : GLFilter() {
     private val mRingTexture = GLTexture()
     private val mRingModelMatrix = ModelMatrix()
 
-    private val mTableProgram = NormalTypeCubeProgram()
+    private val mTableModelData = ModelCreator.createCube()
     private val mTableModelMatrix = ModelMatrix()
+    private val mTableTexture = GLTexture()
 
     private val mViewMatrix = ViewMatrix()
 
     override fun onInit(context: FilterContext) {
         model3DProgram.init()
         mLightProgram.init()
-        mTableProgram.init()
 
         mRingModelData = ModelCreator.createRing(majorSegment = 360)
 
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
             mRingTexture.init()
             mRingTexture.setData(bitmap)
+            bitmap.recycle()
+        }
+
+        BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/wood.png").absolutePath).let { bitmap ->
+            mTableTexture.init()
+            mTableTexture.setData(bitmap)
             bitmap.recycle()
         }
 
@@ -173,20 +178,22 @@ class BlendSceneFilter : GLFilter() {
         mTableModelMatrix.reset()
         mTableModelMatrix.scale(13F, 0.25F, 7F)
         mTableModelMatrix.translate(0F, -0.125F, 0F)
-        mTableProgram.setModelMatrix(mTableModelMatrix)
-        mTableProgram.setMVPMatrix(vpMatrix * mTableModelMatrix)
-        mTableProgram.setLightPoint(lightPoint)
-        mTableProgram.setViewPoint(viewPoint)
-        mTableProgram.draw()
+        mLightProgram.setModelData(mTableModelData)
+        mLightProgram.setTexture(mTableTexture)
+        mLightProgram.setModelMatrix(mTableModelMatrix)
+        mLightProgram.setMVPMatrix(vpMatrix * mTableModelMatrix)
+        mLightProgram.setLightPoint(lightPoint)
+        mLightProgram.setViewPoint(viewPoint)
+        mLightProgram.draw()
     }
 
     override fun onRelease(context: FilterContext) {
         model3DProgram.release()
         mLightProgram.release()
-        mTableProgram.release()
         mTeapotTexture.release()
         mFilmTexture.release()
         mRingTexture.release()
+        mTableTexture.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}

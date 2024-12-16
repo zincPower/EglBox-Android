@@ -1,6 +1,10 @@
 package com.jiangpengyong.eglbox_filter.model
 
 import android.opengl.GLES20
+import com.jiangpengyong.eglbox_filter.model.model.Ball
+import com.jiangpengyong.eglbox_filter.model.model.Circle
+import com.jiangpengyong.eglbox_filter.model.model.Cube
+import com.jiangpengyong.eglbox_filter.model.model.Ring
 
 /**
  * @author jiang peng yong
@@ -47,5 +51,12 @@ object ModelCreator {
         radius: Float = 1F,
     ): ModelData {
         return Circle(angleSpan, radius).create()
+    }
+
+    /**
+     * 创建立方体
+     */
+    fun createCube(): ModelData {
+        return Cube().create()
     }
 }

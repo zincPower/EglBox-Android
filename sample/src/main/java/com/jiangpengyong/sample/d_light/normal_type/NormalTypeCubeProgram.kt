@@ -190,9 +190,6 @@ class NormalTypeCubeProgram : GLProgram() {
 
     private val mVertexCount = 36
 
-//    private var mFaceTranslateMatrix = ModelMatrix()
-//    private var mFaceRotateMatrix = ModelMatrix()
-
     private var mMVPMatrixHandle = 0
     private var mMMatrixHandle = 0
     private var mNormalMatrixHandle = 0
@@ -253,15 +250,6 @@ class NormalTypeCubeProgram : GLProgram() {
     fun setNormalType(vertexNormal: NormalType) {
         mNormalType = vertexNormal
     }
-
-//    private fun drawFace(translateMatrix: GLMatrix, rotateMatrix: GLMatrix) {
-//        val matrix = translateMatrix * rotateMatrix
-//        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, (mMVPMatrix * matrix).matrix, 0)
-//        // 模型矩阵
-//        GLES20.glUniformMatrix4fv(mMMatrixHandle, 1, false, (mMMatrix * matrix).matrix, 0)
-//        GLES20.glUniformMatrix4fv(mNormalMatrixHandle, 1, false, rotateMatrix.matrix, 0)
-//        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_FAN, 0, mVertexCount)
-//    }
 
     override fun getVertexShaderSource(): String = loadFromAssetsFile(App.context.resources, "glsl/light/normal_type/vertex.glsl")
 

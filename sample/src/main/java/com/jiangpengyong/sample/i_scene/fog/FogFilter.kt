@@ -23,7 +23,6 @@ import com.jiangpengyong.eglbox_filter.program.FogProgram
 import com.jiangpengyong.eglbox_filter.program.LightCalculateType
 import com.jiangpengyong.eglbox_filter.utils.Obj3DModelLoader
 import com.jiangpengyong.sample.App
-import com.jiangpengyong.sample.d_light.normal_type.NormalTypeCubeProgram
 import com.jiangpengyong.sample.utils.toRadians
 import java.io.File
 import kotlin.math.cos
@@ -95,18 +94,24 @@ class FogSceneFilter : GLFilter() {
     private val mRingTexture = GLTexture()
     private val mRingModelMatrix = ModelMatrix()
 
-    private val mTableProgram = NormalTypeCubeProgram()
+    private val mTableModelData = ModelCreator.createCube()
     private val mTableModelMatrix = ModelMatrix()
+    private val mTableTexture = GLTexture()
 
     private val mViewMatrix = ViewMatrix()
 
     override fun onInit(context: FilterContext) {
         mFogProgram.init()
-        mTableProgram.init()
 
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
             mRingTexture.init()
             mRingTexture.setData(bitmap)
+            bitmap.recycle()
+        }
+
+        BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/wood.png").absolutePath).let { bitmap ->
+            mTableTexture.init()
+            mTableTexture.setData(bitmap)
             bitmap.recycle()
         }
 
@@ -208,19 +213,21 @@ class FogSceneFilter : GLFilter() {
         mTableModelMatrix.reset()
         mTableModelMatrix.scale(13F, 0.25F, 7F)
         mTableModelMatrix.translate(0F, -0.125F, 0F)
-        mTableProgram.setModelMatrix(mTableModelMatrix)
-        mTableProgram.setMVPMatrix(vpMatrix * mTableModelMatrix)
-        mTableProgram.setLightPoint(lightPoint)
-        mTableProgram.setViewPoint(viewPoint)
-        mTableProgram.draw()
+        mFogProgram.setModelData(mTableModelData)
+        mFogProgram.setTexture(mTableTexture)
+        mFogProgram.setModelMatrix(mTableModelMatrix)
+        mFogProgram.setMVPMatrix(vpMatrix * mTableModelMatrix)
+        mFogProgram.setLightPoint(lightPoint)
+        mFogProgram.setViewPoint(viewPoint)
+        mFogProgram.draw()
     }
 
     override fun onRelease(context: FilterContext) {
         mFogProgram.release()
-        mTableProgram.release()
         mTeapotTexture.release()
         mFilmTexture.release()
         mRingTexture.release()
+        mTableTexture.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}
