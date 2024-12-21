@@ -102,6 +102,7 @@ class FogSceneFilter : GLFilter() {
 
     override fun onInit(context: FilterContext) {
         mFogProgram.init()
+        mFogProgram.setFogColor(Color(0F, 0F, 0F, 1F))
 
         BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
             mRingTexture.init()
