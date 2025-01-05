@@ -19,7 +19,7 @@ class FogActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_blend)
+        setContentView(R.layout.activity_scene)
 
         FilterCenter.registerFilter(FogFilter.TAG, FogFilter::class.java)
 

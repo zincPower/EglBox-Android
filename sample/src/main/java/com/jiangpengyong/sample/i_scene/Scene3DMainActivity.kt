@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.i_scene.fog.FogActivity
+import com.jiangpengyong.sample.i_scene.grayscale_terrain.GrayscaleTerrainActivity
 
 /**
  * @author jiang peng yong
@@ -20,6 +21,10 @@ class Scene3DMainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.fog).setOnClickListener {
             startActivity(Intent(this, FogActivity::class.java))
+        }
+
+        findViewById<View>(R.id.grayscale_terrain).setOnClickListener {
+            startActivity(Intent(this, GrayscaleTerrainActivity::class.java))
         }
     }
 }
