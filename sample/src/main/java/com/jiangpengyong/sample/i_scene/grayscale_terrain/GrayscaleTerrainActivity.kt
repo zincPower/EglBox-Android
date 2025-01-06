@@ -34,8 +34,11 @@ class GrayscaleTerrainActivity : AppCompatActivity() {
         glPreviewView = findViewById(R.id.gl_preview_view)
         glPreviewView.post {
             glPreviewView.setBlank()
-            glPreviewView.setViewpoint(0F, 100F, 500F)
-            glPreviewView.setProjection(ProjectionType.Perspective, 10F, 1000F, 1F)
+            glPreviewView.setViewpoint(0F, 110F, 1F)
+            glPreviewView.setCenterPoint(0F, 0F, 0F)
+//            glPreviewView.setProjection(ProjectionType.Orthographic, 10F, 1000F, 400F)
+            glPreviewView.setProjection(ProjectionType.Perspective, 10F, 1000F, 10F)
+            glPreviewView.setLightPoint(0F, 1F, 0F)
 
             lifecycleScope.launch(Dispatchers.IO) {
                 val filterId = glPreviewView.addFilter(GrayscaleTerrainFilter.TAG)?.also {
@@ -58,11 +61,11 @@ class GrayscaleTerrainActivity : AppCompatActivity() {
                         grayscaleTerrainBitmap = bitmap,
                         meanSeaLevel = -10F,
                         heightDelta = 50F,
-                        textureRepeatCount = 10,
+                        textureRepeatCount = 0,
                     )
                     val grayscaleTerrainData = GrayscaleTerrainFilter.GrayscaleTerrainData(
                         modelData = modelData,
-                        boundaryRange = Range(10F, 20F)
+                        boundaryRange = Range(0F, 5F)
                     )
                     val message = Message.obtain()
                     message.what = GrayscaleTerrainFilter.Type.UPDATE_DATA.value
