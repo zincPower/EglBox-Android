@@ -72,7 +72,7 @@ class GrayscaleTerrainFilter : GLFilter() {
 //                .setDiffuseLightCoefficient()
 //                .setSpecularLightCoefficient()
             mProgram.setLightSourceType(LightSourceType.DirectionalLight)
-            mProgram.setDrawMode(DrawMode.Lines)
+            mProgram.setDrawMode(DrawMode.Triangles)
 
             mProgram.draw()
         }
