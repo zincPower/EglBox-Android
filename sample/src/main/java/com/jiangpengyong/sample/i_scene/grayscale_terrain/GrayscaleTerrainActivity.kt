@@ -47,26 +47,33 @@ class GrayscaleTerrainActivity : AppCompatActivity() {
                 } ?: return@launch
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/grass.jpg").absolutePath).let { bitmap ->
                     val message = Message.obtain()
-                    message.what = GrayscaleTerrainFilter.Type.UPDATE_GRASS_TEXTURE.value
+                    message.what = GrayscaleTerrainFilter.Type.UPDATE_LAND_TEXTURE.value
                     message.obj = bitmap
                     glPreviewView.sendMessageToFilter(filterId, message)
                 }
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/rock.jpeg").absolutePath).let { bitmap ->
                     val message = Message.obtain()
-                    message.what = GrayscaleTerrainFilter.Type.UPDATE_ROCK_TEXTURE.value
+                    message.what = GrayscaleTerrainFilter.Type.UPDATE_MOUNTAIN_TEXTURE.value
+                    message.obj = bitmap
+                    glPreviewView.sendMessageToFilter(filterId, message)
+                }
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/snow.jpg").absolutePath).let { bitmap ->
+                    val message = Message.obtain()
+                    message.what = GrayscaleTerrainFilter.Type.UPDATE_SNOW_TEXTURE.value
                     message.obj = bitmap
                     glPreviewView.sendMessageToFilter(filterId, message)
                 }
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/grayscale_terrain.png").absolutePath).let { bitmap ->
                     val modelData = GrayscaleTerrainLoader.load(
                         grayscaleTerrainBitmap = bitmap,
-                        meanSeaLevel = -10F,
-                        heightDelta = 50F,
+                        meanSeaLevel = 0F,
+                        heightDelta = 80F,
                         textureRepeatCount = 3,
                     )
                     val grayscaleTerrainData = GrayscaleTerrainFilter.GrayscaleTerrainData(
                         modelData = modelData,
-                        boundaryRange = Range(0F, 5F)
+                        mountainBoundaryRange = Range(10F, 15F),
+                        snowBoundaryRange = Range(50F, 55F),
                     )
                     val message = Message.obtain()
                     message.what = GrayscaleTerrainFilter.Type.UPDATE_DATA.value

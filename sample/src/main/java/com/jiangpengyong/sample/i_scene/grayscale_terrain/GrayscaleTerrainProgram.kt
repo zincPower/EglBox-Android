@@ -23,8 +23,11 @@ import com.jiangpengyong.eglbox_filter.program.LightSourceType
 open class GrayscaleTerrainProgram : GLProgram() {
     private var mTextureLandHandle = 0
     private var mTextureMountainHandle = 0
-    private var mBoundaryStartHandle = 0
-    private var mBoundaryEndHandle = 0
+    private var mTextureSnowHandle = 0
+    private var mMountainBoundaryStartHandle = 0
+    private var mMountainBoundaryEndHandle = 0
+    private var mSnowBoundaryStartHandle = 0
+    private var mSnowBoundaryEndHandle = 0
     private var mMVPMatrixHandle = 0
     private var mModelMatrixHandle = 0
     private var mLightPointHandle = 0
@@ -62,13 +65,19 @@ open class GrayscaleTerrainProgram : GLProgram() {
 
     private var mModelData: ModelData? = null
 
-    private var mBoundaryRange: Range<Float> = Range(10F, 20F)
+    private var mMountainBoundaryRange: Range<Float> = Range(10F, 20F)
+    private var mSnowBoundaryRange: Range<Float> = Range(30F, 32.5F)
     private var mLandTexture: GLTexture? = null
     private var mMountainTexture: GLTexture? = null
     private var mSnowTexture: GLTexture? = null
 
-    fun setBoundaryRange(range: Range<Float>): GrayscaleTerrainProgram {
-        mBoundaryRange = range
+    fun setMountainBoundaryRange(range: Range<Float>): GrayscaleTerrainProgram {
+        mMountainBoundaryRange = range
+        return this
+    }
+
+    fun setSnowBoundaryRange(range: Range<Float>): GrayscaleTerrainProgram {
+        mSnowBoundaryRange = range
         return this
     }
 
@@ -160,8 +169,11 @@ open class GrayscaleTerrainProgram : GLProgram() {
     override fun onInit() {
         mTextureLandHandle = getUniformLocation("sTextureLand")
         mTextureMountainHandle = getUniformLocation("sTextureMountain")
-        mBoundaryStartHandle = getUniformLocation("uBoundaryStart")
-        mBoundaryEndHandle = getUniformLocation("uBoundaryEnd")
+        mTextureSnowHandle = getUniformLocation("sTextureSnow")
+        mMountainBoundaryStartHandle = getUniformLocation("uMountainBoundaryStart")
+        mMountainBoundaryEndHandle = getUniformLocation("uMountainBoundaryEnd")
+        mSnowBoundaryStartHandle = getUniformLocation("uSnowBoundaryStart")
+        mSnowBoundaryEndHandle = getUniformLocation("uSnowBoundaryEnd")
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
         mModelMatrixHandle = getUniformLocation("uModelMatrix")
         mLightPointHandle = getUniformLocation("uLightPoint")
@@ -180,18 +192,21 @@ open class GrayscaleTerrainProgram : GLProgram() {
     }
 
     override fun onDraw() {
-        val grassTexture = mLandTexture ?: return
-        val rockTexture = mMountainTexture ?: return
+        val landTexture = mLandTexture ?: return
+        val mountainTexture = mMountainTexture ?: return
+        val snowTexture = mSnowTexture ?: return
         val modelData = mModelData ?: return
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         GLES20.glEnable(GLES20.GL_CULL_FACE)
         GLES20.glFrontFace(modelData.frontFace.value)
 
-        grassTexture.bind(textureUnit = GLES20.GL_TEXTURE0)
+        landTexture.bind(textureUnit = GLES20.GL_TEXTURE0)
         GLES20.glUniform1i(mTextureLandHandle, 0)
-        rockTexture.bind(textureUnit = GLES20.GL_TEXTURE1)
+        mountainTexture.bind(textureUnit = GLES20.GL_TEXTURE1)
         GLES20.glUniform1i(mTextureMountainHandle, 1)
+        snowTexture.bind(textureUnit = GLES20.GL_TEXTURE2)
+        GLES20.glUniform1i(mTextureSnowHandle, 2)
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
         GLES20.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix.matrix, 0)
@@ -201,8 +216,10 @@ open class GrayscaleTerrainProgram : GLProgram() {
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glVertexAttribPointer(mTextureCoordHandle, modelData.textureStep, GLES20.GL_FLOAT, false, modelData.textureStep * 4, modelData.textureBuffer)
         GLES20.glEnableVertexAttribArray(mTextureCoordHandle)
-        GLES20.glUniform1f(mBoundaryStartHandle, mBoundaryRange.lower)
-        GLES20.glUniform1f(mBoundaryEndHandle, mBoundaryRange.upper)
+        GLES20.glUniform1f(mMountainBoundaryStartHandle, mMountainBoundaryRange.lower)
+        GLES20.glUniform1f(mMountainBoundaryEndHandle, mMountainBoundaryRange.upper)
+        GLES20.glUniform1f(mSnowBoundaryStartHandle, mSnowBoundaryRange.lower)
+        GLES20.glUniform1f(mSnowBoundaryEndHandle, mSnowBoundaryRange.upper)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, modelData.normalBuffer ?: return)
         GLES20.glEnableVertexAttribArray(mNormalHandle)
         GLES20.glUniform1f(mShininessHandle, mShininess)
@@ -223,8 +240,8 @@ open class GrayscaleTerrainProgram : GLProgram() {
         GLES20.glDisableVertexAttribArray(mNormalHandle)
         GLES20.glDisableVertexAttribArray(mTextureCoordHandle)
 
-        grassTexture.unbind()
-        rockTexture.unbind()
+        landTexture.unbind()
+        mountainTexture.unbind()
 
         GLES20.glDisable(GLES20.GL_DEPTH_TEST)
         GLES20.glDisable(GLES20.GL_CULL_FACE)
@@ -235,8 +252,11 @@ open class GrayscaleTerrainProgram : GLProgram() {
     override fun onRelease() {
         mTextureLandHandle = 0
         mTextureMountainHandle = 0
-        mBoundaryStartHandle = 0
-        mBoundaryEndHandle = 0
+        mTextureSnowHandle = 0
+        mMountainBoundaryStartHandle = 0
+        mMountainBoundaryEndHandle = 0
+        mSnowBoundaryStartHandle = 0
+        mSnowBoundaryEndHandle = 0
         mMVPMatrixHandle = 0
         mModelMatrixHandle = 0
         mLightPointHandle = 0

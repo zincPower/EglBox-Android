@@ -14,13 +14,23 @@ import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.eglbox_filter.program.DrawMode
 import com.jiangpengyong.eglbox_filter.program.LightSourceType
 
+/**
+ * @author jiang peng yong
+ * @date 2025/1/8 22:38
+ * @email 56002982@qq.com
+ * @des 灰度图滤镜
+ */
 class GrayscaleTerrainFilter : GLFilter() {
     private var mGrayscaleTerrainData: GrayscaleTerrainData? = null
-    private var mGrassTexture = GLTexture(
+    private var mLandTexture = GLTexture(
         wrapS = WrapMode.REPEAT,
         wrapT = WrapMode.REPEAT,
     )
-    private var mRockTexture = GLTexture(
+    private var mMountainTexture = GLTexture(
+        wrapS = WrapMode.REPEAT,
+        wrapT = WrapMode.REPEAT,
+    )
+    private var mSnowTexture = GLTexture(
         wrapS = WrapMode.REPEAT,
         wrapT = WrapMode.REPEAT,
     )
@@ -30,8 +40,9 @@ class GrayscaleTerrainFilter : GLFilter() {
     private val mViewMatrix = ViewMatrix()
 
     override fun onInit(context: FilterContext) {
-        mGrassTexture.init()
-        mRockTexture.init()
+        mLandTexture.init()
+        mMountainTexture.init()
+        mSnowTexture.init()
 
         mProgram.init()
 
@@ -46,8 +57,8 @@ class GrayscaleTerrainFilter : GLFilter() {
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
         val grayscaleTerrainData = mGrayscaleTerrainData ?: return
-        if (!mGrassTexture.isInit()) return
-        if (!mRockTexture.isInit()) return
+        if (!mLandTexture.isInit()) return
+        if (!mMountainTexture.isInit()) return
         val texture = imageInOut.texture ?: return
 
         val space3D = context.space3D
@@ -56,9 +67,11 @@ class GrayscaleTerrainFilter : GLFilter() {
         val fbo = context.getTexFBO(texture.width, texture.height)
         fbo.use {
             mProgram.setModelData(grayscaleTerrainData.modelData)
-            mProgram.setBoundaryRange(grayscaleTerrainData.boundaryRange)
-            mProgram.setLandTexture(mGrassTexture)
-            mProgram.setMountainTexture(mRockTexture)
+            mProgram.setMountainBoundaryRange(grayscaleTerrainData.mountainBoundaryRange)
+            mProgram.setSnowBoundaryRange(grayscaleTerrainData.snowBoundaryRange)
+            mProgram.setLandTexture(mLandTexture)
+            mProgram.setMountainTexture(mMountainTexture)
+            mProgram.setSnowTexture(mSnowTexture)
 //                .setSnowTexture()
             mProgram.setMVPMatrix(vpMatrix)
 //                .setModelMatrix()
@@ -80,11 +93,11 @@ class GrayscaleTerrainFilter : GLFilter() {
     }
 
     override fun onRelease(context: FilterContext) {
-        mProgram.release()
-
         mGrayscaleTerrainData = null
-        mGrassTexture.release()
-        mRockTexture.release()
+        mProgram.release()
+        mLandTexture.release()
+        mMountainTexture.release()
+        mSnowTexture.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}
@@ -97,16 +110,23 @@ class GrayscaleTerrainFilter : GLFilter() {
                 mGrayscaleTerrainData = message.obj as GrayscaleTerrainData
             }
 
-            Type.UPDATE_GRASS_TEXTURE.value -> {
+            Type.UPDATE_LAND_TEXTURE.value -> {
                 (message.obj as Bitmap).let {
-                    mGrassTexture.setData(it)
+                    mLandTexture.setData(it)
                     it.recycle()
                 }
             }
 
-            Type.UPDATE_ROCK_TEXTURE.value -> {
+            Type.UPDATE_MOUNTAIN_TEXTURE.value -> {
                 (message.obj as Bitmap).let {
-                    mRockTexture.setData(it)
+                    mMountainTexture.setData(it)
+                    it.recycle()
+                }
+            }
+
+            Type.UPDATE_SNOW_TEXTURE.value -> {
+                (message.obj as Bitmap).let {
+                    mSnowTexture.setData(it)
                     it.recycle()
                 }
             }
@@ -115,13 +135,15 @@ class GrayscaleTerrainFilter : GLFilter() {
 
     enum class Type(val value: Int) {
         UPDATE_DATA(10000),
-        UPDATE_GRASS_TEXTURE(10001),
-        UPDATE_ROCK_TEXTURE(10002),
+        UPDATE_LAND_TEXTURE(10001),
+        UPDATE_MOUNTAIN_TEXTURE(10002),
+        UPDATE_SNOW_TEXTURE(10003),
     }
 
     data class GrayscaleTerrainData(
         val modelData: ModelData,
-        val boundaryRange: Range<Float>,
+        val mountainBoundaryRange: Range<Float>,
+        val snowBoundaryRange: Range<Float>,
     )
 
     companion object {
