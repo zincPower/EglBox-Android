@@ -9,6 +9,7 @@ import com.jiangpengyong.eglbox_core.utils.Math3D
 import com.jiangpengyong.eglbox_filter.model.FrontFace
 import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.eglbox_filter.model.NormalVectorType
+import com.jiangpengyong.eglbox_filter.utils.Normal
 
 /**
  * @author jiang peng yong
@@ -63,7 +64,7 @@ object GrayscaleTerrainLoader {
         val width = grayscaleTerrainBitmap.width
         val height = grayscaleTerrainBitmap.height
         val vertexList = ArrayList<Float>()
-        val normalList = ArrayList<Float>()
+        val vertexNormals = Array(width) { Array(height) { Normal() } }
         for (w in 0 until width - 1) {
             for (h in 0 until height - 1) {
                 /**
@@ -120,25 +121,52 @@ object GrayscaleTerrainLoader {
                     v1 = Vector(x1 - x2, y1 - y2, z1 - z2),
                     v2 = Vector(x0 - x2, y0 - y2, z0 - z2),
                 )
-                normalList.add(v1.x)
-                normalList.add(v1.y)
-                normalList.add(v1.z)
-                normalList.add(v1.x)
-                normalList.add(v1.y)
-                normalList.add(v1.z)
-                normalList.add(v1.x)
-                normalList.add(v1.y)
-                normalList.add(v1.z)
+
+                for (normal in arrayListOf(vertexNormals[w][h], vertexNormals[w + 1][h], vertexNormals[w][h + 1])) {
+                    normal.add(v1)
+                }
+                for (normal in arrayListOf(vertexNormals[w + 1][h], vertexNormals[w][h + 1], vertexNormals[w + 1][h + 1])) {
+                    normal.add(v2)
+                }
+
+            }
+        }
+        val normalList = ArrayList<Float>()
+        for (w in 0 until width - 1) {
+            for (h in 0 until height - 1) {
+                /**
+                 *  3-----│-----0
+                 *  │     │     │
+                 *  │     │     │
+                 *  │----原点----│> +x
+                 *  │     │     │
+                 *  │     │     │
+                 *  2-----│-----1
+                 *        ᐯ +z
+                 */
+                val v0 = vertexNormals[w + 1][h].getAvg()
+                val v1 = vertexNormals[w + 1][h + 1].getAvg()
+                val v2 = vertexNormals[w][h + 1].getAvg()
+                val v3 = vertexNormals[w][h].getAvg()
+                normalList.add(v0.x)
+                normalList.add(v0.y)
+                normalList.add(v0.z)
+                normalList.add(v3.x)
+                normalList.add(v3.y)
+                normalList.add(v3.z)
+                normalList.add(v2.x)
+                normalList.add(v2.y)
+                normalList.add(v2.z)
 
                 normalList.add(v2.x)
                 normalList.add(v2.y)
                 normalList.add(v2.z)
-                normalList.add(v2.x)
-                normalList.add(v2.y)
-                normalList.add(v2.z)
-                normalList.add(v2.x)
-                normalList.add(v2.y)
-                normalList.add(v2.z)
+                normalList.add(v1.x)
+                normalList.add(v1.y)
+                normalList.add(v1.z)
+                normalList.add(v0.x)
+                normalList.add(v0.y)
+                normalList.add(v0.z)
             }
         }
         return Pair(vertexList, normalList)
