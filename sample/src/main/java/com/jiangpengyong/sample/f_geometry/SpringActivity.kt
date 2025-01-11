@@ -198,7 +198,7 @@ class SpringActivity : AppCompatActivity() {
                 mFilter.init(mContext)
                 GLES20.glEnable(GLES20.GL_DEPTH_TEST)
                 GLES20.glEnable(GLES20.GL_CULL_FACE)
-//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.png").absolutePath).let { bitmap ->
+//                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_square.jpg").absolutePath).let { bitmap ->
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
                     mTexture.init()
                     mTexture.setData(bitmap)

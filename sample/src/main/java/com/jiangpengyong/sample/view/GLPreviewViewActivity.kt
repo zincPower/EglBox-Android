@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.jiangpengyong.eglbox_core.view.FilterCenter
 import com.jiangpengyong.eglbox_core.view.GLPreviewView
-import com.jiangpengyong.eglbox_filter.filter.BallFilter
 import com.jiangpengyong.eglbox_filter.TriangleFilter
+import com.jiangpengyong.eglbox_filter.filter.BallFilter
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.App
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +39,7 @@ class GLPreviewViewActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.image_horizontal).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.png").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.jpg").absolutePath).let { bitmap ->
                     previewView.setImage(bitmap, true)
                 }
             }
@@ -47,7 +47,7 @@ class GLPreviewViewActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.image_vertical).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_vertical.png").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_vertical.jpg").absolutePath).let { bitmap ->
                     previewView.setImage(bitmap, true)
                 }
             }
@@ -91,7 +91,7 @@ class GLPreviewViewActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.export).setOnClickListener {
             previewView.exportImage(
-                bitmap = BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.png").absolutePath),
+                bitmap = BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test_image_horizontal.jpg").absolutePath),
                 data = hashMapOf(),
             ) { bitmap ->
                 runOnUiThread {
