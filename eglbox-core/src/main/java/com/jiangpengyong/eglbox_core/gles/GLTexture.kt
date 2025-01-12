@@ -94,6 +94,13 @@ class GLTexture(
             type,           // 每个像素数据格式
             pixels,
         )
+        if (pixels != null && (minFilter == MinFilter.LINEAR_MIPMAP_NEAREST
+                    || minFilter == MinFilter.LINEAR_MIPMAP_LINEAR
+                    || minFilter == MinFilter.NEAREST_MIPMAP_LINEAR
+                    || minFilter == MinFilter.NEAREST_MIPMAP_NEAREST)
+        ) {
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
+        }
         unbind()
         Logger.i(TAG, "Set data to texture success. id=$id, size=$width x $height, pixels=$pixels")
     }
@@ -127,6 +134,13 @@ class GLTexture(
             GLUtils.getType(bitmap),            // 指定 texel 数据的格式，必须匹配 internal format
             0,                           // 纹理边框尺寸
         )
+        if (minFilter == MinFilter.LINEAR_MIPMAP_NEAREST
+            || minFilter == MinFilter.LINEAR_MIPMAP_LINEAR
+            || minFilter == MinFilter.NEAREST_MIPMAP_LINEAR
+            || minFilter == MinFilter.NEAREST_MIPMAP_NEAREST
+        ) {
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
+        }
         unbind()
         Logger.i(TAG, "Create texture by bitmap. id=$id, size=${this.width} x ${this.height}")
     }
@@ -154,6 +168,13 @@ class GLTexture(
             GLES20.GL_UNSIGNED_BYTE,
             ect1Texture
         )
+        if (minFilter == MinFilter.LINEAR_MIPMAP_NEAREST
+            || minFilter == MinFilter.LINEAR_MIPMAP_LINEAR
+            || minFilter == MinFilter.NEAREST_MIPMAP_LINEAR
+            || minFilter == MinFilter.NEAREST_MIPMAP_NEAREST
+        ) {
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
+        }
         unbind()
         Logger.i(TAG, "Create texture by ect1Texture. id=$id, size=${this.width} x ${this.height}")
     }
@@ -260,8 +281,4 @@ enum class MinFilter(val value: Int) {
 enum class MagFilter(val value: Int) {
     NEAREST(GLES20.GL_NEAREST),
     LINEAR(GLES20.GL_LINEAR),
-    NEAREST_MIPMAP_NEAREST(GLES20.GL_NEAREST_MIPMAP_NEAREST),
-    LINEAR_MIPMAP_NEAREST(GLES20.GL_LINEAR_MIPMAP_NEAREST),
-    NEAREST_MIPMAP_LINEAR(GLES20.GL_NEAREST_MIPMAP_LINEAR),
-    LINEAR_MIPMAP_LINEAR(GLES20.GL_LINEAR_MIPMAP_LINEAR),
 }

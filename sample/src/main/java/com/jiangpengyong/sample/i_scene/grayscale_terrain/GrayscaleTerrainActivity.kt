@@ -45,13 +45,13 @@ class GrayscaleTerrainActivity : AppCompatActivity() {
                 val filterId = glPreviewView.addFilter(GrayscaleTerrainFilter.TAG)?.also {
                     filterId = it
                 } ?: return@launch
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/grass.jpg").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/land.jpg").absolutePath).let { bitmap ->
                     val message = Message.obtain()
                     message.what = GrayscaleTerrainFilter.Type.UPDATE_LAND_TEXTURE.value
                     message.obj = bitmap
                     glPreviewView.sendMessageToFilter(filterId, message)
                 }
-                BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/rock.jpeg").absolutePath).let { bitmap ->
+                BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/mountain.jpeg").absolutePath).let { bitmap ->
                     val message = Message.obtain()
                     message.what = GrayscaleTerrainFilter.Type.UPDATE_MOUNTAIN_TEXTURE.value
                     message.obj = bitmap

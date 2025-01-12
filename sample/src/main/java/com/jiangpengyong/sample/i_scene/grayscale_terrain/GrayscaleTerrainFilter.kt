@@ -8,6 +8,7 @@ import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
 import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.gles.MinFilter
 import com.jiangpengyong.eglbox_core.gles.WrapMode
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.model.ModelData
@@ -25,14 +26,17 @@ class GrayscaleTerrainFilter : GLFilter() {
     private var mLandTexture = GLTexture(
         wrapS = WrapMode.REPEAT,
         wrapT = WrapMode.REPEAT,
+        minFilter = MinFilter.LINEAR_MIPMAP_NEAREST,
     )
     private var mMountainTexture = GLTexture(
         wrapS = WrapMode.REPEAT,
         wrapT = WrapMode.REPEAT,
+        minFilter = MinFilter.LINEAR_MIPMAP_NEAREST,
     )
     private var mSnowTexture = GLTexture(
         wrapS = WrapMode.REPEAT,
         wrapT = WrapMode.REPEAT,
+        minFilter = MinFilter.LINEAR_MIPMAP_NEAREST,
     )
 
     private var mProgram = GrayscaleTerrainProgram()
@@ -40,7 +44,9 @@ class GrayscaleTerrainFilter : GLFilter() {
     private val mViewMatrix = ViewMatrix()
 
     override fun onInit(context: FilterContext) {
-        mLandTexture.init()
+        mLandTexture.init {
+
+        }
         mMountainTexture.init()
         mSnowTexture.init()
 
