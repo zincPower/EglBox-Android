@@ -110,6 +110,8 @@ void main() {
         specularLight = vec4(0);
     }
 
+    // 这里 s 可能会大于 1
+    // 如果纹理是 EDGE 则无所谓，因为大于 1 则会取边缘颜色
     float s = diffuseLight.x + specularLight.x;
     vTextureCoord = vec2(s, 0.5);
 }
