@@ -16,13 +16,9 @@ in vec3 aNormal;
 // 光滑度
 uniform float uShininess;
 
-// 控制三种光是否现实
-uniform int uIsAddAmbientLight;
 uniform int uIsAddDiffuseLight;
 uniform int uIsAddSpecularLight;
 
-// 三种光照系数
-uniform vec4 ambientLightCoefficient;
 uniform vec4 diffuseLightCoefficient;
 uniform vec4 specularLightCoefficient;
 
@@ -95,18 +91,10 @@ vec4 calSpecularLight(
 void main() {
     gl_Position = uMVPMatrix * vec4(aPosition, 1);
 
-    // 环境光强度
-    vec4 ambientLight;
     // 散射光强度
     vec4 diffuseLight;
     // 镜面光亮度
     vec4 specularLight;
-    // 环境光
-    if (uIsAddAmbientLight == 1) {
-        ambientLight = ambientLightCoefficient;
-    } else {
-        ambientLight = vec4(0);
-    }
 
     // 散射光
     if (uIsAddDiffuseLight == 1) {

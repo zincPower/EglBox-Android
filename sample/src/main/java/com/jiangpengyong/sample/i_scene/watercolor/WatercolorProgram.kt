@@ -28,10 +28,8 @@ class WatercolorProgram : GLProgram() {
     private var mPositionHandle = 0
     private var mNormalHandle = 0
     private var mShininessHandle = 0
-    private var mIsAddAmbientLightHandle = 0
     private var mIsAddDiffuseLightHandle = 0
     private var mIsAddSpecularLightHandle = 0
-    private var mAmbientLightCoefficientHandle = 0
     private var mDiffuseLightCoefficientHandle = 0
     private var mSpecularLightCoefficientHandle = 0
     private var mLightSourceTypeHandle = 0
@@ -45,11 +43,9 @@ class WatercolorProgram : GLProgram() {
 
     private var mLightSourceType = LightSourceType.PointLight
 
-    private var mIsAddAmbientLight = true
     private var mIsAddDiffuseLight = true
     private var mIsAddSpecularLight = true
 
-    private var mAmbientLightCoefficient = Light(0.3F, 0.3F, 0.3F, 1.0F)
     private var mDiffuseLightCoefficient = Light(0.7F, 0.7F, 0.7F, 1.0F)
     private var mSpecularLightCoefficient = Light(0.6F, 0.6F, 0.6F, 1.0F)
 
@@ -89,11 +85,6 @@ class WatercolorProgram : GLProgram() {
         return this
     }
 
-    fun setIsAddAmbientLight(value: Boolean): WatercolorProgram {
-        mIsAddAmbientLight = value
-        return this
-    }
-
     fun setIsAddDiffuseLight(value: Boolean): WatercolorProgram {
         mIsAddDiffuseLight = value
         return this
@@ -101,11 +92,6 @@ class WatercolorProgram : GLProgram() {
 
     fun setIsAddSpecularLight(value: Boolean): WatercolorProgram {
         mIsAddSpecularLight = value
-        return this
-    }
-
-    fun setAmbientLightCoefficient(coefficient: Light): WatercolorProgram {
-        mAmbientLightCoefficient = coefficient
         return this
     }
 
@@ -143,10 +129,8 @@ class WatercolorProgram : GLProgram() {
         mPositionHandle = getAttribLocation("aPosition")
         mNormalHandle = getAttribLocation("aNormal")
         mShininessHandle = getUniformLocation("uShininess")
-        mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
         mIsAddDiffuseLightHandle = getUniformLocation("uIsAddDiffuseLight")
         mIsAddSpecularLightHandle = getUniformLocation("uIsAddSpecularLight")
-        mAmbientLightCoefficientHandle = getUniformLocation("ambientLightCoefficient")
         mDiffuseLightCoefficientHandle = getUniformLocation("diffuseLightCoefficient")
         mSpecularLightCoefficientHandle = getUniformLocation("specularLightCoefficient")
         mLightSourceTypeHandle = getUniformLocation("uLightSourceType")
@@ -169,12 +153,8 @@ class WatercolorProgram : GLProgram() {
             GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, modelData.normalBuffer ?: return@bind)
             GLES20.glEnableVertexAttribArray(mNormalHandle)
             GLES20.glUniform1f(mShininessHandle, mShininess)
-            GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
             GLES20.glUniform1i(mIsAddDiffuseLightHandle, if (mIsAddDiffuseLight) 1 else 0)
             GLES20.glUniform1i(mIsAddSpecularLightHandle, if (mIsAddSpecularLight) 1 else 0)
-            mAmbientLightCoefficient.let {
-                GLES20.glUniform4f(mAmbientLightCoefficientHandle, it.red, it.green, it.blue, it.alpha)
-            }
             mDiffuseLightCoefficient.let {
                 GLES20.glUniform4f(mDiffuseLightCoefficientHandle, it.red, it.green, it.blue, it.alpha)
             }
@@ -201,10 +181,8 @@ class WatercolorProgram : GLProgram() {
         mPositionHandle = 0
         mNormalHandle = 0
         mShininessHandle = 0
-        mIsAddAmbientLightHandle = 0
         mIsAddDiffuseLightHandle = 0
         mIsAddSpecularLightHandle = 0
-        mAmbientLightCoefficientHandle = 0
         mDiffuseLightCoefficientHandle = 0
         mSpecularLightCoefficientHandle = 0
         mLightSourceTypeHandle = 0
