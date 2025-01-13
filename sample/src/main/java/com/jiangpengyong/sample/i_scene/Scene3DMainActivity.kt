@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.i_scene.fog.FogActivity
 import com.jiangpengyong.sample.i_scene.grayscale_terrain.GrayscaleTerrainActivity
+import com.jiangpengyong.sample.i_scene.watercolor.WatercolorActivity
 
 /**
  * @author jiang peng yong
@@ -25,6 +26,10 @@ class Scene3DMainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.grayscale_terrain).setOnClickListener {
             startActivity(Intent(this, GrayscaleTerrainActivity::class.java))
+        }
+
+        findViewById<View>(R.id.watercolor).setOnClickListener {
+            startActivity(Intent(this, WatercolorActivity::class.java))
         }
     }
 }

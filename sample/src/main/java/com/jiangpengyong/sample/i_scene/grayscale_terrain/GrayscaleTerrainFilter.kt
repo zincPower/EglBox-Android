@@ -111,25 +111,25 @@ class GrayscaleTerrainFilter : GLFilter() {
 
     override fun onReceiveMessage(message: Message) {
         when (message.what) {
-            Type.UPDATE_DATA.value -> {
+            MessageType.UPDATE_DATA.value -> {
                 mGrayscaleTerrainData = message.obj as GrayscaleTerrainData
             }
 
-            Type.UPDATE_LAND_TEXTURE.value -> {
+            MessageType.UPDATE_LAND_TEXTURE.value -> {
                 (message.obj as Bitmap).let {
                     mLandTexture.setData(it)
                     it.recycle()
                 }
             }
 
-            Type.UPDATE_MOUNTAIN_TEXTURE.value -> {
+            MessageType.UPDATE_MOUNTAIN_TEXTURE.value -> {
                 (message.obj as Bitmap).let {
                     mMountainTexture.setData(it)
                     it.recycle()
                 }
             }
 
-            Type.UPDATE_SNOW_TEXTURE.value -> {
+            MessageType.UPDATE_SNOW_TEXTURE.value -> {
                 (message.obj as Bitmap).let {
                     mSnowTexture.setData(it)
                     it.recycle()
@@ -138,7 +138,7 @@ class GrayscaleTerrainFilter : GLFilter() {
         }
     }
 
-    enum class Type(val value: Int) {
+    enum class MessageType(val value: Int) {
         UPDATE_DATA(10000),
         UPDATE_LAND_TEXTURE(10001),
         UPDATE_MOUNTAIN_TEXTURE(10002),

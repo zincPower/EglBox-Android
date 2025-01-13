@@ -11,6 +11,11 @@
     <TextView
         android:id="@+id/grayscale_terrain"
         style="@style/common_button"
-        android:text="灰度图" />
+        android:text="灰度地形图" />
+
+    <TextView
+        android:id="@+id/watercolor"
+        style="@style/common_button"
+        android:text="水彩渲染" />
 
 </com.jiangpengyong.sample.widget.FlowLayout>

@@ -47,19 +47,19 @@ class GrayscaleTerrainActivity : AppCompatActivity() {
                 } ?: return@launch
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/land.jpg").absolutePath).let { bitmap ->
                     val message = Message.obtain()
-                    message.what = GrayscaleTerrainFilter.Type.UPDATE_LAND_TEXTURE.value
+                    message.what = GrayscaleTerrainFilter.MessageType.UPDATE_LAND_TEXTURE.value
                     message.obj = bitmap
                     glPreviewView.sendMessageToFilter(filterId, message)
                 }
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/mountain.jpeg").absolutePath).let { bitmap ->
                     val message = Message.obtain()
-                    message.what = GrayscaleTerrainFilter.Type.UPDATE_MOUNTAIN_TEXTURE.value
+                    message.what = GrayscaleTerrainFilter.MessageType.UPDATE_MOUNTAIN_TEXTURE.value
                     message.obj = bitmap
                     glPreviewView.sendMessageToFilter(filterId, message)
                 }
                 BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/snow.jpg").absolutePath).let { bitmap ->
                     val message = Message.obtain()
-                    message.what = GrayscaleTerrainFilter.Type.UPDATE_SNOW_TEXTURE.value
+                    message.what = GrayscaleTerrainFilter.MessageType.UPDATE_SNOW_TEXTURE.value
                     message.obj = bitmap
                     glPreviewView.sendMessageToFilter(filterId, message)
                 }
@@ -76,7 +76,7 @@ class GrayscaleTerrainActivity : AppCompatActivity() {
                         snowBoundaryRange = Range(50F, 55F),
                     )
                     val message = Message.obtain()
-                    message.what = GrayscaleTerrainFilter.Type.UPDATE_DATA.value
+                    message.what = GrayscaleTerrainFilter.MessageType.UPDATE_DATA.value
                     message.obj = grayscaleTerrainData
                     glPreviewView.sendMessageToFilter(filterId, message)
                 }

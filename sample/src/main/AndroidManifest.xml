@@ -169,6 +169,9 @@
         <activity
             android:name="com.jiangpengyong.sample.i_scene.grayscale_terrain.GrayscaleTerrainActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.i_scene.watercolor.WatercolorActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
