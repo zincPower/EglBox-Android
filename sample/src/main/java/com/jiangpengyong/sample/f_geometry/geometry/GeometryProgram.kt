@@ -5,6 +5,7 @@ import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.utils.GLMatrix
 import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
+import com.jiangpengyong.eglbox_filter.program.DrawMode
 import com.jiangpengyong.sample.App
 import java.nio.FloatBuffer
 

@@ -18,4 +18,9 @@
         style="@style/common_button"
         android:text="水彩渲染" />
 
+    <TextView
+        android:id="@+id/outline"
+        style="@style/common_button"
+        android:text="描边" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>

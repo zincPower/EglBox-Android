@@ -13,8 +13,8 @@ import com.jiangpengyong.eglbox_core.utils.ProjectionMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.model.ModelCreator
 import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.program.DrawMode
 import com.jiangpengyong.sample.f_geometry.geometry.GeometryProgram
-import com.jiangpengyong.sample.f_geometry.geometry.DrawMode
 
 /**
  * @author jiang peng yong

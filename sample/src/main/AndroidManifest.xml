@@ -172,6 +172,9 @@
         <activity
             android:name="com.jiangpengyong.sample.i_scene.watercolor.WatercolorActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.i_scene.outline.OutlineActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
