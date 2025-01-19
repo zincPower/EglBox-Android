@@ -28,7 +28,7 @@ class OutlineActivity : AppCompatActivity() {
             glPreviewView.setBlank()
             glPreviewView.setLightPoint(0F, 15F, 40F)
             glPreviewView.setViewpoint(0F, 15F, 40F)
-            glPreviewView.setProjection(ProjectionType.Perspective, 10F, 1000F, 1F)
+            glPreviewView.setProjection(ProjectionType.Perspective, 10F, 1000F, 2F)
             filterId = glPreviewView.addFilter(OutlineGroupFilter.TAG)
             glPreviewView.requestRender()
         }

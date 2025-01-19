@@ -1,17 +1,14 @@
 package com.jiangpengyong.sample.i_scene.outline
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
-import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.space3d.Scale
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
-import com.jiangpengyong.eglbox_filter.model.ModelCreator
 import com.jiangpengyong.eglbox_filter.model.ModelData
 import com.jiangpengyong.eglbox_filter.utils.Obj3DModelLoader
 import com.jiangpengyong.sample.App
@@ -30,41 +27,27 @@ class OutlineFilter : GLFilter() {
     private val mOutlineProgram = OutlineProgram()
 
     private var mTeapotModelData: ModelData? = null
-    private val mTeapotTexture = GLTexture()
     private val mTeapotModelMatrix = ModelMatrix()
     private var mTeapotScaleInfo = Scale(1F, 1F, 1F)
 
     private var mFilmModelData: ModelData? = null
-    private val mFilmTexture = GLTexture()
     private val mFilmModelMatrix = ModelMatrix()
     private var mFilmScaleInfo = Scale(1F, 1F, 1F)
 
-    private lateinit var mRingModelData: ModelData
-    private val mRingTexture = GLTexture()
-    private val mRingModelMatrix = ModelMatrix()
-
-    private val mTableModelData = ModelCreator.createCube()
-    private val mTableModelMatrix = ModelMatrix()
-    private val mTableTexture = GLTexture()
+//    private lateinit var mRingModelData: ModelData
+//    private val mRingTexture = GLTexture()
+//    private val mRingModelMatrix = ModelMatrix()
+//
+//    private val mTableModelData = ModelCreator.createCube()
+//    private val mTableModelMatrix = ModelMatrix()
+//    private val mTableTexture = GLTexture()
 
     private val mViewMatrix = ViewMatrix()
 
     override fun onInit(context: FilterContext) {
         mOutlineProgram.init()
 
-        mRingModelData = ModelCreator.createRing(majorSegment = 360)
-
-        BitmapFactory.decodeFile(File(App.context.filesDir, "images/test_image/test-gradient-square.jpg").absolutePath).let { bitmap ->
-            mRingTexture.init()
-            mRingTexture.setData(bitmap)
-            bitmap.recycle()
-        }
-
-        BitmapFactory.decodeFile(File(App.context.filesDir, "images/texture_image/wood.png").absolutePath).let { bitmap ->
-            mTableTexture.init()
-            mTableTexture.setData(bitmap)
-            bitmap.recycle()
-        }
+//        mRingModelData = ModelCreator.createRing(majorSegment = 360)
 
         File(App.context.filesDir, "model/film/film.obj")
             .let { file ->
@@ -76,11 +59,6 @@ class OutlineFilter : GLFilter() {
                 val max = Math.max(Math.max(x, y), z) / 2
                 mFilmScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
-        BitmapFactory.decodeFile(File(App.context.filesDir, "model/film/film.jpg").absolutePath).let { bitmap ->
-            mFilmTexture.init()
-            mFilmTexture.setData(bitmap)
-            bitmap.recycle()
-        }
 
         File(App.context.filesDir, "model/teapot/all/teapot.obj")
             .let { file ->
@@ -92,11 +70,6 @@ class OutlineFilter : GLFilter() {
                 val max = Math.max(Math.max(x, y), z) / 5
                 mTeapotScaleInfo = Scale(1 / max, 1 / max, 1 / max)
             }
-        BitmapFactory.decodeFile(File(App.context.filesDir, "model/teapot/all/teapot.png").absolutePath).let { bitmap ->
-            mTeapotTexture.init()
-            mTeapotTexture.setData(bitmap)
-            bitmap.recycle()
-        }
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
@@ -139,6 +112,7 @@ class OutlineFilter : GLFilter() {
             mFilmModelMatrix.scale(mFilmScaleInfo.scaleX, mFilmScaleInfo.scaleY, mFilmScaleInfo.scaleZ)
             mFilmModelMatrix.rotate(-90F, 1F, 0F, 0F)
             mOutlineProgram.setMVPMatrix(vpMatrix * mFilmModelMatrix)
+            mOutlineProgram.setModelMatrix(mFilmModelMatrix)
             mOutlineProgram.setData(
                 vertexBuffer = modelData.vertexBuffer,
                 normalBuffer = modelData.normalBuffer ?: return@let,
@@ -176,10 +150,6 @@ class OutlineFilter : GLFilter() {
 
     override fun onRelease(context: FilterContext) {
         mOutlineProgram.release()
-        mTeapotTexture.release()
-        mFilmTexture.release()
-        mRingTexture.release()
-        mTableTexture.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}

@@ -15,6 +15,7 @@ import java.nio.FloatBuffer
  */
 class OutlineProgram : GLProgram() {
     private var mMVPMatrixHandle = 0
+    private var mModelMatrixHandle = 0
     private var mPositionHandle = 0
     private var mNormalHandle = 0
 
@@ -23,9 +24,14 @@ class OutlineProgram : GLProgram() {
     private var mVertexCount = 0
 
     private var mMVPMatrix = GLMatrix()
+    private var mModelMatrix = GLMatrix()
 
     fun setMVPMatrix(matrix: GLMatrix) {
         mMVPMatrix = matrix
+    }
+
+    fun setModelMatrix(matrix: GLMatrix) {
+        mModelMatrix = matrix
     }
 
     fun setData(
@@ -40,6 +46,7 @@ class OutlineProgram : GLProgram() {
 
     override fun onInit() {
         mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
+        mModelMatrixHandle = getUniformLocation("uModelMatrix")
         mPositionHandle = getAttribLocation("aPosition")
         mNormalHandle = getAttribLocation("aNormal")
     }
@@ -49,6 +56,7 @@ class OutlineProgram : GLProgram() {
         val normalBuffer = mNormalBuffer ?: return
 
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
+        GLES20.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix.matrix, 0)
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, vertexBuffer)
         GLES20.glEnableVertexAttribArray(mPositionHandle)
         GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, normalBuffer)
@@ -60,6 +68,7 @@ class OutlineProgram : GLProgram() {
 
     override fun onRelease() {
         mMVPMatrixHandle = 0
+        mModelMatrixHandle = 0
         mPositionHandle = 0
         mNormalHandle = 0
     }
