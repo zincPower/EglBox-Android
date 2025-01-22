@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jiangpengyong.sample.widget.FlowLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/scissor_test"
+        style="@style/common_button"
+        android:text="裁剪测试" />
+
+    <TextView
+        android:id="@+id/alpha_test"
+        style="@style/common_button"
+        android:text="alpha 测试" />
+
+    <TextView
+        android:id="@+id/stencil_test"
+        style="@style/common_button"
+        android:text="模板测试" />
+
+</com.jiangpengyong.sample.widget.FlowLayout>

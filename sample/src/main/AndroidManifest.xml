@@ -177,6 +177,19 @@
             android:screenOrientation="landscape" />
 
         <activity
+            android:name="com.jiangpengyong.sample.j_pre_fragment_tests.PerFragmentTestsMainActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.j_pre_fragment_tests.scissor_test.ScissorTestActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.j_pre_fragment_tests.alpha_test.AlphaTestActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.j_pre_fragment_tests.stencil_test.StencilTestActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"
             android:screenOrientation="landscape" />
 

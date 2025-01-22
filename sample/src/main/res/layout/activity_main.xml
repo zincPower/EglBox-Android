@@ -210,14 +210,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/stencil"
+                android:id="@+id/per_fragment_tests"
                 style="@style/common_button"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10、裁剪与模版测试"
+                    android:text="10、逐片段测试"
                     android:textColor="@android:color/white" />
 
                 <ImageView

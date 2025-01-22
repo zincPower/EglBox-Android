@@ -15,6 +15,7 @@ import com.jiangpengyong.sample.font.FontActivity
 import com.jiangpengyong.sample.g_model.Model3DMainActivity
 import com.jiangpengyong.sample.h_blend.BlendMainActivity
 import com.jiangpengyong.sample.i_scene.Scene3DMainActivity
+import com.jiangpengyong.sample.j_pre_fragment_tests.PerFragmentTestsMainActivity
 import com.jiangpengyong.sample.view.GLPreviewViewActivity
 
 /**
@@ -62,6 +63,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.scene).setOnClickListener {
             startActivity(Intent(this, Scene3DMainActivity::class.java))
+        }
+
+        findViewById<View>(R.id.per_fragment_tests).setOnClickListener {
+            startActivity(Intent(this, PerFragmentTestsMainActivity::class.java))
         }
 
         findViewById<View>(R.id.font).setOnClickListener {
