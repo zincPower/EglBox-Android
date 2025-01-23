@@ -1,10 +1,9 @@
-package com.jiangpengyong.eglbox_core.program
+package com.jiangpengyong.sample.j_pre_fragment_tests.alpha_test
 
 import android.opengl.GLES20
 import android.util.Size
 import com.jiangpengyong.eglbox_core.gles.GLProgram
 import com.jiangpengyong.eglbox_core.gles.GLTexture
-import com.jiangpengyong.eglbox_core.gles.Target
 import com.jiangpengyong.eglbox_core.logger.Logger
 import com.jiangpengyong.eglbox_core.utils.IDENTITY_MATRIX_4x4
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
@@ -14,7 +13,7 @@ import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
  * @author jiang peng yong
  * @date 2024/6/15 12:43
  * @email 56002982@qq.com
- * @des 用于绘制 2D 纹理，支持四种模式，通过 [setScaleType] 方法进行设置：
+ * @des 用于绘制 alpha 测试，支持四种模式，通过 [setScaleType] 方法进行设置：
  * ScaleType {
  *     CENTER_CROP,        // 较小边适配，图片按比例缩放，会填充满可绘制区域
  *     CENTER_INSIDE,      // 较大边适配，图片按比例缩放，居中绘制纹理，可能会留有黑边
@@ -39,7 +38,7 @@ import com.jiangpengyong.eglbox_core.utils.allocateFloatBuffer
  * 可以得到一个 [ModelMatrix] 类型的返回值，内部包含了缩放值，可以直接对该矩阵调用相应的方法进行缩放、偏移、旋转，也
  * 可以调用 [ModelMatrix.matrix] 获取 16 个 Float 类型的 [FloatArray] 数组。
  */
-class Texture2DProgram(val target: Target) : GLProgram() {
+class AlphaTestProgram : GLProgram() {
     private var mVertexCoordinates = defaultVertexCoordinates
     private var mTextureCoordinates = defaultTextureCoordinates
     private var mVertexMatrix = IDENTITY_MATRIX_4x4
@@ -64,43 +63,43 @@ class Texture2DProgram(val target: Target) : GLProgram() {
         mTextureCoordinates = allocateFloatBuffer(value)
     }
 
-    fun setScaleType(scaleType: ScaleType): Texture2DProgram {
+    fun setScaleType(scaleType: ScaleType): AlphaTestProgram {
         mCurrentTexture2DInfo.scaleType = scaleType
         return this
     }
 
-    fun setTargetSize(size: Size): Texture2DProgram {
+    fun setTargetSize(size: Size): AlphaTestProgram {
         mCurrentTexture2DInfo.targetSize = size
         return this
     }
 
-    fun isMirrorX(value: Boolean): Texture2DProgram {
+    fun isMirrorX(value: Boolean): AlphaTestProgram {
         mCurrentTexture2DInfo.isMirrorX = value
         return this
     }
 
-    fun isMirrorY(value: Boolean): Texture2DProgram {
+    fun isMirrorY(value: Boolean): AlphaTestProgram {
         mCurrentTexture2DInfo.isMirrorY = value
         return this
     }
 
-    fun setTexture(texture: GLTexture): Texture2DProgram {
+    fun setTexture(texture: GLTexture): AlphaTestProgram {
         mTexture = texture
         mCurrentTexture2DInfo.textureSize = Size(texture.width, texture.height)
         return this
     }
 
-    fun setVertexMatrix(matrix: FloatArray): Texture2DProgram {
+    fun setVertexMatrix(matrix: FloatArray): AlphaTestProgram {
         mCustomVertexMatrix = matrix
         return this
     }
 
-    fun setTextureMatrix(matrix: FloatArray): Texture2DProgram {
+    fun setTextureMatrix(matrix: FloatArray): AlphaTestProgram {
         mCustomTextureMatrix = matrix
         return this
     }
 
-    fun reset(): Texture2DProgram {
+    fun reset(): AlphaTestProgram {
         mVertexMatrix = IDENTITY_MATRIX_4x4
         mTextureMatrix = IDENTITY_MATRIX_4x4
         mTexture = null
@@ -168,26 +167,20 @@ class Texture2DProgram(val target: Target) : GLProgram() {
         }
     """
 
-    override fun getFragmentShaderSource(): String = if (target == Target.TEXTURE_2D) {
-        """
+    override fun getFragmentShaderSource(): String = """
         precision mediump float;
         varying vec2 vTexturePosition;
         uniform sampler2D sTexture;
         void main() {
-            gl_FragColor = texture2D(sTexture, vTexturePosition);
+            vec4 orgColor = texture2D(sTexture, vTexturePosition);
+            if(orgColor.a == 0.0) {
+                discard;
+            } else {
+                gl_FragColor = orgColor;
+            }
         }
-        """
-    } else {
-        """
-        #extension GL_OES_EGL_image_external : require
-        precision mediump float;
-        varying vec2 vTexturePosition;
-        uniform samplerExternalOES sTexture;
-        void main() {
-            gl_FragColor = texture2D(sTexture, vTexturePosition);
-        }
-        """
-    }
+    """
+
 
     private fun updateInfo() {
         // 如果是 Matrix 类型，则矩阵计算交由外部
@@ -231,7 +224,7 @@ class Texture2DProgram(val target: Target) : GLProgram() {
     }
 
     companion object {
-        private const val TAG = "Texture2DProgram"
+        private const val TAG = "AlphaTestProgram"
 
         val defaultVertexCoordinates = allocateFloatBuffer(
             floatArrayOf(
