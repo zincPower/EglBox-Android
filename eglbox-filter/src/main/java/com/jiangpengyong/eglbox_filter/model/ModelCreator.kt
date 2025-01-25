@@ -4,6 +4,7 @@ import android.opengl.GLES20
 import com.jiangpengyong.eglbox_filter.model.model.Ball
 import com.jiangpengyong.eglbox_filter.model.model.Circle
 import com.jiangpengyong.eglbox_filter.model.model.Cube
+import com.jiangpengyong.eglbox_filter.model.model.Rectangle
 import com.jiangpengyong.eglbox_filter.model.model.Ring
 
 /**
@@ -58,5 +59,12 @@ object ModelCreator {
      */
     fun createCube(): ModelData {
         return Cube().create()
+    }
+
+    /**
+     * 创建矩形
+     */
+    fun createRectangle(): ModelData {
+        return Rectangle().create()
     }
 }

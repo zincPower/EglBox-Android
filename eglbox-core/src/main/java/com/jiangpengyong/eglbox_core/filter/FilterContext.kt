@@ -1,6 +1,5 @@
 package com.jiangpengyong.eglbox_core.filter
 
-import android.os.Handler
 import android.os.Message
 import android.util.Size
 import com.jiangpengyong.eglbox_core.egl.EGL

@@ -16,6 +16,7 @@ import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_filter.EglBoxRuntime
 import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.program.Light
 import java.nio.FloatBuffer
 
 /**
@@ -124,7 +125,7 @@ class Model3DFilter : GLFilter() {
                 }
             }
 
-            Model3DMessageType.SET_SIDE_RENDERING_TYPE.value->{
+            Model3DMessageType.SET_SIDE_RENDERING_TYPE.value -> {
                 mSideRenderingType = message.obj as SideRenderingType
             }
 
@@ -181,6 +182,10 @@ class Model3DProgram(private val calculateLightingType: CalculateLightingType = 
     private var mIsAddSpecularLight = true
     private var mSideRenderingType = SideRenderingType.Single
 
+    private var mAmbientLightCoefficient = Light(0.3F, 0.3F, 0.3F, 1.0F)
+    private var mDiffuseLightCoefficient = Light(0.7F, 0.7F, 0.7F, 1.0F)
+    private var mSpecularLightCoefficient = Light(0.6F, 0.6F, 0.6F, 1.0F)
+
     fun setTexture(texture: GLTexture?) {
         mTexture = texture
     }
@@ -231,6 +236,18 @@ class Model3DProgram(private val calculateLightingType: CalculateLightingType = 
         mTextureBuffer = textureBuffer
         mNormalBuffer = normalBuffer
         mVertexCount = vertexCount
+    }
+
+    fun setAmbientLightCoefficient(coefficient: Light) {
+        mAmbientLightCoefficient = coefficient
+    }
+
+    fun setDiffuseLightCoefficient(coefficient: Light) {
+        mDiffuseLightCoefficient = coefficient
+    }
+
+    fun setSpecularLightCoefficient(coefficient: Light) {
+        mSpecularLightCoefficient = coefficient
     }
 
     override fun onInit() {
