@@ -1,0 +1,278 @@
+package com.jiangpengyong.sample.j_pre_fragment_tests.clipping_plane
+
+import android.opengl.GLES20
+import android.util.Log
+import com.jiangpengyong.eglbox_core.gles.GLProgram
+import com.jiangpengyong.eglbox_core.gles.GLTexture
+import com.jiangpengyong.eglbox_core.space3d.Point
+import com.jiangpengyong.eglbox_core.utils.GLMatrix
+import com.jiangpengyong.eglbox_core.utils.GLShaderExt.loadFromAssetsFile
+import com.jiangpengyong.eglbox_filter.EglBoxRuntime
+import com.jiangpengyong.eglbox_filter.model.ModelData
+import com.jiangpengyong.eglbox_filter.program.Color
+import com.jiangpengyong.eglbox_filter.program.ColorType
+import com.jiangpengyong.eglbox_filter.program.DrawMode
+import com.jiangpengyong.eglbox_filter.program.Light
+import com.jiangpengyong.eglbox_filter.program.LightSourceType
+import com.jiangpengyong.eglbox_filter.program.TextureType
+
+/**
+ * @author jiang peng yong
+ * @date 2024/12/6 21:17
+ * @email 56002982@qq.com
+ * @des 裁剪平面 Program
+ */
+open class ClippingPlaneProgram : GLProgram() {
+    private var mMVPMatrixHandle = 0
+    private var mModelMatrixHandle = 0
+    private var mLightPointHandle = 0
+    private var mViewPointHandle = 0
+    private var mPositionHandle = 0
+    private var mNormalHandle = 0
+    private var mShininessHandle = 0
+    private var mIsAddAmbientLightHandle = 0
+    private var mIsAddDiffuseLightHandle = 0
+    private var mIsAddSpecularLightHandle = 0
+    private var mAmbientLightCoefficientHandle = 0
+    private var mDiffuseLightCoefficientHandle = 0
+    private var mSpecularLightCoefficientHandle = 0
+    private var mLightSourceTypeHandle = 0
+    private var mTextureHandle = 0
+    private var mTextureCoordHandle = 0
+    private var mColorHandle = 0
+    private var mTextureTypeHandle = 0
+    private var mClippingPlaneHandle = 0
+
+    private var mMVPMatrix: GLMatrix = GLMatrix()
+    private var mModelMatrix: GLMatrix = GLMatrix()
+
+    private var mLightPoint = Point(0F, 0F, 0F)
+    private var mViewPoint = Point(0F, 0F, 0F)
+    private var mShininess = 50F
+
+    private var mTexture: GLTexture? = null
+    private var mColor = Color(1F, 1F, 1F, 1F)
+    private var mTextureType = TextureType.CheckeredColor
+
+    private var mLightSourceType = LightSourceType.PointLight
+
+    private var mIsAddAmbientLight = true
+    private var mIsAddDiffuseLight = true
+    private var mIsAddSpecularLight = true
+
+    private var mAmbientLightCoefficient = Light(0.3F, 0.3F, 0.3F, 1.0F)
+    private var mDiffuseLightCoefficient = Light(0.7F, 0.7F, 0.7F, 1.0F)
+    private var mSpecularLightCoefficient = Light(0.6F, 0.6F, 0.6F, 1.0F)
+
+    private var mDrawMode: DrawMode? = null
+
+    private var mModelData: ModelData? = null
+
+    private var mClippingPlane = ClippingPlane(1F, 1F, 1F, 0F)
+
+    fun setMVPMatrix(matrix: GLMatrix): ClippingPlaneProgram {
+        mMVPMatrix = matrix
+        return this
+    }
+
+    fun setModelMatrix(matrix: GLMatrix): ClippingPlaneProgram {
+        mModelMatrix = matrix
+        return this
+    }
+
+    fun setLightPoint(lightPoint: Point): ClippingPlaneProgram {
+        mLightPoint = lightPoint
+        return this
+    }
+
+    fun setViewPoint(viewPoint: Point): ClippingPlaneProgram {
+        mViewPoint = viewPoint
+        return this
+    }
+
+    fun setShininess(shininess: Float): ClippingPlaneProgram {
+        mShininess = shininess
+        return this
+    }
+
+    fun setIsAddAmbientLight(value: Boolean): ClippingPlaneProgram {
+        mIsAddAmbientLight = value
+        return this
+    }
+
+    fun setIsAddDiffuseLight(value: Boolean): ClippingPlaneProgram {
+        mIsAddDiffuseLight = value
+        return this
+    }
+
+    fun setIsAddSpecularLight(value: Boolean): ClippingPlaneProgram {
+        mIsAddSpecularLight = value
+        return this
+    }
+
+    fun setAmbientLightCoefficient(coefficient: Light): ClippingPlaneProgram {
+        mAmbientLightCoefficient = coefficient
+        return this
+    }
+
+    fun setDiffuseLightCoefficient(coefficient: Light): ClippingPlaneProgram {
+        mDiffuseLightCoefficient = coefficient
+        return this
+    }
+
+    fun setSpecularLightCoefficient(coefficient: Light): ClippingPlaneProgram {
+        mSpecularLightCoefficient = coefficient
+        return this
+    }
+
+    fun setLightSourceType(lightSourceType: LightSourceType): ClippingPlaneProgram {
+        mLightSourceType = lightSourceType
+        return this
+    }
+
+    fun setTexture(texture: GLTexture): ClippingPlaneProgram {
+        mTexture = texture
+        mTextureType = TextureType.Texture
+        return this
+    }
+
+    fun setColor(color: Color, colorType: ColorType): ClippingPlaneProgram {
+        mColor = color
+        mTextureType = when (colorType) {
+            ColorType.SolidColor -> TextureType.SolidColor
+            ColorType.CheckeredColor -> TextureType.CheckeredColor
+        }
+        return this
+    }
+
+    fun setDrawMode(drawMode: DrawMode): ClippingPlaneProgram {
+        mDrawMode = drawMode
+        return this
+    }
+
+    fun setModelData(modelData: ModelData) {
+        mModelData = modelData
+    }
+
+    fun setClippingPlane(clippingPlane: ClippingPlane) {
+        mClippingPlane = clippingPlane
+    }
+
+    override fun onInit() {
+        mMVPMatrixHandle = getUniformLocation("uMVPMatrix")
+        mModelMatrixHandle = getUniformLocation("uModelMatrix")
+        mLightPointHandle = getUniformLocation("uLightPoint")
+        mViewPointHandle = getUniformLocation("uViewPoint")
+        mPositionHandle = getAttribLocation("aPosition")
+        mTextureCoordHandle = getAttribLocation("aTextureCoord")
+        mNormalHandle = getAttribLocation("aNormal")
+        mShininessHandle = getUniformLocation("uShininess")
+        mIsAddAmbientLightHandle = getUniformLocation("uIsAddAmbientLight")
+        mIsAddDiffuseLightHandle = getUniformLocation("uIsAddDiffuseLight")
+        mIsAddSpecularLightHandle = getUniformLocation("uIsAddSpecularLight")
+        mAmbientLightCoefficientHandle = getUniformLocation("ambientLightCoefficient")
+        mDiffuseLightCoefficientHandle = getUniformLocation("diffuseLightCoefficient")
+        mSpecularLightCoefficientHandle = getUniformLocation("specularLightCoefficient")
+        mLightSourceTypeHandle = getUniformLocation("uLightSourceType")
+        mTextureHandle = getUniformLocation("uTexture")
+        mColorHandle = getUniformLocation("uColor")
+        mTextureTypeHandle = getUniformLocation("uTextureType")
+        mClippingPlaneHandle = getUniformLocation("uClippingPlane")
+    }
+
+    override fun onDraw() {
+        val modelData = mModelData
+        if (modelData == null) {
+            Log.e(TAG, "Model data is null.")
+            return
+        }
+        if (mTextureType == TextureType.Texture) {
+            val texture = mTexture
+            if (texture == null) {
+                Log.e(TAG, "Texture is null.")
+            } else {
+                texture.bind { realDraw(modelData) }
+            }
+        } else {
+            realDraw(modelData)
+        }
+    }
+
+    override fun onRelease() {
+        mMVPMatrixHandle = 0
+        mModelMatrixHandle = 0
+        mLightPointHandle = 0
+        mViewPointHandle = 0
+        mPositionHandle = 0
+        mNormalHandle = 0
+        mShininessHandle = 0
+        mIsAddAmbientLightHandle = 0
+        mIsAddDiffuseLightHandle = 0
+        mIsAddSpecularLightHandle = 0
+        mAmbientLightCoefficientHandle = 0
+        mDiffuseLightCoefficientHandle = 0
+        mSpecularLightCoefficientHandle = 0
+        mLightSourceTypeHandle = 0
+        mTextureHandle = 0
+        mTextureCoordHandle = 0
+        mColorHandle = 0
+        mTextureTypeHandle = 0
+        mClippingPlaneHandle = 0
+    }
+
+    override fun getVertexShaderSource(): String = loadFromAssetsFile(
+        EglBoxRuntime.context.resources,
+        "glsl/clipping_plane/vertex.glsl"
+    )
+
+    override fun getFragmentShaderSource(): String = loadFromAssetsFile(
+        EglBoxRuntime.context.resources,
+        "glsl/clipping_plane/fragment.glsl"
+    )
+
+    protected open fun realDraw(modelData: ModelData) {
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix.matrix, 0)
+        GLES20.glUniformMatrix4fv(mModelMatrixHandle, 1, false, mModelMatrix.matrix, 0)
+        GLES20.glUniform4f(mClippingPlaneHandle, mClippingPlane.a, mClippingPlane.b, mClippingPlane.c, mClippingPlane.d)
+        GLES20.glUniform3f(mLightPointHandle, mLightPoint.x, mLightPoint.y, mLightPoint.z)
+        GLES20.glUniform3f(mViewPointHandle, mViewPoint.x, mViewPoint.y, mViewPoint.z)
+        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, modelData.vertexBuffer)
+        GLES20.glEnableVertexAttribArray(mPositionHandle)
+        if (mTextureType == TextureType.Texture) {
+            val textureBuffer = modelData.textureBuffer
+            if (textureBuffer == null) {
+                Log.e(TAG, "Texture buffer is null.")
+            } else {
+                GLES20.glVertexAttribPointer(mTextureCoordHandle, modelData.textureStep, GLES20.GL_FLOAT, false, modelData.textureStep * 4, textureBuffer)
+                GLES20.glEnableVertexAttribArray(mTextureCoordHandle)
+            }
+        } else {
+            GLES20.glUniform4f(mColorHandle, mColor.red, mColor.green, mColor.blue, mColor.alpha)
+        }
+        GLES20.glUniform1i(mTextureTypeHandle, mTextureType.value)
+        GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 3 * 4, modelData.normalBuffer ?: return)
+        GLES20.glEnableVertexAttribArray(mNormalHandle)
+        GLES20.glUniform1f(mShininessHandle, mShininess)
+        GLES20.glUniform1i(mIsAddAmbientLightHandle, if (mIsAddAmbientLight) 1 else 0)
+        GLES20.glUniform1i(mIsAddDiffuseLightHandle, if (mIsAddDiffuseLight) 1 else 0)
+        GLES20.glUniform1i(mIsAddSpecularLightHandle, if (mIsAddSpecularLight) 1 else 0)
+        mAmbientLightCoefficient.let {
+            GLES20.glUniform4f(mAmbientLightCoefficientHandle, it.red, it.green, it.blue, it.alpha)
+        }
+        mDiffuseLightCoefficient.let {
+            GLES20.glUniform4f(mDiffuseLightCoefficientHandle, it.red, it.green, it.blue, it.alpha)
+        }
+        mSpecularLightCoefficient.let {
+            GLES20.glUniform4f(mSpecularLightCoefficientHandle, it.red, it.green, it.blue, it.alpha)
+        }
+
+        GLES20.glDrawArrays(mDrawMode?.value ?: GLES20.GL_TRIANGLES, 0, modelData.count)
+        GLES20.glDisableVertexAttribArray(mPositionHandle)
+        GLES20.glDisableVertexAttribArray(mNormalHandle)
+        GLES20.glDisableVertexAttribArray(mTextureCoordHandle)
+    }
+
+    companion object {
+        const val TAG = "LightProgram"
+    }
+}

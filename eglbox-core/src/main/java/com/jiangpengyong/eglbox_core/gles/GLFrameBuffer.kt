@@ -1,7 +1,6 @@
 package com.jiangpengyong.eglbox_core.gles
 
 import android.opengl.GLES20
-import android.opengl.GLES30
 import android.util.Log
 import com.jiangpengyong.eglbox_core.logger.Logger
 import java.nio.ByteBuffer
@@ -92,23 +91,23 @@ class GLFrameBuffer : GLObject {
             return
         }
         bindColorTexture(colorTexture, colorAttachment)
-//        bindDepthTexture(depthTexture, depthAttachment)
+        bindDepthTexture(depthTexture, depthAttachment)
 
-        use {
-            // 创建组合深度-模板缓冲
-            val depthStencilRbo = IntArray(1)
-            GLES30.glGenRenderbuffers(1, depthStencilRbo, 0)
-            GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, depthStencilRbo[0])
-            GLES30.glRenderbufferStorage(GLES30.GL_RENDERBUFFER, GLES30.GL_DEPTH24_STENCIL8, colorTexture.width, colorTexture.height)
-            GLES30.glFramebufferRenderbuffer(
-                GLES30.GL_FRAMEBUFFER, GLES30.GL_DEPTH_ATTACHMENT,
-                GLES30.GL_RENDERBUFFER, depthStencilRbo[0]
-            )
-            GLES30.glFramebufferRenderbuffer(
-                GLES30.GL_FRAMEBUFFER, GLES30.GL_STENCIL_ATTACHMENT,
-                GLES30.GL_RENDERBUFFER, depthStencilRbo[0]
-            )
-        }
+//        use {
+//            // 创建组合深度-模板缓冲
+//            val depthStencilRbo = IntArray(1)
+//            GLES30.glGenRenderbuffers(1, depthStencilRbo, 0)
+//            GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, depthStencilRbo[0])
+//            GLES30.glRenderbufferStorage(GLES30.GL_RENDERBUFFER, GLES30.GL_DEPTH24_STENCIL8, colorTexture.width, colorTexture.height)
+//            GLES30.glFramebufferRenderbuffer(
+//                GLES30.GL_FRAMEBUFFER, GLES30.GL_DEPTH_ATTACHMENT,
+//                GLES30.GL_RENDERBUFFER, depthStencilRbo[0]
+//            )
+//            GLES30.glFramebufferRenderbuffer(
+//                GLES30.GL_FRAMEBUFFER, GLES30.GL_STENCIL_ATTACHMENT,
+//                GLES30.GL_RENDERBUFFER, depthStencilRbo[0]
+//            )
+//        }
 
         block?.let { use { it.invoke() } }
     }

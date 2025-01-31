@@ -188,6 +188,9 @@
         <activity
             android:name="com.jiangpengyong.sample.j_pre_fragment_tests.stencil_test.StencilTestActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="com.jiangpengyong.sample.j_pre_fragment_tests.clipping_plane.ClippingPlaneActivity"
+            android:screenOrientation="landscape" />
 
         <activity
             android:name="com.jiangpengyong.sample.font.FontActivity"

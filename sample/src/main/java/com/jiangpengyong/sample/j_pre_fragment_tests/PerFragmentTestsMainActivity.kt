@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.jiangpengyong.eglbox_sample.R
 import com.jiangpengyong.sample.j_pre_fragment_tests.alpha_test.AlphaTestActivity
+import com.jiangpengyong.sample.j_pre_fragment_tests.clipping_plane.ClippingPlaneActivity
 import com.jiangpengyong.sample.j_pre_fragment_tests.scissor_test.ScissorTestActivity
 import com.jiangpengyong.sample.j_pre_fragment_tests.stencil_test.StencilTestActivity
 
@@ -30,6 +31,10 @@ class PerFragmentTestsMainActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.stencil_test).setOnClickListener {
             startActivity(Intent(this, StencilTestActivity::class.java))
+        }
+
+        findViewById<TextView>(R.id.clipping_plane).setOnClickListener {
+            startActivity(Intent(this, ClippingPlaneActivity::class.java))
         }
     }
 }

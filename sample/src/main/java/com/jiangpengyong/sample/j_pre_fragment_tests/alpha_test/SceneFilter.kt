@@ -145,7 +145,6 @@ class SceneFilter : GLFilter() {
             model3DProgram.draw()
         }
 
-
         mTeapotModelData?.let { modelData ->
             mTeapotModelMatrix.reset()
             mTeapotModelMatrix.translate(-5F, 0F, 0F)

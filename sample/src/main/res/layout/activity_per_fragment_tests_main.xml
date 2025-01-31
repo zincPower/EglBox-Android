@@ -18,4 +18,9 @@
         style="@style/common_button"
         android:text="模板测试" />
 
+    <TextView
+        android:id="@+id/clipping_plane"
+        style="@style/common_button"
+        android:text="任意平面裁剪" />
+
 </com.jiangpengyong.sample.widget.FlowLayout>
