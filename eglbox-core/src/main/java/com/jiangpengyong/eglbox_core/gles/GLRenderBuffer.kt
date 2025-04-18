@@ -1,6 +1,7 @@
 package com.jiangpengyong.eglbox_core.gles
 
 import android.opengl.GLES20
+import android.opengl.GLES30
 import android.util.Size
 import com.jiangpengyong.eglbox_core.logger.Logger
 
@@ -11,7 +12,6 @@ import com.jiangpengyong.eglbox_core.logger.Logger
  * @des 渲染
  */
 class GLRenderBuffer(
-    val attachment: Int = GLES20.GL_DEPTH_ATTACHMENT,
     val internalFormat: Int = GLES20.GL_DEPTH_COMPONENT16,
 ) : GLObject {
     var id = 0
@@ -28,7 +28,7 @@ class GLRenderBuffer(
         GLES20.glGenRenderbuffers(1, array, 0)
         GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, array[0])
         id = array[0]
-        Logger.i(TAG, "Create framebuffer success. id=$id")
+        Logger.i(TAG, "Create GLRenderBuffer success. id=$id")
     }
 
     override fun release() {
@@ -57,12 +57,40 @@ class GLRenderBuffer(
             Logger.e(TAG, "GLRenderBuffer isn't initialized【bind】. id=$id")
             return
         }
-        GLES20.glFramebufferRenderbuffer(
-            GLES20.GL_FRAMEBUFFER,
-            attachment,
-            GLES20.GL_RENDERBUFFER,
-            id
-        )
+        when (internalFormat) {
+            GLES20.GL_DEPTH_COMPONENT16, GLES30.GL_DEPTH_COMPONENT24, GLES30.GL_DEPTH_COMPONENT32F -> {
+                GLES20.glFramebufferRenderbuffer(
+                    GLES20.GL_FRAMEBUFFER,
+                    GLES20.GL_DEPTH_ATTACHMENT,
+                    GLES20.GL_RENDERBUFFER,
+                    id
+                )
+            }
+
+            GLES20.GL_STENCIL_INDEX, GLES20.GL_STENCIL_INDEX8 -> {
+                GLES20.glFramebufferRenderbuffer(
+                    GLES20.GL_FRAMEBUFFER,
+                    GLES20.GL_STENCIL_ATTACHMENT,
+                    GLES20.GL_RENDERBUFFER,
+                    id
+                )
+            }
+
+            GLES30.GL_DEPTH24_STENCIL8, GLES30.GL_DEPTH32F_STENCIL8 -> {
+                GLES20.glFramebufferRenderbuffer(
+                    GLES20.GL_FRAMEBUFFER,
+                    GLES20.GL_DEPTH_ATTACHMENT,
+                    GLES20.GL_RENDERBUFFER,
+                    id
+                )
+                GLES20.glFramebufferRenderbuffer(
+                    GLES20.GL_FRAMEBUFFER,
+                    GLES20.GL_STENCIL_ATTACHMENT,
+                    GLES20.GL_RENDERBUFFER,
+                    id
+                )
+            }
+        }
     }
 
     fun unbind() {
@@ -70,16 +98,36 @@ class GLRenderBuffer(
             Logger.e(TAG, "GLRenderBuffer isn't initialized【unbind】. id=$id")
             return
         }
-        // TODO 是否需要兼容其他类型
         val currentDepthInfo = EglBox.getCurrentDepthInfo()
-        if (currentDepthInfo.depthType == DepthType.RenderBuffer && currentDepthInfo.id == id) {
+        if (currentDepthInfo.id == id) return
+        if (internalFormat == GLES20.GL_DEPTH_COMPONENT16
+            || internalFormat == GLES30.GL_DEPTH_COMPONENT24
+            || internalFormat == GLES30.GL_DEPTH_COMPONENT32F
+            || internalFormat == GLES30.GL_DEPTH24_STENCIL8
+            || internalFormat == GLES30.GL_DEPTH32F_STENCIL8
+        ) {
             GLES20.glFramebufferRenderbuffer(
                 GLES20.GL_FRAMEBUFFER,
-                attachment,
+                GLES20.GL_DEPTH_ATTACHMENT,
                 GLES20.GL_RENDERBUFFER,
                 0
             )
         }
+        if (internalFormat == GLES20.GL_STENCIL_INDEX8
+            || internalFormat == GLES30.GL_DEPTH24_STENCIL8
+            || internalFormat == GLES30.GL_DEPTH32F_STENCIL8
+        ) {
+            GLES20.glFramebufferRenderbuffer(
+                GLES20.GL_FRAMEBUFFER,
+                GLES20.GL_STENCIL_ATTACHMENT,
+                GLES20.GL_RENDERBUFFER,
+                0
+            )
+        }
+    }
+
+    override fun toString(): String {
+        return "[ GLRenderBuffer id=${id} internalFormat=${internalFormat.toString(16)} ]"
     }
 
     companion object {

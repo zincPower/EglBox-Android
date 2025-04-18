@@ -99,14 +99,12 @@ class GLCachePool(
 
     fun recycle(fbo: GLFrameBuffer) {
         if (!fbo.isInit()) return
-        if (fbo.haveColorTexture()) {
-            val textures = fbo.unbindAllColorTextures()
-            textures?.forEach { recycle(it) }
-        }
-        if (fbo.haveDepthTexture()) {
-            val texture = fbo.unbindTexture(GLES20.GL_DEPTH_ATTACHMENT)
-            texture?.let { recycle(it) }
-        }
+        fbo.unbindAllColorTextures()?.forEach { recycle(it) }
+        fbo.unbindTexture(GLES20.GL_DEPTH_ATTACHMENT)?.let { recycle(it) }
+        fbo.unbindTexture(GLES20.GL_STENCIL_ATTACHMENT)?.let { recycle(it) }
+        // TODO 可以考虑增加回收 render buffer
+        fbo.unbindDepthRenderBuffer()?.release()
+        fbo.unbindStencilRenderBuffer()?.release()
         mFBOCache.add(0, fbo)
         if (mFBOCache.size > fboCacheSize) {
             val lastFBO = mFBOCache.removeLastOrNull()

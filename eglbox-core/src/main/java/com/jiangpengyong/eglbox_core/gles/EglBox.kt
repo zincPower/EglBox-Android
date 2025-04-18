@@ -67,7 +67,6 @@ object EglBox {
         }
     }
 
-
     fun checkError(optionName: String) {
         var error: Int
         while (GLES20.glGetError().also { error = it } != GLES20.GL_NO_ERROR) {

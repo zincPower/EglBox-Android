@@ -2,14 +2,18 @@ package com.jiangpengyong.sample.j_pre_fragment_tests.stencil_test
 
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
+import android.opengl.GLES30
 import android.os.Bundle
 import android.os.Message
+import android.util.Size
 import com.jiangpengyong.eglbox_core.filter.FilterContext
 import com.jiangpengyong.eglbox_core.filter.GLFilter
 import com.jiangpengyong.eglbox_core.filter.ImageInOut
-import com.jiangpengyong.eglbox_core.gles.DepthType
+import com.jiangpengyong.eglbox_core.gles.GLFrameBuffer
+import com.jiangpengyong.eglbox_core.gles.GLRenderBuffer
 import com.jiangpengyong.eglbox_core.gles.GLTexture
 import com.jiangpengyong.eglbox_core.gles.blend
+import com.jiangpengyong.eglbox_core.program.isValid
 import com.jiangpengyong.eglbox_core.utils.ModelMatrix
 import com.jiangpengyong.eglbox_core.utils.ViewMatrix
 import com.jiangpengyong.eglbox_filter.model.FrontFace
@@ -32,6 +36,10 @@ class StencilTestFilter : GLFilter() {
 
     private val mLightProgram = LightProgram()
 
+    private val mFBO = GLFrameBuffer()
+    private val mRenderBuffer = GLRenderBuffer(GLES30.GL_DEPTH24_STENCIL8)
+    private var mRenderBufferSize = Size(0, 0)
+
     override fun onInit(context: FilterContext) {
         mSceneFilter.init(context)
 
@@ -42,6 +50,9 @@ class StencilTestFilter : GLFilter() {
         }
 
         mLightProgram.init()
+
+        mFBO.init()
+        mRenderBuffer.init()
     }
 
     override fun onDraw(context: FilterContext, imageInOut: ImageInOut) {
@@ -49,14 +60,20 @@ class StencilTestFilter : GLFilter() {
 
         val space3D = context.space3D
         val lightPoint = space3D.lightPoint
+        val viewPoint = space3D.viewPoint
 
-        val fbo = context.getTexFBO(texture.width, texture.height, depthType = DepthType.Texture)
-        fbo.use {
+        val textureSize = Size(texture.width, texture.height)
+        if (!mRenderBufferSize.isValid() || mRenderBufferSize != textureSize) {
+            mRenderBufferSize = textureSize
+            mRenderBuffer.setSize(mRenderBufferSize)
+            mFBO.bindRenderBuffer(mRenderBuffer)
+        }
+
+        val tex = context.getColorTexture(texture.width, texture.height)
+        mFBO.bindTexture(tex)
+        mFBO.use {
             GLES20.glEnable(GLES20.GL_DEPTH_TEST)
             GLES20.glEnable(GLES20.GL_CULL_FACE)
-
-            val space3D = context.space3D
-            val viewPoint = space3D.viewPoint
 
             mTableModelMatrix.reset()
             mTableModelMatrix.scale(13F, 0.25F, 7F)
@@ -122,13 +139,14 @@ class StencilTestFilter : GLFilter() {
             GLES20.glDisable(GLES20.GL_CULL_FACE)
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
         }
-        imageInOut.out(fbo)
+        mFBO.unbindTexture()?.let { imageInOut.out(it) }
     }
 
     override fun onRelease(context: FilterContext) {
         mSceneFilter.release()
         mTableTexture.release()
         mLightProgram.release()
+        mFBO.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}
