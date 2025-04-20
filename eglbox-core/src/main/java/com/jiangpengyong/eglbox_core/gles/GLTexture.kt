@@ -255,6 +255,21 @@ class GLTexture(
             wrapS = WrapMode.EDGE,
             wrapT = WrapMode.EDGE,
         )
+
+//        /**
+//         * 创建模板纹理
+//         *
+//         */
+//        fun createStencilTexture() = GLTexture(
+//            target = Target.TEXTURE_2D,
+//            internalFormat = GLES20.GL_STENCIL_INDEX8,
+//            format = GLES20.GL_STENCIL_INDEX,
+//            type = GLES20.GL_UNSIGNED_SHORT,
+//            minFilter = MinFilter.NEAREST,
+//            magFilter = MagFilter.LINEAR,
+//            wrapS = WrapMode.EDGE,
+//            wrapT = WrapMode.EDGE,
+//        )
     }
 }
 

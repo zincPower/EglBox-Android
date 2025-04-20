@@ -2,7 +2,6 @@ package com.jiangpengyong.eglbox_core.gles
 
 import android.opengl.GLES20
 import android.opengl.GLES30
-import android.util.Size
 import com.jiangpengyong.eglbox_core.logger.Logger
 
 /**
@@ -11,9 +10,7 @@ import com.jiangpengyong.eglbox_core.logger.Logger
  * @email 56002982@qq.com
  * @des 渲染
  */
-class GLRenderBuffer(
-    val internalFormat: Int = GLES20.GL_DEPTH_COMPONENT16,
-) : GLObject {
+class GLRenderBuffer(val internalFormat: Int = GLES30.GL_DEPTH24_STENCIL8) : GLObject {
     var id = 0
         private set
 
@@ -28,7 +25,7 @@ class GLRenderBuffer(
         GLES20.glGenRenderbuffers(1, array, 0)
         GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, array[0])
         id = array[0]
-        Logger.i(TAG, "Create GLRenderBuffer success. id=$id")
+        Logger.i(TAG, "Create renderBuffer success. id=$id")
     }
 
     override fun release() {
@@ -39,7 +36,7 @@ class GLRenderBuffer(
         id = 0
     }
 
-    fun setSize(size: Size) {
+    fun setSize(width: Int, height: Int) {
         if (!isInit()) {
             Logger.e(TAG, "GLRenderBuffer isn't initialized【setSize】. id=$id")
             return
@@ -47,8 +44,8 @@ class GLRenderBuffer(
         GLES20.glRenderbufferStorage(
             GLES20.GL_RENDERBUFFER,
             internalFormat,
-            size.width,
-            size.height
+            width,
+            height
         )
     }
 
@@ -67,7 +64,7 @@ class GLRenderBuffer(
                 )
             }
 
-            GLES20.GL_STENCIL_INDEX, GLES20.GL_STENCIL_INDEX8 -> {
+            GLES20.GL_STENCIL_INDEX8 -> {
                 GLES20.glFramebufferRenderbuffer(
                     GLES20.GL_FRAMEBUFFER,
                     GLES20.GL_STENCIL_ATTACHMENT,

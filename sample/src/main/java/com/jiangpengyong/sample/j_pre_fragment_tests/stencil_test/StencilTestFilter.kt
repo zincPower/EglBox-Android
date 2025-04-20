@@ -23,11 +23,16 @@ import com.jiangpengyong.eglbox_filter.program.LightProgram
 import com.jiangpengyong.sample.App
 import java.io.File
 
+/**
+ * @author jiang peng yong
+ * @date 2025/4/18 08:41
+ * @email 56002982@qq.com
+ * @des 模板测试滤镜
+ */
 class StencilTestFilter : GLFilter() {
     private val mSceneFilter = SceneFilter()
     private val mViewMatrix = ViewMatrix()
-    private val mMirrorMatrix = ModelMatrix()
-        .apply { scale(1F, -1F, 1F) }
+    private val mMirrorMatrix = ModelMatrix().apply { scale(1F, -1F, 1F) }
 
     private val mTableModelData = ModelCreator.createCube()
     private val mTableSurfaceModelData = ModelCreator.createRectangle()
@@ -65,7 +70,7 @@ class StencilTestFilter : GLFilter() {
         val textureSize = Size(texture.width, texture.height)
         if (!mRenderBufferSize.isValid() || mRenderBufferSize != textureSize) {
             mRenderBufferSize = textureSize
-            mRenderBuffer.setSize(mRenderBufferSize)
+            mRenderBuffer.setSize(mRenderBufferSize.width, mRenderBufferSize.height)
             mFBO.bindRenderBuffer(mRenderBuffer)
         }
 
@@ -147,6 +152,7 @@ class StencilTestFilter : GLFilter() {
         mTableTexture.release()
         mLightProgram.release()
         mFBO.release()
+        mRenderBuffer.release()
     }
 
     override fun onUpdateData(updateData: Bundle) {}

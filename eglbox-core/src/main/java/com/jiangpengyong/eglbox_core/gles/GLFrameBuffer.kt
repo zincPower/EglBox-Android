@@ -117,7 +117,7 @@ class GLFrameBuffer : GLObject {
                 bindDepthRenderBuffer(renderBuffer, block)
             }
 
-            GLES20.GL_STENCIL_INDEX, GLES20.GL_STENCIL_INDEX8 -> {
+            GLES20.GL_STENCIL_INDEX8 -> {
                 if (checkStencilAttachmentExist()) {
                     Logger.e(TAG, "GLFrameBuffer has bound stencil on attachment. id=${id} stencilTexture=${mStencilTexture} stencilRenderBuffer=${mStencilRenderBuffer} depthAndStencilRenderBuffer=${mDepthAndStencilRenderBuffer}")
                     return
@@ -168,94 +168,6 @@ class GLFrameBuffer : GLObject {
         bindColorTexture(colorTexture, colorAttachment)
         bindDepthTexture(depthTexture, block)
     }
-
-//    fun bindTexture(
-//        colorTexture: GLTexture,
-//        depthTexture: GLTexture,
-//        stencilTexture: GLTexture,
-//        colorAttachment: Int = GLES20.GL_COLOR_ATTACHMENT0,
-//        block: (() -> Unit)? = null
-//    ) {
-//        if (!isInit()) {
-//            Logger.e(TAG, "GLFrameBuffer isn't initialized【bindTexture】. id=${id}")
-//            return
-//        }
-//        if (!colorTexture.isInit()) {
-//            Logger.e(TAG, "Color texture isn't initialized【bindTexture】. id=${id}, color texture=${colorTexture}")
-//            return
-//        }
-//        if (!depthTexture.isInit()) {
-//            Logger.e(TAG, "Depth texture isn't initialized【bindTexture】. id=${id}, depth texture=${depthTexture}")
-//            return
-//        }
-//        if (!stencilTexture.isInit()) {
-//            Logger.e(TAG, "Stencil texture isn't initialized【bindTexture】. id=${id}, stencil texture=${stencilTexture}")
-//            return
-//        }
-//        if (checkColorAttachmentExist(colorAttachment)) {
-//            Log.e(TAG, "GLFrameBuffer has bound color texture on attachment. id=${id} attachment=${colorAttachment.toString(16)}")
-//            return
-//        }
-//        if (checkDepthAttachmentExist()) {
-//            Logger.e(TAG, "GLFrameBuffer has bound depth texture on attachment. id=${id} depthTexture=${mDepthTexture} depthRenderBuffer=${mDepthAndStencilRenderBuffer}")
-//            return
-//        }
-//        if (checkStencilAttachmentExist()) {
-//            Logger.e(TAG, "GLFrameBuffer has bound stencil texture on attachment. id=${id} stencilTexture=${mStencilTexture} stencilRenderBuffer=${mDepthAndStencilRenderBuffer}")
-//            return
-//        }
-//        bindColorTexture(colorTexture, colorAttachment)
-//        bindDepthTexture(depthTexture)
-//        bindStencilTexture(stencilTexture, block)
-//    }
-
-//    fun bindTexture(
-//        colorTexture: GLTexture,
-//        depthTexture: GLTexture,
-//        stencilRenderBuffer: GLRenderBuffer,
-//        colorAttachment: Int = GLES20.GL_COLOR_ATTACHMENT0,
-//        block: (() -> Unit)? = null
-//    ) {
-//        if (!isInit()) {
-//            Logger.e(TAG, "GLFrameBuffer isn't initialized【bindTexture】. id=${id}")
-//            return
-//        }
-//        if (!colorTexture.isInit()) {
-//            Logger.e(TAG, "Color texture isn't initialized【bindTexture】. id=${id}, color texture=${colorTexture}")
-//            return
-//        }
-//        if (!depthTexture.isInit()) {
-//            Logger.e(TAG, "Depth texture isn't initialized【bindTexture】. id=${id}, depth texture=${depthTexture}")
-//            return
-//        }
-//        if (!stencilRenderBuffer.isInit()) {
-//            Logger.e(TAG, "Stencil render buffer isn't initialized【bindTexture】. id=${id}, stencilRenderBuffer=${stencilRenderBuffer}")
-//            return
-//        }
-//        if (stencilRenderBuffer.internalFormat != GLES20.GL_STENCIL_INDEX && stencilRenderBuffer.internalFormat != GLES20.GL_STENCIL_INDEX8) {
-//            Logger.e(TAG, "Render buffer internal format is invalid for depth and stencil buffer. id=${id}, stencilRenderBuffer=${stencilRenderBuffer}")
-//            return
-//        }
-//        if (checkColorAttachmentExist(colorAttachment)) {
-//            Log.e(TAG, "GLFrameBuffer has bound color texture on attachment. id=${id} attachment=${colorAttachment.toString(16)}")
-//            return
-//        }
-//        if (checkDepthAttachmentExist()) {
-//            Logger.e(TAG, "GLFrameBuffer has bound depth texture on attachment. id=${id} depthTexture=${mDepthTexture} depthRenderBuffer=${mDepthAndStencilRenderBuffer}")
-//            return
-//        }
-//        if (checkStencilAttachmentExist()) {
-//            Logger.e(TAG, "GLFrameBuffer has bound stencil texture on attachment. id=${id} stencilTexture=${mStencilTexture} stencilRenderBuffer=${mDepthAndStencilRenderBuffer}")
-//            return
-//        }
-//        bindColorTexture(colorTexture, colorAttachment)
-//        bindDepthTexture(depthTexture)
-//        mStencilRenderBuffer = stencilRenderBuffer
-//        use {
-//            stencilRenderBuffer.bind()
-//            block?.invoke()
-//        }
-//    }
 
     fun bindTexture(
         colorTexture: GLTexture,
@@ -420,10 +332,8 @@ class GLFrameBuffer : GLObject {
             bind()
         }
         // 绑定的多个纹理应该是相同尺寸的，所以获取第一个做尺寸
-        val texture = mColorTextures.values.firstOrNull() ?: mDepthTexture
-        if (texture != null) {
-//            Logger.e(TAG, "Texture is nullptr. id=$id")
-//            return
+        val texture = mColorTextures.values.firstOrNull() ?: mDepthTexture ?: mStencilTexture
+        if (texture != null && texture.width != 0 && texture.height != 0) {
             GLES20.glViewport(0, 0, texture.width, texture.height)
         }
         block()
@@ -479,7 +389,7 @@ class GLFrameBuffer : GLObject {
             )
             val frameBufferStatus = GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)
             if (frameBufferStatus != GLES20.GL_FRAMEBUFFER_COMPLETE) {
-                Logger.e(TAG, "Frame buffer bind texture failure. status=$frameBufferStatus")
+                Logger.e(TAG, "Frame buffer bind texture failure. status=0x${frameBufferStatus.toString(16)}")
             }
             block?.invoke()
         }
@@ -504,7 +414,7 @@ class GLFrameBuffer : GLObject {
             )
             val frameBufferStatus = GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)
             if (frameBufferStatus != GLES20.GL_FRAMEBUFFER_COMPLETE) {
-                Logger.e(TAG, "Frame buffer bind depth texture failure. status=$frameBufferStatus")
+                Logger.e(TAG, "Frame buffer bind depth texture failure. status=0x${frameBufferStatus.toString(16)}")
             }
             block?.invoke()
         }
@@ -552,7 +462,7 @@ class GLFrameBuffer : GLObject {
     }
 
     private fun bindStencilRenderBuffer(renderBuffer: GLRenderBuffer, block: (() -> Unit)?) {
-        if (renderBuffer.internalFormat != GLES20.GL_STENCIL_INDEX && renderBuffer.internalFormat != GLES20.GL_STENCIL_INDEX8) {
+        if (renderBuffer.internalFormat != GLES20.GL_STENCIL_INDEX8) {
             Log.e(TAG, "Only RenderBuffer internal format is GL_STENCIL_INDEX or GL_STENCIL_INDEX8 can bound on Stencil attachment.")
             return
         }
@@ -561,7 +471,7 @@ class GLFrameBuffer : GLObject {
             renderBuffer.bind()
             val frameBufferStatus = GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)
             if (frameBufferStatus != GLES20.GL_FRAMEBUFFER_COMPLETE) {
-                Logger.e(TAG, "Frame buffer bind stencil render buffer failure. status=$frameBufferStatus")
+                Logger.e(TAG, "Frame buffer bind stencil render buffer failure. status=0x${frameBufferStatus.toString(16)}")
             }
             block?.invoke()
         }
